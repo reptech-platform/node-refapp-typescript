@@ -1,0 +1,40 @@
+{
+  "name": "noderefapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "tsc && node dist/app.js",
+    "lint": "eslint . --ext .ts",
+    "start:dev": "ts-node ./src/app.ts",
+    "loop": "nodemon start:dev",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-fileupload": "^1.5.0",
+    "inversify": "^6.0.2",
+    "inversify-binding-decorators": "^4.0.0",
+    "inversify-express-utils": "^6.4.6",
+    "mongoose": "^8.4.3",
+    "nodemon": "^3.1.0",
+    "reflect-metadata": "^0.2.1",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/express-fileupload": "^1.5.0",
+    "@types/node": "^20.14.8",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "eslint": "^8.57.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.4.3"
+  }
+}
