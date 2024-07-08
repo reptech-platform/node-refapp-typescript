@@ -15,9 +15,9 @@ export const AirLineSchema: Schema = new Schema({
     logo: { type: String, default: null },
     CEO: { type: PersonSchema, default: null }
 }, {
-    _id:false
+    _id: false
 });
 
 new Helper().SetToJSON(AirLineSchema);
 
-// export default mongoose.model<IAirLineSchema>("Airline", AirLineSchema);
+export default mongoose.model<IAirLineSchema>("Airline", AirLineSchema);

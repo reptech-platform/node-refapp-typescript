@@ -6,6 +6,7 @@ export interface IAirLine {
     name: String;
     logo: String;
     CEO: IPerson;
+    airportId: String;
 }
 
 @injectable()
@@ -14,5 +15,6 @@ export class AirLine implements IAirLine {
     name: String;
     logo: String;
     CEO: IPerson;
+    airportId: String;
     constructor() { }
 }

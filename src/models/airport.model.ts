@@ -10,6 +10,7 @@ export interface IAirport {
     isInsideCity: Boolean;
     locationJSON: String;
     location: AirportLocation;
+    airlineId: String;
 }
 
 @injectable()
@@ -25,4 +26,5 @@ export class Airport implements IAirport {
     isInsideCity: Boolean;
     locationJSON: String;
     location: AirportLocation;
+    airlineId: String;
 }

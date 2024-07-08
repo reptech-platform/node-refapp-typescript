@@ -24,9 +24,9 @@ export const AirportSchema: Schema = new Schema({
     location: { type: AirportLocationSchema, default: null }
 
 }, {
-    _id:false
+    _id: false
 });
 
 new Helper().SetToJSON(AirportSchema);
 
-// export default mongoose.model<IAirportSchema>("Airport", AirportSchema);
+export default mongoose.model<IAirportSchema>("Airport", AirportSchema);
