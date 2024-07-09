@@ -1,18 +1,18 @@
 import { inject, injectable } from "inversify";
 import { Error, default as mongoose } from "mongoose";
-import Traveller, { ITravellerSchema } from "../db/models/travellers.db.model";
+import TripTraveller, { ITripTravellerSchema } from "../db/models/triptravellers.db.model";
 import Helper from "../utils/helper.utils";;
 import TYPES from "../constants/types";
 
 @injectable()
-export default class TravellersService {
+export default class TripTravellersService {
 
     constructor(@inject(TYPES.Helper) private helper: Helper) {
     }
 
-    public async createTraveller(traveller: ITravellerSchema | any): Promise<ITravellerSchema> {
-        return Traveller.create(traveller)
-            .then((data: ITravellerSchema) => {
+    public async createTraveller(tripTraveller: ITripTravellerSchema | any): Promise<ITripTravellerSchema> {
+        return TripTraveller.create(tripTraveller)
+            .then((data: ITripTravellerSchema) => {
                 return data;
             })
             .catch((error: Error) => {
@@ -20,9 +20,9 @@ export default class TravellersService {
             });
     }
 
-    public async createBulkTraveller(travellers: ITravellerSchema[] | any[]): Promise<ITravellerSchema[]> {
+    public async createTravellers(tripTravellers: ITripTravellerSchema[] | any[]): Promise<ITripTravellerSchema[]> {
 
-        return Traveller.insertMany(travellers)
+        return TripTraveller.insertMany(tripTravellers)
             .then((data: any) => {
                 return data;
             })

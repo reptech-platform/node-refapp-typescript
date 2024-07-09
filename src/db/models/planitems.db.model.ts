@@ -3,7 +3,7 @@ import Helper from "../../utils/helper.utils";
 import { AirLineSchema, IAirLineSchema } from "./airlines.db.model";
 import { AirportSchema, IAirportSchema } from "./airports.db.model";
 
-export interface IFlightSchema extends Document {
+export interface IPlanItemSchema extends Document {
     flightNumber: String;
     seatNumber: String;
     confirmationCode: String;
@@ -15,7 +15,7 @@ export interface IFlightSchema extends Document {
     toAirport: IAirportSchema;
 }
 
-export const FlightSchema: Schema = new Schema({
+export const PlanItemSchema: Schema = new Schema({
     flightNumber: { type: String, default: null },
     seatNumber: { type: String, default: null },
     confirmationCode: { type: String, default: null },
@@ -29,6 +29,6 @@ export const FlightSchema: Schema = new Schema({
     timestamps: true
 });
 
-new Helper().SetToJSON(FlightSchema);
+new Helper().SetToJSON(PlanItemSchema);
 
-// export default mongoose.model<IFlightSchema>("Flight", FlightSchema);
+//export default mongoose.model<IPlanItemSchema>("PlanItem", PlanItemSchema);

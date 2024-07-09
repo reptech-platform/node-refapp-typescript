@@ -11,7 +11,8 @@ import DocumentsService from "../services/documents.service";
 
 import PersonAttachmentsService from "../services/personattachments.service";
 
-import TravellersService from "../services/travellers.service";
+import TripTravellersService from "../services/triptravellers.service";
+import PersonTripsService from "../services/persontrips.service";
 
 import Helper from "../utils/helper.utils";
 
@@ -26,7 +27,8 @@ export default class ContainerConfigLoader {
         container.bind<DocumentsService>(TYPES.DocumentsService).to(DocumentsService);
         container.bind<DocumentsController>(TYPES.DocumentsController).to(DocumentsController);
         container.bind<PersonAttachmentsService>(TYPES.PersonAttachmentsService).to(PersonAttachmentsService);
-        container.bind<TravellersService>(TYPES.TravellersService).to(TravellersService);
+        container.bind<TripTravellersService>(TYPES.TripTravellersService).to(TripTravellersService);
+        container.bind<PersonTripsService>(TYPES.PersonTripsService).to(PersonTripsService);
         return container;
     }
 }

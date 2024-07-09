@@ -4,7 +4,7 @@ import { BaseHttpController, controller, httpDelete, httpGet, httpPost, httpPut 
 import { JsonResult } from "inversify-express-utils/lib/results";
 import TYPES from "../constants/types";
 import PersonsService from "../services/persons.service";
-import TravellersService from "../services/travellers.service";
+import PersonTripsService from "../services/persontrips.service";
 import TripService from "../services/trips.service";
 import Helper from "../utils/helper.utils";
 import { IPerson } from "../models/psersons.model";
@@ -13,7 +13,7 @@ import { IPerson } from "../models/psersons.model";
 export class PersonsController extends BaseHttpController {
     constructor(@inject(TYPES.PersonsService) private personsService: PersonsService,
         @inject(TYPES.TripsService) private tripService: TripService,
-        @inject(TYPES.TravellersService) private travellersService: TravellersService,
+        @inject(TYPES.PersonTripsService) private personTripsService: PersonTripsService,
         @inject(TYPES.Helper) private helper: Helper
     ) {
         super();
@@ -53,24 +53,24 @@ export class PersonsController extends BaseHttpController {
     public async createPerson(req: express.Request, res: express.Response, next: express.NextFunction): Promise<JsonResult> {
 
         let person: IPerson = JSON.parse(JSON.stringify(req.body));
-        let travellersId: any[] = [];
+        let personTrips: any[] = [];
 
         if (!this.helper.IsArrayNull(person.trips)) {
 
             for (var iTraveller = 0; iTraveller < person.trips.length; iTraveller++) {
                 const tmp = await this.tripService.createTrip(person.trips[iTraveller]);
                 const mapItem = { tripId: tmp._id, personId: null };
-                travellersId.push(mapItem);
+                personTrips.push(mapItem);
             };
 
         }
 
-        const content = await this.personsService.createPerson(req.body);
+        const content = await this.personsService.createPerson(person);
 
-        if (!this.helper.IsArrayNull(travellersId)) {
+        if (!this.helper.IsArrayNull(personTrips)) {
 
-            travellersId.forEach(x => x.tripId = content._id);
-            await this.travellersService.createBulkTraveller(travellersId);
+            personTrips.forEach(x => x.personId = content._id);
+            await this.personTripsService.createPersonTrips(personTrips);
 
         }
 
