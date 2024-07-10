@@ -8,7 +8,11 @@ const TYPES = {
     DocumentsController: Symbol.for('DocumentsController'),
     PersonAttachmentsService: Symbol.for('PersonAttachmentsService'),
     TripTravellersService: Symbol.for('TripTravellersService'),
-    PersonTripsService: Symbol.for('PersonTripsService')
+    PersonTripsService: Symbol.for('PersonTripsService'),
+    AirportsService: Symbol.for('AirportsService'),
+    AirportsController: Symbol.for('AirportsController'),
+    AirlinesService: Symbol.for('AirlinesService'),
+    AirlinesController: Symbol.for('AirlinesController')
 };
 
 export default TYPES;

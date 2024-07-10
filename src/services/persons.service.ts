@@ -21,7 +21,7 @@ export default class PersonsService {
             });
     }
 
-    public async getPerson(id: string): Promise<IPersonSchema[]> {
+    public async getPerson(id: string): Promise<IPersonSchema> {
         return Person.find({ _id: id })
             .then((data: IPersonSchema[]) => {
                 return this.helper.GetItemFromArray(data, 0, {});
@@ -54,8 +54,8 @@ export default class PersonsService {
                     ]
                 }
             },
-            { "$addFields": { "trips": "$TravellersMap.trips" } },
             { $unwind: { path: "$TravellersMap", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "trips": "$TravellersMap.trips" } },
             {
                 $project: {
                     "TravellersMap": 0,
@@ -94,8 +94,8 @@ export default class PersonsService {
                     ]
                 }
             },
-            { "$addFields": { "trips": "$PersonTrips.trips" } },
             { $unwind: { path: "$PersonTrips", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "trips": "$PersonTrips.trips" } },
             {
                 $project: {
                     "PersonTrips": 0,

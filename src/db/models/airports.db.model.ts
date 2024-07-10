@@ -11,6 +11,7 @@ export interface IAirportSchema extends Document {
     isInsideCity: Boolean;
     locationJSON: String;
     location: IAirportLocationSchema;
+    airlineId: String;
 }
 
 export const AirportSchema: Schema = new Schema({
@@ -21,10 +22,10 @@ export const AirportSchema: Schema = new Schema({
     longitude: { type: Number, default: null },
     isInsideCity: { type: Boolean, default: null },
     locationJSON: { type: String, default: null },
-    location: { type: AirportLocationSchema, default: null }
-
+    location: { type: AirportLocationSchema, default: null },
+    airlineId: { type: Schema.Types.ObjectId, default: null }
 }, {
-    _id: false
+    timestamps: true
 });
 
 new Helper().SetToJSON(AirportSchema);

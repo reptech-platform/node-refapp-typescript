@@ -4,7 +4,6 @@ import TripSchema, { ITripSchema } from "../db/models/trips.db.model";
 import Helper from "../utils/helper.utils";;
 import TYPES from "../constants/types";
 import { ITrip } from "../models/trips.model";
-import { pipeline } from "stream";
 
 @injectable()
 export default class TripsService {
@@ -22,7 +21,7 @@ export default class TripsService {
             });
     }
 
-    public async getTrip(id: string): Promise<ITripSchema[]> {
+    public async getTrip(id: string): Promise<ITripSchema> {
         return TripSchema.find({ _id: id })
             .then((data: ITripSchema[]) => {
                 return this.helper.GetItemFromArray(data, 0, {});
@@ -53,8 +52,8 @@ export default class TripsService {
                     ]
                 }
             },
-            { "$addFields": { "travellers": "$TravellersMap.travellers" } },
             { $unwind: { path: "$TravellersMap", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "travellers": "$TravellersMap.travellers" } },
             {
                 $project: {
                     "TravellersMap": 0,
@@ -95,8 +94,8 @@ export default class TripsService {
                     ]
                 }
             },
-            { "$addFields": { "travellers": "$TripTravellers.travellers" } },
             { $unwind: { path: "$TripTravellers", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "travellers": "$TripTravellers.travellers" } },
             {
                 $project: {
                     "TripTravellers": 0,

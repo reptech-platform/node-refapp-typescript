@@ -1,20 +1,23 @@
 import { injectable } from "inversify";
 import { IPerson } from "./psersons.model";
+import { Airport, IAirport } from "./airport.model";
 
-export interface IAirLine {
+export interface IAirline {
     airlineCode: String;
     name: String;
     logo: String;
     CEO: IPerson;
-    airportId: String;
+    airport: IAirport;
+    airportId: any;
 }
 
 @injectable()
-export class AirLine implements IAirLine {
+export class Airline implements IAirline {
     airlineCode: String;
     name: String;
     logo: String;
     CEO: IPerson;
-    airportId: String;
+    airport: Airport;
+    airportId: any;
     constructor() { }
 }

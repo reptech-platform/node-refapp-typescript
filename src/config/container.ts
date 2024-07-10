@@ -14,6 +14,11 @@ import PersonAttachmentsService from "../services/personattachments.service";
 import TripTravellersService from "../services/triptravellers.service";
 import PersonTripsService from "../services/persontrips.service";
 
+import AirportsService from "../services/airports.service";
+import { AirportsController } from "../controller/airports.controller";
+import AirlinesService from "../services/airlines.service";
+import { AirlinesController } from "../controller/airlines.controller";
+
 import Helper from "../utils/helper.utils";
 
 export default class ContainerConfigLoader {
@@ -29,6 +34,10 @@ export default class ContainerConfigLoader {
         container.bind<PersonAttachmentsService>(TYPES.PersonAttachmentsService).to(PersonAttachmentsService);
         container.bind<TripTravellersService>(TYPES.TripTravellersService).to(TripTravellersService);
         container.bind<PersonTripsService>(TYPES.PersonTripsService).to(PersonTripsService);
+        container.bind<AirportsService>(TYPES.AirportsService).to(AirportsService);
+        container.bind<AirportsController>(TYPES.AirportsController).to(AirportsController);
+        container.bind<AirlinesService>(TYPES.AirlinesService).to(AirlinesService);
+        container.bind<AirlinesController>(TYPES.AirlinesController).to(AirlinesController);
         return container;
     }
 }

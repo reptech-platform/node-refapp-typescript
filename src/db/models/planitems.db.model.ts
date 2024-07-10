@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import { AirLineSchema, IAirLineSchema } from "./airlines.db.model";
+import { AirlineSchema, IAirlineSchema } from "./airlines.db.model";
 import { AirportSchema, IAirportSchema } from "./airports.db.model";
 
 export interface IPlanItemSchema extends Document {
@@ -10,7 +10,7 @@ export interface IPlanItemSchema extends Document {
     startsAt: Date;
     endsAt: Date;
     duaration: String;
-    airLine: IAirLineSchema;
+    airLine: IAirlineSchema;
     fromAirport: IAirportSchema;
     toAirport: IAirportSchema;
 }
@@ -22,7 +22,7 @@ export const PlanItemSchema: Schema = new Schema({
     startsAt: { type: Date, default: null },
     endsAt: { type: Date, default: null },
     duaration: { type: String, default: null },
-    airLine: { type: AirLineSchema, default: null },
+    airLine: { type: AirportSchema, default: null },
     fromAirport: { type: AirportSchema, default: null },
     toAirport: { type: AirportSchema, default: null }
 }, {
