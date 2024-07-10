@@ -7,6 +7,7 @@ import DocumentsService from "../services/documents.service";
 import { UploadedFile } from "express-fileupload";
 import Helper from "../utils/helper.utils";
 import PersonAttachmentsService from "../services/personattachments.service";
+import fs from "fs";
 
 @controller("/documents")
 
@@ -48,6 +49,12 @@ export class DocumentsController extends BaseHttpController {
 
             personId = this.helper.ObjectId(personId);
             const _file = req.files.file as UploadedFile;
+            const uploadFolder = "./uploads/";
+
+            if (!fs.existsSync(uploadFolder)) {
+                fs.mkdirSync(uploadFolder);
+            }
+
             const uploadPath = "./uploads/" + _file.name;
 
             _file.mv(uploadPath, async (err) => {
