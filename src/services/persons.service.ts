@@ -78,7 +78,7 @@ export default class PersonsService {
         let $pipeline = [
             {
                 $lookup: {
-                    from: "travellers", localField: "_id", foreignField: "personId", as: "TravellersMap",
+                    from: "persontrips", localField: "_id", foreignField: "personId", as: "PersonTrips",
                     pipeline: [
                         {
                             $lookup: {
@@ -94,11 +94,11 @@ export default class PersonsService {
                     ]
                 }
             },
-            { "$addFields": { "trips": "$TravellersMap.trips" } },
-            { $unwind: { path: "$TravellersMap", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "trips": "$PersonTrips.trips" } },
+            { $unwind: { path: "$PersonTrips", preserveNullAndEmptyArrays: true } },
             {
                 $project: {
-                    "TravellersMap": 0,
+                    "PersonTrips": 0,
                     "__v": 0
                 }
             }

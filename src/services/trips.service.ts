@@ -79,7 +79,7 @@ export default class TripsService {
             { $match: { _id: this.helper.ObjectId(id) } },
             {
                 $lookup: {
-                    from: "travellers", localField: "_id", foreignField: "tripId", as: "TravellersMap",
+                    from: "triptravellers", localField: "_id", foreignField: "tripId", as: "TripTravellers",
                     pipeline: [
                         {
                             $lookup: {
@@ -95,11 +95,11 @@ export default class TripsService {
                     ]
                 }
             },
-            { "$addFields": { "travellers": "$TravellersMap.travellers" } },
-            { $unwind: { path: "$TravellersMap", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "travellers": "$TripTravellers.travellers" } },
+            { $unwind: { path: "$TripTravellers", preserveNullAndEmptyArrays: true } },
             {
                 $project: {
-                    "TravellersMap": 0,
+                    "TripTravellers": 0,
                     "__v": 0
                 }
             }
