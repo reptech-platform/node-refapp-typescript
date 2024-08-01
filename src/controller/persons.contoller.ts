@@ -8,6 +8,7 @@ import PersonTripsService from "../services/persontrips.service";
 import TripService from "../services/trips.service";
 import Helper from "../utils/helper.utils";
 import { IPerson } from "../models/psersons.model";
+import { Search } from "../models/search.model";
 
 @controller("/persons")
 export class PersonsController extends BaseHttpController {
@@ -77,6 +78,32 @@ export class PersonsController extends BaseHttpController {
         const statusCode = 201;
         return this.json(content, statusCode);
 
+    }
+
+    @httpPost("/search")
+    public async searchPerson(req: express.Request, res: express.Response, next: express.NextFunction): Promise<JsonResult> {
+
+        let search: Search = JSON.parse(JSON.stringify(req.body));
+        const content = await this.personsService.searchPerson(search);
+        const statusCode = 200;
+        return this.json(content, statusCode);
+    }
+
+    @httpPost("/search/count")
+    public async searchPersonCount(req: express.Request, res: express.Response, next: express.NextFunction): Promise<JsonResult> {
+
+        let search: Search = JSON.parse(JSON.stringify(req.body));
+        const content = await this.personsService.searchPersonCount(search);
+        const statusCode = 200;
+        return this.json(content, statusCode);
+    }
+
+    @httpGet("/records/count")
+    public async getPersonCount(req: express.Request, res: express.Response, next: express.NextFunction): Promise<JsonResult> {
+
+        const content = await this.personsService.getPersonCount();
+        const statusCode = 200;
+        return this.json(content, statusCode);
     }
 
     @httpPut("/:id")
