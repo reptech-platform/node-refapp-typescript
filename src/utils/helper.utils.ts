@@ -36,6 +36,16 @@ export default class Helper {
         return true;
     };
 
+    public IsJsonNull(e: any): Boolean {
+        if (this.IsNull(e)) return true;
+        for (var key in e) {
+            if (Object.prototype.hasOwnProperty.call(e, key)) {
+                return false;
+            }
+        }
+        return true;
+    };
+
     public SetToJSON(v: any): void {
         if (!this.IsNullValue(v)) {
             v.set("toJSON", {

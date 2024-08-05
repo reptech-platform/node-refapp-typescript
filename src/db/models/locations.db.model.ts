@@ -1,17 +1,14 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { CitySchema, ICitySchema } from "./cities.db.model";
 
 export interface ILocationSchema extends Document {
     address: string;
-    name: string;
-    countryRegion: string;
-    region: string;
+    city: ICitySchema;
 }
 
 export const LocationSchema: Schema = new Schema({
-    name: { type: String, default: null },
     address: { type: String, default: null },
-    countryRegion: { type: String, default: null },
-    region: { type: String, default: null }
+    city: { type: CitySchema, default: null },
 }, {
     _id: false
 });

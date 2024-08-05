@@ -2,12 +2,12 @@
   "name": "noderefapp",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
+  "main": "build/app.js",
   "scripts": {
-    "start": "tsc && node dist/app.js",
+    "start": "tsc && node build/app.js",
     "lint": "eslint . --ext .ts",
     "start:dev": "ts-node ./src/app.ts",
-    "loop": "nodemon start:dev",
+    "dev": "nodemon ./src/app.ts",
     "build": "tsc"
   },
   "keywords": [],

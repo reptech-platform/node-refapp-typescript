@@ -20,7 +20,7 @@ export default class DocumentsService {
             });
     }
 
-    public async getDocument(id: string): Promise<IDocumentSchema[]> {
+    public async getDocument(id: string): Promise<IDocumentSchema> {
         return Document.find({ _id: id })
             .then((data: IDocumentSchema[]) => {
                 return this.helper.GetItemFromArray(data, 0, {});

@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import { FlightSchema, IFlightSchema } from "./flights.db.model";
+import { PlanItemSchema, IPlanItemSchema } from "./planitems.db.model";
 
 export interface ITripSchema extends Document {
     shareId: string,
@@ -13,7 +13,7 @@ export interface ITripSchema extends Document {
     endTime: Date;
     cost: Number;
     budget: Number;
-    flights: IFlightSchema[]
+    planItems: IPlanItemSchema[]
 }
 
 export const TripSchema: Schema = new Schema({
@@ -27,7 +27,7 @@ export const TripSchema: Schema = new Schema({
     endTime: { type: Date, default: null },
     cost: { type: mongoose.Types.Decimal128, default: null },
     budget: { type: mongoose.Types.Decimal128, default: null },
-    flights: [{ type: FlightSchema, default: null }]
+    planItems: [{ type: PlanItemSchema, default: null }]
 }, {
     timestamps: true
 });

@@ -2,22 +2,24 @@ import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { PersonSchema, IPersonSchema } from "./persons.db.model";
 
-export interface IAirLineSchema extends Document {
+export interface IAirlineSchema extends Document {
     airlineCode: String;
     name: String;
     logo: String;
     CEO: IPersonSchema;
+    airportId: String;
 }
 
-export const AirLineSchema: Schema = new Schema({
+export const AirlineSchema: Schema = new Schema({
     airlineCode: { type: String, default: null },
     name: { type: String, default: null },
     logo: { type: String, default: null },
-    CEO: { type: PersonSchema, default: null }
+    CEO: { type: PersonSchema, default: null },
+    airportId: { type: Schema.Types.ObjectId, default: null }
 }, {
-    _id:false
+    timestamps: true
 });
 
-new Helper().SetToJSON(AirLineSchema);
+new Helper().SetToJSON(AirlineSchema);
 
-// export default mongoose.model<IAirLineSchema>("Airline", AirLineSchema);
+export default mongoose.model<IAirlineSchema>("Airline", AirlineSchema);

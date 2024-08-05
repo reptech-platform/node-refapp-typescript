@@ -1,17 +1,13 @@
 import { injectable } from "inversify";
-
-export interface IPlanItem {
-    confirmationCode: string;
-    startsAt: Date;
-    endsAt: Date;
-    duaration: number
-}
+import { PublicTransport } from "./publictransport.model";
+import { IAirline } from "./airlines.model";
+import { IAirport } from "./airport.model";
 
 @injectable()
-export class PlanItem implements IPlanItem {
-    confirmationCode: string;
-    startsAt: Date;
-    endsAt: Date;
-    duaration: number;
-    constructor() { }
-};
+export class PlanItems extends PublicTransport {
+    flightNumber: String;
+    airline: IAirline;
+    fromAirport: IAirport;
+    toAirport: IAirport;
+    constructor() { super(); }
+}

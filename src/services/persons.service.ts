@@ -4,6 +4,7 @@ import Person, { IPersonSchema } from "../db/models/persons.db.model";
 import Helper from "../utils/helper.utils";
 import TYPES from "../constants/types";
 import { IPerson } from "../models/psersons.model";
+import { Search, SortBy, FilterBy, Pagination } from "../models/search.model";
 
 @injectable()
 export default class PersonsService {
@@ -21,7 +22,7 @@ export default class PersonsService {
             });
     }
 
-    public async getPerson(id: string): Promise<IPersonSchema[]> {
+    public async getPerson(id: string): Promise<IPersonSchema> {
         return Person.find({ _id: id })
             .then((data: IPersonSchema[]) => {
                 return this.helper.GetItemFromArray(data, 0, {});
@@ -54,8 +55,8 @@ export default class PersonsService {
                     ]
                 }
             },
-            { "$addFields": { "trips": "$TravellersMap.trips" } },
             { $unwind: { path: "$TravellersMap", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "trips": "$TravellersMap.trips" } },
             {
                 $project: {
                     "TravellersMap": 0,
@@ -78,7 +79,7 @@ export default class PersonsService {
         let $pipeline = [
             {
                 $lookup: {
-                    from: "travellers", localField: "_id", foreignField: "personId", as: "TravellersMap",
+                    from: "persontrips", localField: "_id", foreignField: "personId", as: "PersonTrips",
                     pipeline: [
                         {
                             $lookup: {
@@ -94,11 +95,11 @@ export default class PersonsService {
                     ]
                 }
             },
-            { "$addFields": { "trips": "$TravellersMap.trips" } },
-            { $unwind: { path: "$TravellersMap", preserveNullAndEmptyArrays: true } },
+            { $unwind: { path: "$PersonTrips", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "trips": "$PersonTrips.trips" } },
             {
                 $project: {
-                    "TravellersMap": 0,
+                    "PersonTrips": 0,
                     "__v": 0
                 }
             }
@@ -107,6 +108,93 @@ export default class PersonsService {
         return Person.aggregate($pipeline)
             .then((data: any[]) => {
                 return data;
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    public async searchPerson(search: Search): Promise<any> {
+
+
+        let $sort = {}, $match = {}, $limit: any = undefined, $skip: any = undefined;
+
+        if (!this.helper.IsArrayNull(search.sort)) {
+            search.sort.forEach((e: SortBy) => {
+                let sortBy: SortBy = new SortBy(e);
+                $sort = { ...$sort, [sortBy.name]: sortBy.getOrder() };
+            });
+        }
+
+        if (!this.helper.IsArrayNull(search.filter)) {
+            search.filter.forEach((e: FilterBy) => {
+                let filterBy: FilterBy = new FilterBy(e);
+                $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
+            });
+        }
+
+        if (!this.helper.IsJsonNull(search.pagination)) {
+            let pagination: Pagination = new Pagination(search.pagination);
+            $limit = { $limit: pagination.getLimit() };
+            $skip = { $skip: pagination.getOffset() };
+        }
+
+        let $pipeline = [
+            { $sort },
+            { $match }
+        ];
+
+        if ($limit) $pipeline.push($limit);
+        if ($skip) $pipeline.push($skip);
+
+        return Person.aggregate($pipeline)
+            .then((data: any) => {
+                return this.helper.GetItemFromArray(data, -1, []);
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    public async searchPersonCount(search: Search): Promise<any> {
+
+
+        let $match = {};
+
+        if (!this.helper.IsNullValue(search) && !this.helper.IsArrayNull(search.filter)) {
+            search.filter.forEach((e: FilterBy) => {
+                let filterBy: FilterBy = new FilterBy(e);
+                $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
+            });
+        }
+
+        let $pipeline = [
+            { $match },
+            { $group: { _id: null, recordCount: { $sum: 1 } } },
+            { $project: { _id: 0 } }
+        ];
+
+        return Person.aggregate($pipeline)
+            .then((data: any) => {
+                let dbRst = this.helper.GetItemFromArray(data, 0, { recordCount: 0 });
+                return dbRst.recordCount;
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    public async getPersonCount(): Promise<any> {
+
+        let $pipeline = [
+            { $group: { _id: null, recordCount: { $sum: 1 } } },
+            { $project: { _id: 0 } }
+        ];
+
+        return Person.aggregate($pipeline)
+            .then((data: any) => {
+                let dbRst = this.helper.GetItemFromArray(data, 0, { recordCount: 0 });
+                return dbRst.recordCount;
             })
             .catch((error: Error) => {
                 throw error;

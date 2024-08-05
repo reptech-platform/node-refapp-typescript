@@ -1,5 +1,6 @@
 import { injectable } from "inversify";
 import { AirportLocation } from "./airportlocations.model";
+import { Airline, IAirline } from "./airlines.model";
 
 export interface IAirport {
     name: String;
@@ -10,6 +11,8 @@ export interface IAirport {
     isInsideCity: Boolean;
     locationJSON: String;
     location: AirportLocation;
+    airline: IAirline;
+    airlineId: any;
 }
 
 @injectable()
@@ -25,4 +28,6 @@ export class Airport implements IAirport {
     isInsideCity: Boolean;
     locationJSON: String;
     location: AirportLocation;
+    airline: Airline;
+    airlineId: any;
 }

@@ -7,7 +7,7 @@ import TripService from "../services/trips.service";
 import Helper from "../utils/helper.utils";
 import { ITrip } from "../models/trips.model";
 import PersonsService from "../services/persons.service";
-import TravellersService from "../services/travellers.service";
+import TripTravellersService from "../services/triptravellers.service";
 
 @controller("/trips")
 export class TripsController extends BaseHttpController {
@@ -15,7 +15,7 @@ export class TripsController extends BaseHttpController {
     constructor(
         @inject(TYPES.TripsService) private tripService: TripService,
         @inject(TYPES.PersonsService) private personsService: PersonsService,
-        @inject(TYPES.TravellersService) private travellersService: TravellersService,
+        @inject(TYPES.TripTravellersService) private tripTravellersService: TripTravellersService,
         @inject(TYPES.Helper) private helper: Helper) {
         super();
     }
@@ -72,7 +72,7 @@ export class TripsController extends BaseHttpController {
         if (!this.helper.IsArrayNull(travellersId)) {
 
             travellersId.forEach(x => x.tripId = content._id);
-            await this.travellersService.createBulkTraveller(travellersId);
+            await this.tripTravellersService.createTravellers(travellersId);
 
         }
 

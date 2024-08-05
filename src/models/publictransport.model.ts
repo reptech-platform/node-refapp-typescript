@@ -1,8 +1,8 @@
 import { injectable } from "inversify";
-import { PlanItem } from "./planitems.model";
+import { BasePlanItem } from "./baseplanitems.model";
 
 @injectable()
-export class PublicTransport extends PlanItem {
+export class PublicTransport extends BasePlanItem {
     seatNumber: String;
     constructor() { super(); }
 }

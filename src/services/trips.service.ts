@@ -4,7 +4,6 @@ import TripSchema, { ITripSchema } from "../db/models/trips.db.model";
 import Helper from "../utils/helper.utils";;
 import TYPES from "../constants/types";
 import { ITrip } from "../models/trips.model";
-import { pipeline } from "stream";
 
 @injectable()
 export default class TripsService {
@@ -22,7 +21,7 @@ export default class TripsService {
             });
     }
 
-    public async getTrip(id: string): Promise<ITripSchema[]> {
+    public async getTrip(id: string): Promise<ITripSchema> {
         return TripSchema.find({ _id: id })
             .then((data: ITripSchema[]) => {
                 return this.helper.GetItemFromArray(data, 0, {});
@@ -53,8 +52,8 @@ export default class TripsService {
                     ]
                 }
             },
-            { "$addFields": { "travellers": "$TravellersMap.travellers" } },
             { $unwind: { path: "$TravellersMap", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "travellers": "$TravellersMap.travellers" } },
             {
                 $project: {
                     "TravellersMap": 0,
@@ -79,7 +78,7 @@ export default class TripsService {
             { $match: { _id: this.helper.ObjectId(id) } },
             {
                 $lookup: {
-                    from: "travellers", localField: "_id", foreignField: "tripId", as: "TravellersMap",
+                    from: "triptravellers", localField: "_id", foreignField: "tripId", as: "TripTravellers",
                     pipeline: [
                         {
                             $lookup: {
@@ -95,11 +94,11 @@ export default class TripsService {
                     ]
                 }
             },
-            { "$addFields": { "travellers": "$TravellersMap.travellers" } },
-            { $unwind: { path: "$TravellersMap", preserveNullAndEmptyArrays: true } },
+            { $unwind: { path: "$TripTravellers", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "travellers": "$TripTravellers.travellers" } },
             {
                 $project: {
-                    "TravellersMap": 0,
+                    "TripTravellers": 0,
                     "__v": 0
                 }
             }

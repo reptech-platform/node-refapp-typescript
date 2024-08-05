@@ -1,0 +1,27 @@
+
+services:
+
+  mongo_db:
+    container_name : node-refapp-mongo-docker
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongo_db:/data/db
+
+  node-refapp:
+    container_name: node-refapp-docker
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    volumes:
+      - ./src:/home/node/app/src
+      - ./nodemon.json:/home/node/app/nodemon.json    
+    expose:
+      - '3000'
+    depends_on:
+      - mongo_db
+
+volumes:
+  mongo_db: {}
