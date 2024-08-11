@@ -139,6 +139,8 @@ export default class PersonsService {
             $skip = { $skip: pagination.getOffset() };
         }
 
+        let recordCount = await this.searchPersonCount(search);
+
         let $pipeline: any = [];
 
         if ($match) $pipeline.push({ $match });
@@ -148,7 +150,7 @@ export default class PersonsService {
 
         return Person.aggregate($pipeline)
             .then((data: any) => {
-                return this.helper.GetItemFromArray(data, -1, []);
+                return { count: recordCount, data: this.helper.GetItemFromArray(data, -1, []) };
             })
             .catch((error: Error) => {
                 throw error;
