@@ -117,7 +117,7 @@ export default class PersonsService {
     public async searchPerson(search: Search): Promise<any> {
 
 
-        let $sort = {}, $match = {}, $limit: any = undefined, $skip: any = undefined;
+        let $sort: any = undefined, $match: any = undefined, $limit: any = undefined, $skip: any = undefined;
 
         if (!this.helper.IsArrayNull(search.sort)) {
             search.sort.forEach((e: SortBy) => {
@@ -139,11 +139,10 @@ export default class PersonsService {
             $skip = { $skip: pagination.getOffset() };
         }
 
-        let $pipeline = [
-            { $sort },
-            { $match }
-        ];
+        let $pipeline: any = [];
 
+        if ($match) $pipeline.push({ $match });
+        if ($sort) $pipeline.push({ $sort });
         if ($limit) $pipeline.push($limit);
         if ($skip) $pipeline.push($skip);
 
