@@ -1,8 +1,9 @@
 import { injectable } from "inversify";
-import { IPerson } from "./psersons.model";
-import { PlanItems } from "./planitems.model";
+import { IPerson } from "./persons.model";
+import { IPlanItems } from "./planitems.model";
 
 export interface ITrip {
+    _id: string;
     shareId: string;
     name: string;
     budget: number;
@@ -13,12 +14,13 @@ export interface ITrip {
     startTime: Date;
     endTime: Date;
     cost: number;
-    planItems?: PlanItems[];
-    travellers: IPerson[] | [];
+    planItems?: IPlanItems[];
+    travellers?: IPerson[];
 }
 
 @injectable()
 export class Trip implements ITrip {
+    _id: string;
     shareId: string;
     name: string;
     budget: number;
@@ -29,8 +31,8 @@ export class Trip implements ITrip {
     startTime: Date;
     endTime: Date;
     cost: number;
-    planItems?: PlanItems[];
-    travellers: IPerson[] | [];
+    planItems?: IPlanItems[];
+    travellers?: IPerson[];
 
     constructor() { }
 }

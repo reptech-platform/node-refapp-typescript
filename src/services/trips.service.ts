@@ -1,37 +1,38 @@
-import { inject, injectable } from "inversify";
-import { Error, default as mongoose } from "mongoose";
+import { Error } from "mongoose";
+import Helper from "../utils/helper.utils";
 import TripSchema, { ITripSchema } from "../db/models/trips.db.model";
-import Helper from "../utils/helper.utils";;
-import TYPES from "../constants/types";
 import { ITrip } from "../models/trips.model";
+import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
+import { provideSingleton, inject } from "../utils/provideSingleton";
 
-@injectable()
+@provideSingleton(TripsService)
 export default class TripsService {
 
-    constructor(@inject(TYPES.Helper) private helper: Helper) {
-    }
+    constructor(@inject(Helper) private helper: Helper) { }
 
-    public async getTrips(): Promise<ITripSchema[]> {
+    public async getTrips(): Promise<ITrip[]> {
         return TripSchema.find()
             .then((data: ITripSchema[]) => {
-                return data;
+                let results = this.helper.GetItemFromArray(data, -1, []);
+                return results as ITrip[];
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getTrip(id: string): Promise<ITripSchema> {
+    public async getTrip(id: string): Promise<ITrip> {
         return TripSchema.find({ _id: id })
             .then((data: ITripSchema[]) => {
-                return this.helper.GetItemFromArray(data, 0, {});
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as ITrip;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getTripsTravellers(): Promise<any> {
+    public async getTripsTravellers(): Promise<ITrip[]> {
 
         let $pipeline = [
             {
@@ -63,15 +64,16 @@ export default class TripsService {
         ];
 
         return TripSchema.aggregate($pipeline)
-            .then((data: any) => {
-                return data;
+            .then((data: ITripSchema[]) => {
+                let results = this.helper.GetItemFromArray(data, -1, []);
+                return results as ITrip[];
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getTripTravellers(id: string): Promise<any> {
+    public async getTripTravellers(id: string): Promise<ITrip> {
 
         let $pipeline = [
 
@@ -105,28 +107,31 @@ export default class TripsService {
         ];
 
         return TripSchema.aggregate($pipeline)
-            .then((data: any) => {
-                return this.helper.GetItemFromArray(data, 0, {});
+            .then((data: ITripSchema[]) => {
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as ITrip;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async createTrip(trip: ITripSchema | ITrip): Promise<ITripSchema> {
+    public async createTrip(trip: ITripSchema | ITrip): Promise<ITrip> {
         return TripSchema.create(trip)
             .then((data: ITripSchema) => {
-                return data;
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as ITrip;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async updateTrip(id: string, trip: any): Promise<ITripSchema> {
+    public async updateTrip(id: string, trip: any): Promise<ITrip> {
         return TripSchema.findOneAndUpdate({ _id: id }, trip, { new: true })
             .then((data: any) => {
-                return data;
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as ITrip;
             })
             .catch((error: Error) => {
                 throw error;
@@ -137,6 +142,97 @@ export default class TripsService {
         return TripSchema.findOneAndDelete({ _id: id })
             .then(() => {
                 return true;
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    public async searchTrip(search: Search): Promise<SearchResults> {
+
+
+        let $sort: any = undefined, $match: any = undefined, $limit: any = undefined, $skip: any = undefined;
+
+        if (!this.helper.IsArrayNull(search.sort)) {
+            search.sort?.forEach((e: SortBy) => {
+                let sortBy: SortBy = new SortBy(e);
+                $sort = { ...$sort, [sortBy.name]: sortBy.getOrder() };
+            });
+        }
+
+        if (!this.helper.IsArrayNull(search.filter)) {
+            search.filter?.forEach((e: FilterBy) => {
+                let filterBy: FilterBy = new FilterBy(e);
+                $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
+            });
+        }
+
+        if (!this.helper.IsJsonNull(search.pagination)) {
+            let pagination: Pagination = new Pagination(search.pagination);
+            $limit = { $limit: pagination.getLimit() };
+            $skip = { $skip: pagination.getOffset() };
+        }
+
+        let recordCount = await this.searchTripCount(search);
+
+        let $pipeline: any = [];
+
+        if ($match) $pipeline.push({ $match });
+        if ($sort) $pipeline.push({ $sort });
+        if ($limit) $pipeline.push($limit);
+        if ($skip) $pipeline.push($skip);
+
+        return TripSchema.aggregate($pipeline)
+            .then((data: ITripSchema[]) => {
+                let results: SearchResults = new SearchResults();
+                results.count = recordCount;
+                results.data = this.helper.GetItemFromArray(data, -1, []);
+                return results;
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    public async searchTripCount(search: Search): Promise<number> {
+
+
+        let $match = {};
+
+        if (!this.helper.IsNullValue(search) && !this.helper.IsArrayNull(search.filter)) {
+            search.filter?.forEach((e: FilterBy) => {
+                let filterBy: FilterBy = new FilterBy(e);
+                $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
+            });
+        }
+
+        let $pipeline = [
+            { $match },
+            { $group: { _id: null, recordCount: { $sum: 1 } } },
+            { $project: { _id: 0 } }
+        ];
+
+        return TripSchema.aggregate($pipeline)
+            .then((data: ITripSchema[]) => {
+                let dbRst = this.helper.GetItemFromArray(data, 0, { recordCount: 0 });
+                return dbRst.recordCount as number;
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    public async getTripCount(): Promise<number> {
+
+        let $pipeline = [
+            { $group: { _id: null, recordCount: { $sum: 1 } } },
+            { $project: { _id: 0 } }
+        ];
+
+        return TripSchema.aggregate($pipeline)
+            .then((data: ITripSchema[]) => {
+                let dbRst = this.helper.GetItemFromArray(data, 0, { recordCount: 0 });
+                return dbRst.recordCount as number;
             })
             .catch((error: Error) => {
                 throw error;

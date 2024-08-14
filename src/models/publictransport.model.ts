@@ -3,6 +3,6 @@ import { BasePlanItem } from "./baseplanitems.model";
 
 @injectable()
 export class PublicTransport extends BasePlanItem {
-    seatNumber: String;
+    seatNumber: string;
     constructor() { super(); }
 }

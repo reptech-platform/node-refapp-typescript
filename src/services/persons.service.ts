@@ -1,38 +1,50 @@
-import { inject, injectable } from "inversify";
-import { Error, default as mongoose } from "mongoose";
-import Person, { IPersonSchema } from "../db/models/persons.db.model";
+import { Error } from "mongoose";
+import PersonSchema, { IPersonSchema } from "../db/models/persons.db.model";
 import Helper from "../utils/helper.utils";
-import TYPES from "../constants/types";
-import { IPerson } from "../models/psersons.model";
-import { Search, SortBy, FilterBy, Pagination } from "../models/search.model";
+import { IPerson } from "../models/persons.model";
+import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
+import { provideSingleton, inject } from "../utils/provideSingleton";
 
-@injectable()
+@provideSingleton(PersonsService)
 export default class PersonsService {
 
-    constructor(@inject(TYPES.Helper) private helper: Helper) {
+    constructor(@inject(Helper) private helper: Helper) {
     }
 
-    public async getPersons(): Promise<IPersonSchema[]> {
-        return Person.find()
+    public async getPersons(): Promise<IPerson[]> {
+        return PersonSchema.find()
             .then((data: IPersonSchema[]) => {
-                return data;
+                let results = this.helper.GetItemFromArray(data, -1, []);
+                return results as IPerson[];
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getPerson(id: string): Promise<IPersonSchema> {
-        return Person.find({ _id: id })
+    public async getPerson(id: string): Promise<IPerson> {
+        return PersonSchema.find({ _id: id })
             .then((data: IPersonSchema[]) => {
-                return this.helper.GetItemFromArray(data, 0, {});
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IPerson;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getPersonTrips(id: string): Promise<any> {
+    public async createPerson(person: IPersonSchema | IPerson): Promise<IPerson> {
+        return PersonSchema.create(person)
+            .then((data: IPersonSchema) => {
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IPerson;
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    public async getPersonTrips(id: string): Promise<IPerson> {
 
         let $pipeline = [
 
@@ -65,16 +77,17 @@ export default class PersonsService {
             }
         ];
 
-        return Person.aggregate($pipeline)
-            .then((data: any) => {
-                return this.helper.GetItemFromArray(data, 0, {});
+        return PersonSchema.aggregate($pipeline)
+            .then((data: IPersonSchema[]) => {
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IPerson;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getPersonsTrips(): Promise<any> {
+    public async getPersonsTrips(): Promise<IPerson[]> {
 
         let $pipeline = [
             {
@@ -105,29 +118,51 @@ export default class PersonsService {
             }
         ];
 
-        return Person.aggregate($pipeline)
-            .then((data: any[]) => {
-                return data;
+        return PersonSchema.aggregate($pipeline)
+            .then((data: IPersonSchema[]) => {
+                let results = this.helper.GetItemFromArray(data, -1, []);
+                return results as IPerson[];
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async searchPerson(search: Search): Promise<any> {
+    public async updatePerson(id: string, person: any): Promise<IPerson> {
+        return PersonSchema.findOneAndUpdate({ _id: id }, person, { new: true })
+            .then((data: any) => {
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IPerson;
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    public async deletePerson(id: string): Promise<boolean> {
+        return PersonSchema.findOneAndDelete({ _id: id })
+            .then(() => {
+                return true;
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    public async searchPerson(search: Search): Promise<SearchResults> {
 
 
         let $sort: any = undefined, $match: any = undefined, $limit: any = undefined, $skip: any = undefined;
 
         if (!this.helper.IsArrayNull(search.sort)) {
-            search.sort.forEach((e: SortBy) => {
+            search.sort?.forEach((e: SortBy) => {
                 let sortBy: SortBy = new SortBy(e);
                 $sort = { ...$sort, [sortBy.name]: sortBy.getOrder() };
             });
         }
 
         if (!this.helper.IsArrayNull(search.filter)) {
-            search.filter.forEach((e: FilterBy) => {
+            search.filter?.forEach((e: FilterBy) => {
                 let filterBy: FilterBy = new FilterBy(e);
                 $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
             });
@@ -148,22 +183,25 @@ export default class PersonsService {
         if ($limit) $pipeline.push($limit);
         if ($skip) $pipeline.push($skip);
 
-        return Person.aggregate($pipeline)
-            .then((data: any) => {
-                return { count: recordCount, data: this.helper.GetItemFromArray(data, -1, []) };
+        return PersonSchema.aggregate($pipeline)
+            .then((data: IPersonSchema[]) => {
+                let results: SearchResults = new SearchResults();
+                results.count = recordCount;
+                results.data = this.helper.GetItemFromArray(data, -1, []);
+                return results;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async searchPersonCount(search: Search): Promise<any> {
+    public async searchPersonCount(search: Search): Promise<number> {
 
 
         let $match = {};
 
         if (!this.helper.IsNullValue(search) && !this.helper.IsArrayNull(search.filter)) {
-            search.filter.forEach((e: FilterBy) => {
+            search.filter?.forEach((e: FilterBy) => {
                 let filterBy: FilterBy = new FilterBy(e);
                 $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
             });
@@ -175,57 +213,27 @@ export default class PersonsService {
             { $project: { _id: 0 } }
         ];
 
-        return Person.aggregate($pipeline)
-            .then((data: any) => {
+        return PersonSchema.aggregate($pipeline)
+            .then((data: IPersonSchema[]) => {
                 let dbRst = this.helper.GetItemFromArray(data, 0, { recordCount: 0 });
-                return dbRst.recordCount;
+                return dbRst.recordCount as number;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getPersonCount(): Promise<any> {
+    public async getPersonCount(): Promise<number> {
 
         let $pipeline = [
             { $group: { _id: null, recordCount: { $sum: 1 } } },
             { $project: { _id: 0 } }
         ];
 
-        return Person.aggregate($pipeline)
-            .then((data: any) => {
+        return PersonSchema.aggregate($pipeline)
+            .then((data: IPersonSchema[]) => {
                 let dbRst = this.helper.GetItemFromArray(data, 0, { recordCount: 0 });
-                return dbRst.recordCount;
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
-    }
-
-    public async createPerson(person: IPersonSchema | IPerson): Promise<IPersonSchema> {
-        return Person.create(person)
-            .then((data: IPersonSchema) => {
-                return data;
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
-    }
-
-    public async updatePerson(id: string, person: any): Promise<IPersonSchema> {
-        return Person.findOneAndUpdate({ _id: id }, person, { new: true })
-            .then((data: any) => {
-                return data;
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
-    }
-
-    public async deletePerson(id: string): Promise<boolean> {
-        return Person.findOneAndDelete({ _id: id })
-            .then(() => {
-                return true;
+                return dbRst.recordCount as number;
             })
             .catch((error: Error) => {
                 throw error;

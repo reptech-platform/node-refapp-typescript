@@ -1,15 +1,15 @@
 import { injectable } from "inversify";
 
 export interface ICity {
-    name: String;
-    countryRegion: String;
-    region: String;
+    name: string;
+    countryRegion: string;
+    region: string;
 }
 
 @injectable()
 export class City implements ICity {
-    name: String;
-    countryRegion: String;
-    region: String;
+    name: string;
+    countryRegion: string;
+    region: string;
     constructor() { }
 }

@@ -1,6 +1,7 @@
 import { injectable } from "inversify";
 
-interface IDocument {
+export interface IDocument {
+    _id: string;
     docName: string;
     docLocation: string;
     docFileType: string;
@@ -8,9 +9,9 @@ interface IDocument {
 
 @injectable()
 export class Document implements IDocument {
-    constructor(
-        public docName: string,
-        public docLocation: string,
-        public docFileType: string,
-    ) { }
+    _id: string;
+    docName: string;
+    docLocation: string;
+    docFileType: string;
+    constructor() { }
 }

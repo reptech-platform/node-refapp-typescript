@@ -5,7 +5,6 @@ import Helper from "../utils/helper.utils";
 export class SortBy {
     name: string;
     order: string;
-    sortBy: SortBy;
 
     constructor(sortBy: SortBy) {
         this.name = sortBy.name;
@@ -23,9 +22,9 @@ export class Pagination {
     size: number | 10;
     page: number | 1;
 
-    constructor(pagination: Pagination) {
-        this.size = pagination.size || 10;
-        this.page = pagination.page || 1;
+    constructor(pagination?: Pagination) {
+        this.size = pagination?.size || 10;
+        this.page = pagination?.page || 1;
     }
 
     getLimit() {
@@ -41,7 +40,7 @@ export class Pagination {
 export class FilterBy {
     name: string;
     condition: string;
-    value: string;
+    value: string | number;
     private helper: Helper;
 
     constructor(filterBy: FilterBy) {
@@ -84,10 +83,16 @@ export class FilterBy {
 @injectable()
 export class Search {
 
-    sort: SortBy[] = [];
-    filter: FilterBy[] = [];
-    pagination: Pagination;
+    sort?: SortBy[] = [];
+    filter?: FilterBy[] = [];
+    pagination?: Pagination;
 
     constructor() { }
 
+}
+
+@injectable()
+export class SearchResults {
+    count: number;
+    data: any;
 }

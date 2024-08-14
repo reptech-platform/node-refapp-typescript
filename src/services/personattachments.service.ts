@@ -1,59 +1,76 @@
-import { inject, injectable } from "inversify";
-import { Error, default as mongoose } from "mongoose";
+import { Error } from "mongoose";
 import Helper from "../utils/helper.utils";
-import TYPES from "../constants/types";
-import PersonAttachment, { IPersonAttachmentSchema } from "../db/models/personattachments.db.model";
+import PersonAttachmentSchema, { IPersonAttachmentSchema } from "../db/models/personattachments.db.model";
+import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
+import { provideSingleton, inject } from "../utils/provideSingleton";
+import { IPersonAttachment } from "../models/personattachment.model";
 
-@injectable()
+@provideSingleton(PersonAttachmentsService)
 export default class PersonAttachmentsService {
 
-    constructor(@inject(TYPES.Helper) private helper: Helper) {
+    constructor(@inject(Helper) private helper: Helper) {
     }
 
-    public async getPersonAttachments(): Promise<IPersonAttachmentSchema[]> {
-        return PersonAttachment.find()
+    public async getPersonsAttachments(): Promise<IPersonAttachment[]> {
+        return PersonAttachmentSchema.find()
             .then((data: IPersonAttachmentSchema[]) => {
-                return data;
+                let results = this.helper.GetItemFromArray(data, -1, []);
+                return results as IPersonAttachment[];
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getPersonAttachment(id: string): Promise<IPersonAttachmentSchema[]> {
-        return PersonAttachment.find({ _id: id })
+    public async getPersonAttachments(personId: string): Promise<IPersonAttachment[]> {
+        return PersonAttachmentSchema.find({ personId: personId })
             .then((data: IPersonAttachmentSchema[]) => {
-                return this.helper.GetItemFromArray(data, 0, {});
+                let results = this.helper.GetItemFromArray(data, -1, []);
+                return results as IPersonAttachment[];
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getPersonAttachmentByDocId(id: string): Promise<IPersonAttachmentSchema[]> {
-        return PersonAttachment.find({ documentId: id })
+    public async getPersonAttachmentById(id: string): Promise<IPersonAttachment> {
+        return PersonAttachmentSchema.find({ _id: id })
             .then((data: IPersonAttachmentSchema[]) => {
-                return this.helper.GetItemFromArray(data, 0, {});
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IPersonAttachment;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async createPersonAttachment(personAttachment: IPersonAttachmentSchema): Promise<IPersonAttachmentSchema> {
-        return PersonAttachment.create(personAttachment)
+    public async getPersonAttachmentByDocId(documentId: string): Promise<IPersonAttachment> {
+        return PersonAttachmentSchema.find({ documentId: documentId })
+            .then((data: IPersonAttachmentSchema[]) => {
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IPersonAttachment;
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    public async createPersonAttachment(personAttachment: IPersonAttachmentSchema): Promise<IPersonAttachment> {
+        return PersonAttachmentSchema.create(personAttachment)
             .then((data: IPersonAttachmentSchema) => {
-                return data;
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IPersonAttachment;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async updatePersonAttachment(id: string, person: any): Promise<IPersonAttachmentSchema> {
-        return PersonAttachment.findOneAndUpdate({ _id: id }, person, { new: true })
+    public async updatePersonAttachment(id: string, person: any): Promise<IPersonAttachment> {
+        return PersonAttachmentSchema.findOneAndUpdate({ _id: id }, person, { new: true })
             .then((data: any) => {
-                return data;
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IPersonAttachment;
             })
             .catch((error: Error) => {
                 throw error;
@@ -61,7 +78,7 @@ export default class PersonAttachmentsService {
     }
 
     public async deletePersonAttachment(id: string): Promise<boolean> {
-        return PersonAttachment.findOneAndDelete({ _id: id })
+        return PersonAttachmentSchema.findOneAndDelete({ _id: id })
             .then(() => {
                 return true;
             })
@@ -70,8 +87,8 @@ export default class PersonAttachmentsService {
             });
     }
 
-    public async deletePersonAttachmentByDocId(id: string): Promise<boolean> {
-        return PersonAttachment.findOneAndDelete({ documentId: id })
+    public async deletePersonAttachmentByDocId(documentId: string): Promise<boolean> {
+        return PersonAttachmentSchema.findOneAndDelete({ documentId: documentId })
             .then(() => {
                 return true;
             })

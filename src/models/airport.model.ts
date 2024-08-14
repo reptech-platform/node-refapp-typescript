@@ -1,33 +1,35 @@
 import { injectable } from "inversify";
-import { AirportLocation } from "./airportlocations.model";
-import { Airline, IAirline } from "./airlines.model";
+import { IAirportLocation } from "./airportlocations.model";
+import { IAirline } from "./airlines.model";
 
 export interface IAirport {
-    name: String;
-    icaoCode: String;
-    iataCode: String;
-    latitude: Number;
-    longitude: Number;
+    _id: string;
+    name: string;
+    icaoCode: string;
+    iataCode: string;
+    latitude: number;
+    longitude: number;
     isInsideCity: Boolean;
-    locationJSON: String;
-    location: AirportLocation;
-    airline: IAirline;
+    locationJSON: string;
+    location?: IAirportLocation;
+    airline?: IAirline;
     airlineId: any;
 }
 
 @injectable()
 export class Airport implements IAirport {
 
-    constructor(
-    ) { }
-    name: String;
-    icaoCode: String;
-    iataCode: String;
-    latitude: Number;
-    longitude: Number;
+    constructor() { }
+
+    _id: string;
+    name: string;
+    icaoCode: string;
+    iataCode: string;
+    latitude: number;
+    longitude: number;
     isInsideCity: Boolean;
-    locationJSON: String;
-    location: AirportLocation;
-    airline: Airline;
+    locationJSON: string;
+    location?: IAirportLocation;
+    airline?: IAirline;
     airlineId: any;
 }

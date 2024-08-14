@@ -1,29 +1,29 @@
 
 require("dotenv").config();
-import "reflect-metadata";
-import * as bodyParser from "body-parser";
-import { InversifyExpressServer } from "inversify-express-utils";
-import { DbConnection } from "./db/utils/connection.db";
-import ContainerConfigLoader from "./config/container";
-import fileUpload from "express-fileupload";
+import express, { Response as ExResponse, Request as ExRequest } from "express";
+import { RegisterRoutes } from "../build/routes";
+import swaggerUi from "swagger-ui-express";
 
-const container = ContainerConfigLoader.Load();
+import * as bodyParser from "body-parser";
+import { DbConnection } from "./db/utils/connection.db";
+export const app = express();
+
 
 DbConnection.initConnection().then(() => {
     DbConnection.setAutoReconnect();
 
-    const server = new InversifyExpressServer(container);
 
-    server.setConfig((app) => {
-        app.use(bodyParser.urlencoded({
-            extended: true,
-        }));
-        app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({
+        extended: true,
+    }));
+    app.use(bodyParser.json());
 
-        app.use(fileUpload());
+    app.use("/docs", swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
+        return res.send(
+            swaggerUi.generateHTML(await import("../build/swagger.json"))
+        );
     });
 
-    const serverInstance = server.build();
-    serverInstance.listen(process.env.PORT);
-    console.log(`Server started on port ${process.env.PORT} :)`);
+    RegisterRoutes(app);
+
 });

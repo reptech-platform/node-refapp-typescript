@@ -1,49 +1,53 @@
-import { inject, injectable } from "inversify";
-import { Error, default as mongoose } from "mongoose";
+import { Error } from "mongoose";
 import Document, { IDocumentSchema } from "../db/models/documents.db.model";
 import Helper from "../utils/helper.utils";
-import TYPES from "../constants/types";
+import { provideSingleton, inject } from "../utils/provideSingleton";
+import { IDocument } from "../models/documents.model";
 
-@injectable()
+@provideSingleton(DocumentsService)
 export default class DocumentsService {
 
-    constructor(@inject(TYPES.Helper) private helper: Helper) {
+    constructor(@inject(Helper) private helper: Helper) {
     }
 
-    public async getDocuments(): Promise<IDocumentSchema[]> {
+    public async getDocuments(): Promise<IDocument[]> {
         return Document.find()
             .then((data: IDocumentSchema[]) => {
-                return data;
+                let results = this.helper.GetItemFromArray(data, -1, []);
+                return results as IDocument[];
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getDocument(id: string): Promise<IDocumentSchema> {
+    public async getDocument(id: string): Promise<IDocument> {
         return Document.find({ _id: id })
             .then((data: IDocumentSchema[]) => {
-                return this.helper.GetItemFromArray(data, 0, {});
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IDocument;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async createDocument(document: IDocumentSchema): Promise<IDocumentSchema> {
+    public async createDocument(document: IDocumentSchema): Promise<IDocument> {
         return Document.create(document)
             .then((data: IDocumentSchema) => {
-                return data;
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IDocument;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async updateDocument(id: string, person: any): Promise<IDocumentSchema> {
+    public async updateDocument(id: string, person: any): Promise<IDocument> {
         return Document.findOneAndUpdate({ _id: id }, person, { new: true })
             .then((data: any) => {
-                return data;
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IDocument;
             })
             .catch((error: Error) => {
                 throw error;

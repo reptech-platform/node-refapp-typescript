@@ -1,14 +1,11 @@
-import { inject, injectable } from "inversify";
-import { Error, default as mongoose } from "mongoose";
+import { Error } from "mongoose";
 import TripTraveller, { ITripTravellerSchema } from "../db/models/triptravellers.db.model";
-import Helper from "../utils/helper.utils";;
-import TYPES from "../constants/types";
+import { provideSingleton } from "../utils/provideSingleton";
 
-@injectable()
+@provideSingleton(TripTravellersService)
 export default class TripTravellersService {
 
-    constructor(@inject(TYPES.Helper) private helper: Helper) {
-    }
+    constructor() { }
 
     public async createTraveller(tripTraveller: ITripTravellerSchema | any): Promise<ITripTravellerSchema> {
         return TripTraveller.create(tripTraveller)

@@ -1,7 +1,7 @@
-import { injectable } from "inversify";
 const Types = require('mongoose').Types;
+import { provideSingleton } from "../utils/provideSingleton";
 
-@injectable()
+@provideSingleton(Helper)
 export default class Helper {
 
     constructor() { }
