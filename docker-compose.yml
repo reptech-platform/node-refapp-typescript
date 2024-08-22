@@ -1,23 +1,24 @@
 version: '3.8'
 
 services:
-
   mongo_db:
-    container_name : node-refapp-mongo-docker
+    container_name: node-refapp-mongo-docker
     image: mongo:latest
     restart: always
     volumes:
       - mongo_db:/data/db
     ports:
       - '9005:27017'
-
-  node-refapp:
+  node_refapp:
     container_name: node-refapp-docker
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
-    env_file: .env
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      DB_CONN_URL: mongodb://mongo_db:27017/node_refapp
     expose:
       - '3000'
     ports:
@@ -30,3 +31,4 @@ services:
 
 volumes:
   mongo_db: {}
+
