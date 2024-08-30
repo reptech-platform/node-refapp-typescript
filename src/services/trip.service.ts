@@ -1,7 +1,7 @@
 import { Error } from "mongoose";
 import Helper from "../utils/helper.utils";
-import TripSchema, { ITripSchema } from "../db/models/trips.db.model";
-import { ITrip } from "../models/trips.model";
+import TripSchema, { ITripSchema } from "../db/models/trip.db.model";
+import { ITrip } from "../models/trip.model";
 import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 

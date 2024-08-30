@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import { AirlineSchema, IAirlineSchema } from "./airlines.db.model";
-import { AirportSchema, IAirportSchema } from "./airports.db.model";
+import { AirlineSchema, IAirlineSchema } from "./airline.db.model";
+import { AirportSchema, IAirportSchema } from "./airport.db.model";
 
 export interface IPlanItemSchema extends Document {
     flightNumber: String;

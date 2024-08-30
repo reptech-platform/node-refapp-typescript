@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import { PlanItemSchema, IPlanItemSchema } from "./planitems.db.model";
+import { PlanItemSchema, IPlanItemSchema } from "./planitem.db.model";
 
 export interface ITripSchema extends Document {
     shareId: string,

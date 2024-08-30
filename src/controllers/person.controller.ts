@@ -1,12 +1,12 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path, SuccessResponse } from "tsoa";
-import PersonsService from "../services/persons.service";
-import TripService from "../services/trips.service";
+import PersonsService from "../services/person.service";
+import TripService from "../services/trip.service";
 import Helper from "../utils/helper.utils";
 import { provideSingleton, inject } from "../utils/provideSingleton";
-import { IPerson } from "../models/persons.model";
+import { IPerson } from "../models/person.model";
 import { Search, SearchResults } from "../models/search.model";
-import { ITrip } from "../models/trips.model";
-import PersonTripsService from "../services/persontrips.service";
+import { ITrip } from "../models/trip.model";
+import PersonTripsService from "../services/persontrip.service";
 
 @Tags("Persons")
 @Route("persons")

@@ -1,81 +1,44 @@
 import { Error } from "mongoose";
+import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import Helper from "../utils/helper.utils";;
-import AirlineSchema, { IAirlineSchema } from "../db/models/airlines.db.model";
-import { IAirline } from "../models/airlines.model";
-import { FilterBy, Pagination, Search, SearchResults, SortBy } from "../models/search.model";
+import AirportSchema, { IAirportSchema } from "../db/models/airport.db.model";
+import { IAirport } from "../models/airport.model";
 
-@provideSingleton(AirlinesService)
-export default class AirlinesService {
+@provideSingleton(AirportsService)
+export default class AirportsService {
 
-    constructor(@inject(Helper) private helper: Helper) {
-    }
+    constructor(@inject(Helper) private helper: Helper) { }
 
-    public async getAirlines(): Promise<IAirline[]> {
-        return AirlineSchema.find()
-            .then((data: IAirlineSchema[]) => {
+    public async getAirports(): Promise<IAirport[]> {
+        return AirportSchema.find()
+            .then((data: IAirportSchema[]) => {
                 let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as IAirline[];
+                return results as IAirport[];
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getAirline(id: string): Promise<IAirline> {
-        return AirlineSchema.find({ _id: id })
-            .then((data: IAirlineSchema[]) => {
-                let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as IAirline;
+    public async getAirport(id: string): Promise<IAirport> {
+        return AirportSchema.find({ _id: id })
+            .then((data: IAirportSchema[]) => {
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IAirport;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async getAirlinesAirports(): Promise<IAirline[]> {
-
-        let $pipeline = [
-            {
-                $lookup: {
-                    from: "airports", localField: "airportId", foreignField: "_id", as: "Airports",
-                    pipeline: [
-                        {
-                            $project: {
-                                "__v": 0
-                            }
-                        }
-                    ]
-                }
-            },
-            { $unwind: { path: "$Airports", preserveNullAndEmptyArrays: true } },
-            { "$addFields": { "airports": "$Airports" } },
-            {
-                $project: {
-                    "Airports": 0,
-                    "__v": 0
-                }
-            }
-
-        ];
-
-        return AirlineSchema.aggregate($pipeline)
-            .then((data: IAirlineSchema[]) => {
-                let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as IAirline[];
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
-    }
-
-    public async getAirlineAirports(id: string): Promise<IAirline> {
+    public async getAriportAirlines(id: string): Promise<IAirport> {
 
         let $pipeline = [
             { $match: { _id: this.helper.ObjectId(id) } },
             {
                 $lookup: {
-                    from: "airports", localField: "airportId", foreignField: "_id", as: "Airports",
+                    from: "airlines", localField: "airlineId", foreignField: "_id", as: "Airlines",
                     pipeline: [
                         {
                             $project: {
@@ -85,50 +48,87 @@ export default class AirlinesService {
                     ]
                 }
             },
-            { $unwind: { path: "$Airports", preserveNullAndEmptyArrays: true } },
-            { "$addFields": { "airports": "$Airports" } },
+            { $unwind: { path: "$Airlines", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "airlines": "$Airlines" } },
             {
                 $project: {
-                    "Airports": 0,
+                    "Airlines": 0,
                     "__v": 0
                 }
             }
+
         ];
 
-        return AirlineSchema.aggregate($pipeline)
-            .then((data: any) => {
+        return AirportSchema.aggregate($pipeline)
+            .then((data: IAirportSchema[]) => {
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IAirport;
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    public async getAriportsAirlines(): Promise<IAirport[]> {
+
+        let $pipeline = [
+            {
+                $lookup: {
+                    from: "airlines", localField: "airlineId", foreignField: "_id", as: "Airlines",
+                    pipeline: [
+                        {
+                            $project: {
+                                "__v": 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$Airlines", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "airlines": "$Airlines" } },
+            {
+                $project: {
+                    "Airlines": 0,
+                    "__v": 0
+                }
+            }
+
+        ];
+
+        return AirportSchema.aggregate($pipeline)
+            .then((data: IAirportSchema[]) => {
                 let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as IAirline;
+                return results as IAirport[];
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async createAirline(airline: IAirline | IAirline): Promise<IAirline> {
-        return AirlineSchema.create(airline)
-            .then((data: IAirlineSchema) => {
+    public async createAirport(airport: IAirportSchema | IAirport): Promise<IAirport> {
+        return AirportSchema.create(airport)
+            .then((data: IAirportSchema) => {
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IAirline;
+                return results as IAirport;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async updateAirline(id: string, airline: IAirline): Promise<IAirline> {
-        return AirlineSchema.findOneAndUpdate({ _id: id }, airline, { new: true })
+    public async updateAirport(id: string, airport: IAirport): Promise<IAirport> {
+        return AirportSchema.findOneAndUpdate({ _id: id }, airport, { new: true })
             .then((data: any) => {
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IAirline;
+                return results as IAirport;
             })
             .catch((error: Error) => {
                 throw error;
             });
     }
 
-    public async deleteAirline(id: string): Promise<boolean> {
-        return AirlineSchema.findOneAndDelete({ _id: id })
+    public async deleteAirport(id: string): Promise<boolean> {
+        return AirportSchema.findOneAndDelete({ _id: id })
             .then(() => {
                 return true;
             })
@@ -137,7 +137,7 @@ export default class AirlinesService {
             });
     }
 
-    public async searchAirline(search: Search): Promise<SearchResults> {
+    public async searchAirport(search: Search): Promise<SearchResults> {
 
 
         let $sort: any = undefined, $match: any = undefined, $limit: any = undefined, $skip: any = undefined;
@@ -162,7 +162,7 @@ export default class AirlinesService {
             $skip = { $skip: pagination.getOffset() };
         }
 
-        let recordCount = await this.searchAirlineCount(search);
+        let recordCount = await this.searchAirportCount(search);
 
         let $pipeline: any = [];
 
@@ -171,8 +171,8 @@ export default class AirlinesService {
         if ($limit) $pipeline.push($limit);
         if ($skip) $pipeline.push($skip);
 
-        return AirlineSchema.aggregate($pipeline)
-            .then((data: IAirlineSchema[]) => {
+        return AirportSchema.aggregate($pipeline)
+            .then((data: IAirportSchema[]) => {
                 let results: SearchResults = new SearchResults();
                 results.count = recordCount;
                 results.data = this.helper.GetItemFromArray(data, -1, []);
@@ -183,7 +183,7 @@ export default class AirlinesService {
             });
     }
 
-    public async searchAirlineCount(search: Search): Promise<number> {
+    public async searchAirportCount(search: Search): Promise<number> {
 
 
         let $match = {};
@@ -201,8 +201,8 @@ export default class AirlinesService {
             { $project: { _id: 0 } }
         ];
 
-        return AirlineSchema.aggregate($pipeline)
-            .then((data: IAirlineSchema[]) => {
+        return AirportSchema.aggregate($pipeline)
+            .then((data: IAirportSchema[]) => {
                 let dbRst = this.helper.GetItemFromArray(data, 0, { recordCount: 0 });
                 return dbRst.recordCount as number;
             })
@@ -211,15 +211,15 @@ export default class AirlinesService {
             });
     }
 
-    public async getAirlineCount(): Promise<number> {
+    public async getAirportCount(): Promise<number> {
 
         let $pipeline = [
             { $group: { _id: null, recordCount: { $sum: 1 } } },
             { $project: { _id: 0 } }
         ];
 
-        return AirlineSchema.aggregate($pipeline)
-            .then((data: IAirlineSchema[]) => {
+        return AirportSchema.aggregate($pipeline)
+            .then((data: IAirportSchema[]) => {
                 let dbRst = this.helper.GetItemFromArray(data, 0, { recordCount: 0 });
                 return dbRst.recordCount as number;
             })

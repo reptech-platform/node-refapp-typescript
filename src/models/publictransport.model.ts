@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import { BasePlanItem } from "./baseplanitems.model";
+import { BasePlanItem } from "./baseplanitem.model";
 
 @injectable()
 export class PublicTransport extends BasePlanItem {

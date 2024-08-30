@@ -1,7 +1,7 @@
 import { Error } from "mongoose";
-import PersonSchema, { IPersonSchema } from "../db/models/persons.db.model";
+import PersonSchema, { IPersonSchema } from "../db/models/person.db.model";
 import Helper from "../utils/helper.utils";
-import { IPerson } from "../models/persons.model";
+import { IPerson } from "../models/person.model";
 import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 

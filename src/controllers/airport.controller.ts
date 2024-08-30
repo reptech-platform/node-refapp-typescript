@@ -1,11 +1,11 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path, SuccessResponse } from "tsoa";
 import Helper from "../utils/helper.utils";
 import { provideSingleton, inject } from "../utils/provideSingleton";
-import AirportsService from "../services/airports.service";
-import AirlinesService from "../services/airlines.service";
+import AirportsService from "../services/airport.service";
+import AirlinesService from "../services/airline.service";
 import { IAirport } from "../models/airport.model";
 import { Search, SearchResults } from "../models/search.model";
-import { IAirline } from "../models/airlines.model";
+import { IAirline } from "../models/airline.model";
 
 @Tags("Airports")
 @Route("airports")

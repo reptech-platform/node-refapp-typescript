@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
-import { IAirportLocation } from "./airportlocations.model";
-import { IAirline } from "./airlines.model";
+import { IAirportLocation } from "./airportlocation.model";
+import { IAirline } from "./airline.model";
 
 export interface IAirport {
     _id: string;

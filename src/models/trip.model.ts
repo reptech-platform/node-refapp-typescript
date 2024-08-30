@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
-import { IPerson } from "./persons.model";
-import { IPlanItems } from "./planitems.model";
+import { IPerson } from "./person.model";
+import { IPlanItems } from "./planitem.model";
 
 export interface ITrip {
     _id: string;

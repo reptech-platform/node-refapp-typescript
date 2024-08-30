@@ -1,8 +1,8 @@
 import { Error } from "mongoose";
-import Document, { IDocumentSchema } from "../db/models/documents.db.model";
+import Document, { IDocumentSchema } from "../db/models/document.db.model";
 import Helper from "../utils/helper.utils";
 import { provideSingleton, inject } from "../utils/provideSingleton";
-import { IDocument } from "../models/documents.model";
+import { IDocument } from "../models/document.model";
 
 @provideSingleton(DocumentsService)
 export default class DocumentsService {

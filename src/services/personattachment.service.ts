@@ -1,6 +1,6 @@
 import { Error } from "mongoose";
 import Helper from "../utils/helper.utils";
-import PersonAttachmentSchema, { IPersonAttachmentSchema } from "../db/models/personattachments.db.model";
+import PersonAttachmentSchema, { IPersonAttachmentSchema } from "../db/models/personattachment.db.model";
 import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { IPersonAttachment } from "../models/personattachment.model";

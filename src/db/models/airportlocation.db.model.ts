@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import { GeographicPointSchema, IGeographicPointSchema } from "./geographicpoints.db.model";
-import { CitySchema, ICitySchema } from "./cities.db.model";
+import { GeographicPointSchema, IGeographicPointSchema } from "./geographicpoint.db.model";
+import { CitySchema, ICitySchema } from "./citie.db.model";
 
 export interface IAirportLocationSchema extends Document {
     loc: IGeographicPointSchema;
@@ -15,7 +15,7 @@ export const AirportLocationSchema: Schema = new Schema({
     city: { type: CitySchema, default: null }
 
 }, {
-    _id:false
+    _id: false
 });
 
 new Helper().SetToJSON(AirportLocationSchema);

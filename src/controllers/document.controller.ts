@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Delete, Tags, Route, Path, FormField, Response, UploadedFile, SuccessResponse } from "tsoa";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import Helper from "../utils/helper.utils";
-import DocumentsService from "../services/documents.service";
-import PersonAttachmentsService from "../services/personattachments.service";
-import { IDocument } from "../models/documents.model";
+import DocumentsService from "../services/document.service";
+import PersonAttachmentsService from "../services/personattachment.service";
+import { IDocument } from "../models/document.model";
 import fs from "fs";
 
 @Tags("Documents")

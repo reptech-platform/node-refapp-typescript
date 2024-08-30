@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import { IAirportLocationSchema, AirportLocationSchema } from "./airportlocations.db.model";
+import { IAirportLocationSchema, AirportLocationSchema } from "./airportlocation.db.model";
 
 export interface IAirportSchema extends Document {
     name: String;

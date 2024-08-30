@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { LocationSchema, ILocationSchema } from "./locations.db.model";
+import { LocationSchema, ILocationSchema } from "./location.db.model";
 import Helper from "../../utils/helper.utils";;
 
 export interface IPersonSchema extends Document {

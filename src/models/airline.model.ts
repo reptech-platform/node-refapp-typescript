@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import { IPerson } from "./persons.model";
+import { IPerson } from "./person.model";
 import { IAirport } from "./airport.model";
 
 export interface IAirline {

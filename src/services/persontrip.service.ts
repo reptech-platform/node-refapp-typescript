@@ -1,5 +1,5 @@
 import { Error } from "mongoose";
-import PersonTrip, { IPersonTripSchema } from "../db/models/persontrips.db.model";
+import PersonTrip, { IPersonTripSchema } from "../db/models/persontrip.db.model";
 import { provideSingleton } from "../utils/provideSingleton";
 
 @provideSingleton(PersonTripsService)

@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import { Location } from "./location.model";
-import { IGeographicPoint } from "./geographicpoints.model";
+import { IGeographicPoint } from "./geographicpoint.model";
 
 
 export interface IAirportLocation extends Location {

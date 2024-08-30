@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import { PersonSchema, IPersonSchema } from "./persons.db.model";
+import { PersonSchema, IPersonSchema } from "./person.db.model";
 
 export interface IAirlineSchema extends Document {
     airlineCode: String;
