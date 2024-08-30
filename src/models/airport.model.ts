@@ -12,7 +12,7 @@ export interface IAirport {
     isInsideCity: Boolean;
     locationJSON: string;
     location?: IAirportLocation;
-    airline?: IAirline;
+    airlineAirport?: IAirline;
     airlineId: any;
 }
 
@@ -30,6 +30,6 @@ export class Airport implements IAirport {
     isInsideCity: Boolean;
     locationJSON: string;
     location?: IAirportLocation;
-    airline?: IAirline;
+    airlineAirport?: IAirline;
     airlineId: any;
 }

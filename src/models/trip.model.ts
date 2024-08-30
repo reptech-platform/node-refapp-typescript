@@ -4,6 +4,7 @@ import { IPlanItems } from "./planitem.model";
 
 export interface ITrip {
     _id: string;
+    tripId: string;
     shareId: string;
     name: string;
     budget: number;
@@ -21,6 +22,7 @@ export interface ITrip {
 @injectable()
 export class Trip implements ITrip {
     _id: string;
+    tripId: string;
     shareId: string;
     name: string;
     budget: number;

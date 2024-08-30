@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { GeographicPointSchema, IGeographicPointSchema } from "./geographicpoint.db.model";
-import { CitySchema, ICitySchema } from "./citie.db.model";
+import { CitySchema, ICitySchema } from "./city.db.model";
 
 export interface IAirportLocationSchema extends Document {
     loc: IGeographicPointSchema;

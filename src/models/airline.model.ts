@@ -8,7 +8,7 @@ export interface IAirline {
     name: string;
     logo: string;
     CEO?: IPerson;
-    airport?: IAirport;
+    airportAirline?: IAirport;
     airportId: any;
 }
 
@@ -19,7 +19,7 @@ export class Airline implements IAirline {
     name: string;
     logo: string;
     CEO?: IPerson;
-    airport?: IAirport;
+    airportAirline?: IAirport;
     airportId: any;
     constructor() { }
 }

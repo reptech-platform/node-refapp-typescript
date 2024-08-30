@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 import { ILocation } from "./location.model";
 import { ITrip } from "./trip.model";
 import { Feature, PersonGender } from "../enums";
-import { IPersonAttachment } from "./personattachment.model";
+import { IDocument } from "./document.model";
 
 export interface IPerson {
     _id: string;
@@ -15,7 +15,7 @@ export interface IPerson {
     gender?: PersonGender,
     age?: number,
     emails?: string[],
-    personAttachments: IPersonAttachment[];
+    personAttachments: IDocument[];
     bestFriend: IPerson;
     friends: IPerson[];
     addressInfo?: ILocation[],
@@ -38,7 +38,7 @@ export class Person implements IPerson {
     gender?: PersonGender;
     age?: number;
     emails?: string[];
-    personAttachments: IPersonAttachment[];
+    personAttachments: IDocument[];
     bestFriend: IPerson;
     friends: IPerson[];
     addressInfo?: ILocation[];

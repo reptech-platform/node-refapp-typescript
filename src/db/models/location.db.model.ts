@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { CitySchema, ICitySchema } from "./citie.db.model";
+import { CitySchema, ICitySchema } from "./city.db.model";
 
 export interface ILocationSchema extends Document {
     address: string;
