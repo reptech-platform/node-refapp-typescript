@@ -10,6 +10,7 @@ export interface IPlanItems extends PublicTransport {
     airline: IAirline;
     fromAirport?: IAirport;
     toAirport?: IAirport;
+    /* Ticket is not embeded */
     ticket: ITicket;
 }
 

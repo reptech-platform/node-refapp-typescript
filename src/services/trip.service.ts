@@ -238,4 +238,8 @@ export default class TripsService {
                 throw error;
             });
     }
+
+    public async getTripsTravellers(): Promise<ITrip[]> {
+
+    }
 }

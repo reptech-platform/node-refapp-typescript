@@ -17,6 +17,7 @@ export interface ITrip {
     cost: number;
     planItems?: IPlanItems[];
     travellers?: IPerson[];
+
 }
 
 @injectable()

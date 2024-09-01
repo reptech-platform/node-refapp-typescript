@@ -21,15 +21,30 @@ export class TripsController extends Controller {
         super();
     }
 
+    /**
+     * Get all trips along with travellers
+     * @returns 
+     */
     @Get("/")
     public async getTrips(): Promise<ITrip[]> {
         return await this.tripService.getTrips();
     }
 
+    /**
+     * Get specific trip by passing the trip id
+     * @param id 
+     * @returns 
+     */
     @Get("/:id")
     public async getTrip(@Path() id: string): Promise<ITrip> {
         return await this.tripService.getTrip(id);
     }
+
+    /**
+     * Create new trip along with travellers
+     * @param body 
+     * @returns 
+     */
 
     @Post("/")
     @SuccessResponse("201", "Created")
@@ -50,49 +65,118 @@ export class TripsController extends Controller {
 
         }
 
-        const content = await this.tripService.createTrip(trip);
+        /*const content = await this.tripService.createTrip(trip);
 
         if (!this.helper.IsArrayNull(travellersId)) {
 
             travellersId.forEach(x => x.tripId = content._id);
             await this.tripTravellersService.createTravellers(travellersId);
 
+        }*/
+
+        const content = await this.personsService.createPerson(person);
+
+        if (!this.helper.IsArrayNull(personTrips)) {
+
+            personTrips.forEach(x => x.personId = content._id);
+            await this.personTripsService.createPersonTrips(personTrips);
+
         }
 
         return content
     }
 
+    /**
+     * Update existing trip
+     * @param id 
+     * @param body 
+     * @returns 
+     */
     @Put("/:id")
     public async updateTrip(@Path() id: string, @Body() body: ITrip): Promise<ITrip> {
         return await this.tripService.updateTrip(id, body);
     }
+
+    /**
+     * Delete Trip 
+     */
 
     @Delete("/:id")
     public async deleteTrip(@Path() id: string): Promise<boolean> {
         return await this.tripService.deleteTrip(id);
     }
 
+    /**
+     * Get list of trips
+     * @returns 
+     */
     @Get("/records/count")
     public async getTripCount(): Promise<number> {
         return await this.tripService.getTripCount();
     }
 
+    /**
+     * 
+     * @param body 
+     * @returns 
+     */
     @Post("/search/count")
     public async searchTripCount(@Body() body: Search): Promise<number> {
         return await this.tripService.searchTripCount(body);
     }
 
+    /**
+     * 
+     * @param body 
+     * @returns 
+     */
     @Post("/search")
     public async searchTrip(@Body() body: Search): Promise<SearchResults> {
         return await this.tripService.searchTrip(body);
     }
 
+    /**
+     * Get All trips and their travellers
+     * @returns 
+     */
     @Get("/travellers")
     public async getTripsTravellers(): Promise<ITrip[]> {
         return await this.tripService.getTripsTravellers();
     }
 
-    @Get("/:id/travellers")
+    /**
+     * Delete traveller from trip travellers
+     * @returns 
+     */
+    @Delete("/travellers/${tripId}/{$travellerId")
+    public async getTripsTravellers(): Promise<ITrip[]> {
+        return await this.tripService.getTripsTravellers();
+    }
+
+    /**
+     * Update traveller for trip traveller
+     * @returns 
+     */
+    @Patch("/travellers/${tripId}/{$travellerId")
+    public async getTripsTravellers(): Promise<ITrip[]> {
+        return await this.tripService.getTripsTravellers();
+    }
+
+    /**
+     * Add new traveller to trip travellers
+     * @returns 
+     */
+    @Post("/travellers/${tripId}")
+    public async getTripsTravellers(): Promise<ITrip[]> {
+        return await this.tripService.getTripsTravellers();
+    }
+
+    /**
+     * Get specific trip's travellers
+     * @param id 
+     * @returns 
+     */
+    @Get("/:tripId/travellers")
     public async getTripTravellers(@Path() id: string): Promise<ITrip> {
         return await this.tripService.getTripTravellers(id);
     }

@@ -15,6 +15,7 @@ export interface IPerson {
     gender?: PersonGender,
     age?: number,
     emails?: string[],
+    /* Person Attachments are embeded */
     personAttachments: IDocument[];
     bestFriend: IPerson;
     friends: IPerson[];

@@ -88,11 +88,17 @@ export class PersonsController extends Controller {
         return await this.personsService.searchPerson(body);
     }
 
+    /*
+    Get All persons and their trips
+     */
     @Get("/trips")
     public async getPersonsTrips(): Promise<IPerson[]> {
         return await this.personsService.getPersonsTrips();
     }
 
+    /*
+     * Get specific person's trips
+     */
     @Get("/:id/trips")
     public async getPersonTrips(@Path() id: string): Promise<IPerson> {
         return await this.personsService.getPersonTrips(id);
