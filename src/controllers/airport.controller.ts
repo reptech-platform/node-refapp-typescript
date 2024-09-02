@@ -35,11 +35,11 @@ export class AirportsController extends Controller {
 
         let airport: IAirport = body;
 
-        const airline: IAirline | undefined = airport.airline;
+        const airline: IAirline | undefined = airport.airlines;
 
         if (airline) {
             const tmp = await this.airlinesService.createAirline(airline);
-            airport.airlineId = tmp._id;
+            airport.airlines = tmp;
         }
 
         return await this.airportsService.createAirport(airport);

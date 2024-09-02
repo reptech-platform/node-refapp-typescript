@@ -63,7 +63,7 @@ export class DocumentsController extends Controller {
 
             const content = await this.documentsService.createDocument(input);
 
-            const documentId = content._id;
+            const documentId = content.docid;
 
             input = { personId, documentId };
 

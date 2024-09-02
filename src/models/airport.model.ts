@@ -3,7 +3,6 @@ import { IAirportLocation } from "./airportlocation.model";
 import { IAirline } from "./airline.model";
 
 export interface IAirport {
-    _id: string;
     name: string;
     icaoCode: string;
     iataCode: string;
@@ -12,8 +11,7 @@ export interface IAirport {
     isInsideCity: Boolean;
     locationJSON: string;
     location?: IAirportLocation;
-    airlineAirport?: IAirline;
-    airlineId: any;
+    airlines?: IAirline;
 }
 
 @injectable()
@@ -21,7 +19,6 @@ export class Airport implements IAirport {
 
     constructor() { }
 
-    _id: string;
     name: string;
     icaoCode: string;
     iataCode: string;
@@ -30,6 +27,5 @@ export class Airport implements IAirport {
     isInsideCity: Boolean;
     locationJSON: string;
     location?: IAirportLocation;
-    airlineAirport?: IAirline;
-    airlineId: any;
+    airlines?: IAirline;
 }

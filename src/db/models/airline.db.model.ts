@@ -13,6 +13,10 @@ export interface IAirlineSchema extends Document {
      * Embeded collection inside the collection
      */
     CEO: IPersonTripSchema;
+    /**
+     * Referencing the _id from Airport collection
+     */
+    airport: String;
 }
 
 /**
@@ -25,7 +29,11 @@ export const AirlineSchema: Schema = new Schema({
     /**
      * Embeded collection inside the collection
      */
-    CEO: { type: PersonTripSchema, default: null }
+    CEO: { type: PersonTripSchema, default: null },
+    /**
+     * Referencing the _id from Airport collection
+     */
+    airport: { type: Schema.Types.ObjectId, default: null }
 }, {
     timestamps: true,
     /**

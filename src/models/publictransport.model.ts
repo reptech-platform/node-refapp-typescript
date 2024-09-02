@@ -1,8 +1,15 @@
 import { injectable } from "inversify";
 import { BasePlanItem } from "./baseplanitem.model";
 
-@injectable()
-export class PublicTransport extends BasePlanItem {
+export interface IPublicTransport extends BasePlanItem {
     seatNumber: string;
-    constructor() { super(); }
+}
+
+@injectable()
+export abstract class PublicTransport
+    extends BasePlanItem implements IPublicTransport {
+    seatNumber: string;
+    constructor() {
+        super();
+    }
 }

@@ -4,8 +4,10 @@ import { ITrip } from "./trip.model";
 import { Feature, PersonGender } from "../enums";
 import { IDocument } from "./document.model";
 
+/**
+ * Interface to validate model field construction
+ */
 export interface IPerson {
-    _id: string;
     userName?: string,
     firstName?: string,
     middleName?: string,
@@ -15,7 +17,6 @@ export interface IPerson {
     gender?: PersonGender,
     age?: number,
     emails?: string[],
-    /* Person Attachments are embeded */
     personAttachments: IDocument[];
     bestFriend: IPerson;
     friends: IPerson[];
@@ -26,7 +27,9 @@ export interface IPerson {
     trips?: ITrip[]
 }
 
-
+/**
+ * Model defination for Data transfer object
+ */
 @injectable()
 export class Person implements IPerson {
     _id: string;

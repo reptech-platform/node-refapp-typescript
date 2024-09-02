@@ -59,31 +59,20 @@ export class TripsController extends Controller {
 
             for (var iTraveller = 0; iTraveller < persons.length; iTraveller++) {
                 const tmp = await this.personsService.createPerson(persons[iTraveller]);
-                const mapItem = { personId: tmp._id, tripId: null };
+                const mapItem = { personId: tmp.userName, tripId: null };
                 travellersId.push(mapItem);
             };
 
         }
 
-        /*const content = await this.tripService.createTrip(trip);
+        const content = await this.tripService.createTrip(trip);
 
         if (!this.helper.IsArrayNull(travellersId)) {
-
-            travellersId.forEach(x => x.tripId = content._id);
+            travellersId.forEach(x => x.tripId = content.tripId);
             await this.tripTravellersService.createTravellers(travellersId);
-
-        }*/
-
-        const content = await this.personsService.createPerson(person);
-
-        if (!this.helper.IsArrayNull(personTrips)) {
-
-            personTrips.forEach(x => x.personId = content._id);
-            await this.personTripsService.createPersonTrips(personTrips);
-
         }
 
-        return content
+        return content;
     }
 
     /**

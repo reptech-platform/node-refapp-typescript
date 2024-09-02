@@ -35,11 +35,11 @@ export class AirlinesController extends Controller {
     public async createAirline(@Body() body: IAirline): Promise<IAirline> {
 
         let airline: IAirline = body;
-        const airport: IAirport | undefined = airline.airport;
+        const airport: IAirport | undefined = airline.airports;
 
         if (airport) {
             const tmp = await this.airportsService.createAirport(airport);
-            airline.airportId = tmp._id;
+            airline.airports = tmp;
         }
 
         return await this.airlinesService.createAirline(airline);

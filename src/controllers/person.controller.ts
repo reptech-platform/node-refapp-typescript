@@ -44,7 +44,7 @@ export class PersonsController extends Controller {
 
             for (var iTrip = 0; iTrip < trips.length; iTrip++) {
                 const tmp = await this.tripService.createTrip(trips[iTrip]);
-                const mapItem = { personId: null, tripId: tmp._id };
+                const mapItem = { personId: null, tripId: tmp.tripId };
                 personTrips.push(mapItem);
             };
 
@@ -54,7 +54,7 @@ export class PersonsController extends Controller {
 
         if (!this.helper.IsArrayNull(personTrips)) {
 
-            personTrips.forEach(x => x.personId = content._id);
+            personTrips.forEach(x => x.personId = content.userName);
             await this.personTripsService.createPersonTrips(personTrips);
 
         }

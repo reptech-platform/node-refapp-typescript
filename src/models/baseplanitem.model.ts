@@ -1,6 +1,7 @@
 import { injectable } from "inversify";
 
 export interface IBasePlanItem {
+    planItemId: number;
     confirmationCode: string;
     startsAt: Date;
     endsAt: Date;
@@ -8,7 +9,8 @@ export interface IBasePlanItem {
 }
 
 @injectable()
-export class BasePlanItem implements IBasePlanItem {
+export abstract class BasePlanItem implements IBasePlanItem {
+    planItemId: number;
     confirmationCode: string;
     startsAt: Date;
     endsAt: Date;

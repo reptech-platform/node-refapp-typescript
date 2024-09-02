@@ -2,8 +2,10 @@ import { injectable } from "inversify";
 import { IPerson } from "./person.model";
 import { IPlanItems } from "./planitem.model";
 
+/**
+ * Interface to validate model field construction
+ */
 export interface ITrip {
-    _id: string;
     tripId: string;
     shareId: string;
     name: string;
@@ -12,17 +14,24 @@ export interface ITrip {
     tags: string[];
     startAt: Date;
     endsAt: Date;
-    startTime: Date;
-    endTime: Date;
+    /**
+     * To store only time, declare as string and use field validation at DB
+     */
+    startTime: string;
+    /**
+     * To store only time, declare as string and use field validation at DB
+     */
+    endTime: string;
     cost: number;
     planItems?: IPlanItems[];
     travellers?: IPerson[];
-
 }
 
+/**
+ * Model defination for Data transfer object
+ */
 @injectable()
 export class Trip implements ITrip {
-    _id: string;
     tripId: string;
     shareId: string;
     name: string;
@@ -31,8 +40,14 @@ export class Trip implements ITrip {
     tags: string[];
     startAt: Date;
     endsAt: Date;
-    startTime: Date;
-    endTime: Date;
+    /**
+     * To store only time, declare as string and use field validation at DB
+     */
+    startTime: string;
+    /**
+     * To store only time, declare as string and use field validation at DB
+     */
+    endTime: string;
     cost: number;
     planItems?: IPlanItems[];
     travellers?: IPerson[];
