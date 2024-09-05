@@ -8,7 +8,7 @@ export interface IAirport {
     iataCode: string;
     latitude: number;
     longitude: number;
-    isInsideCity: Boolean;
+    isInsideCity: boolean;
     locationJSON: string;
     location?: IAirportLocation;
     airlines?: IAirline;
@@ -24,7 +24,7 @@ export class Airport implements IAirport {
     iataCode: string;
     latitude: number;
     longitude: number;
-    isInsideCity: Boolean;
+    isInsideCity: boolean;
     locationJSON: string;
     location?: IAirportLocation;
     airlines?: IAirline;

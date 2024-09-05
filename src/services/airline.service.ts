@@ -12,7 +12,7 @@ export default class AirlinesService {
     }
 
     public async getAirlines(): Promise<IAirline[]> {
-        return AirlineSchema.find()
+        return AirlineSchema.find({}, { _id: 0 })
             .then((data: IAirlineSchema[]) => {
                 let results = this.helper.GetItemFromArray(data, -1, []);
                 return results as IAirline[];
@@ -22,8 +22,8 @@ export default class AirlinesService {
             });
     }
 
-    public async getAirline(id: string): Promise<IAirline> {
-        return AirlineSchema.find({ _id: id })
+    public async getAirline(airlineCode: string): Promise<IAirline> {
+        return AirlineSchema.find({ airlineCode }, { _id: 0 })
             .then((data: IAirlineSchema[]) => {
                 let results = this.helper.GetItemFromArray(data, -1, []);
                 return results as IAirline;
@@ -116,8 +116,8 @@ export default class AirlinesService {
             });
     }
 
-    public async updateAirline(id: string, airline: IAirline): Promise<IAirline> {
-        return AirlineSchema.findOneAndUpdate({ _id: id }, airline, { new: true })
+    public async updateAirline(airlineCode: string, airline: IAirline): Promise<IAirline> {
+        return AirlineSchema.findOneAndUpdate({ airlineCode }, airline, { new: true })
             .then((data: any) => {
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as IAirline;
@@ -127,8 +127,8 @@ export default class AirlinesService {
             });
     }
 
-    public async deleteAirline(id: string): Promise<boolean> {
-        return AirlineSchema.findOneAndDelete({ _id: id })
+    public async deleteAirline(airlineCode: string): Promise<boolean> {
+        return AirlineSchema.findOneAndDelete({ airlineCode })
             .then(() => {
                 return true;
             })

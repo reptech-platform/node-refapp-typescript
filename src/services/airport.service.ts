@@ -11,7 +11,7 @@ export default class AirportsService {
     constructor(@inject(Helper) private helper: Helper) { }
 
     public async getAirports(): Promise<IAirport[]> {
-        return AirportSchema.find()
+        return AirportSchema.find({}, { _id: 0 })
             .then((data: IAirportSchema[]) => {
                 let results = this.helper.GetItemFromArray(data, -1, []);
                 return results as IAirport[];
@@ -21,8 +21,8 @@ export default class AirportsService {
             });
     }
 
-    public async getAirport(id: string): Promise<IAirport> {
-        return AirportSchema.find({ _id: id })
+    public async getAirport(icaoCode: string, iataCode: string): Promise<IAirport> {
+        return AirportSchema.find({ icaoCode, iataCode }, { _id: 0 })
             .then((data: IAirportSchema[]) => {
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as IAirport;
@@ -116,8 +116,8 @@ export default class AirportsService {
             });
     }
 
-    public async updateAirport(id: string, airport: IAirport): Promise<IAirport> {
-        return AirportSchema.findOneAndUpdate({ _id: id }, airport, { new: true })
+    public async updateAirport(icaoCode: string, iataCode: string, airport: IAirport): Promise<IAirport> {
+        return AirportSchema.findOneAndUpdate({ icaoCode, iataCode }, airport, { new: true })
             .then((data: any) => {
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as IAirport;
@@ -127,8 +127,8 @@ export default class AirportsService {
             });
     }
 
-    public async deleteAirport(id: string): Promise<boolean> {
-        return AirportSchema.findOneAndDelete({ _id: id })
+    public async deleteAirport(icaoCode: string, iataCode: string): Promise<boolean> {
+        return AirportSchema.findOneAndDelete({ icaoCode, iataCode })
             .then(() => {
                 return true;
             })

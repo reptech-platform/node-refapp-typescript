@@ -17,9 +17,9 @@ export interface IPerson {
     gender?: PersonGender,
     age?: number,
     emails?: string[],
-    personAttachments: IDocument[];
-    bestFriend: IPerson;
-    friends: IPerson[];
+    personAttachments?: IDocument[];
+    bestFriend?: IPerson;
+    friends?: IPerson[];
     addressInfo?: ILocation[],
     homeAddress?: ILocation,
     favoriteFeature?: Feature,
@@ -42,9 +42,9 @@ export class Person implements IPerson {
     gender?: PersonGender;
     age?: number;
     emails?: string[];
-    personAttachments: IDocument[];
-    bestFriend: IPerson;
-    friends: IPerson[];
+    personAttachments?: IDocument[];
+    bestFriend?: IPerson;
+    friends?: IPerson[];
     addressInfo?: ILocation[];
     homeAddress?: ILocation;
     favoriteFeature?: Feature;

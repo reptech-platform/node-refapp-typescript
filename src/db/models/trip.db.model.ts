@@ -1,9 +1,11 @@
 import mongoose, { Document, Schema } from "mongoose";
-import DateOnly from "mongoose-dateonly";
-import AutoIncrement from "mongoose-sequence";
-
+import DateOnlyFactory from "mongoose-dateonly";
+import AutoIncrementFactory from "mongoose-sequence";
 import Helper from "../../utils/helper.utils";
 import { PlanItemSchema, IPlanItemSchema } from "./planitem.db.model";
+
+const AutoIncrement = AutoIncrementFactory(mongoose);
+const DateOnly = DateOnlyFactory(mongoose);
 
 /**
  * Interface to validate schema field construction
@@ -15,10 +17,10 @@ export interface ITripSchema extends Document {
     budget: Number;
     description: String;
     tags: String[];
-    startAt: DateOnly;
-    endsAt: DateOnly;
-    startTime: String;
-    endTime: String;
+    startAt: Date;
+    endsAt: Date;
+    startTime: Date;
+    endTime: Date;
     cost: Number;
     planItems: IPlanItemSchema[]
 }
@@ -33,25 +35,25 @@ export const TripSchema: Schema = new Schema({
     budget: { type: mongoose.Types.Decimal128, default: null },
     description: { type: String, default: null },
     tags: [{ type: String, default: null }],
-    startAt: { type: DateOnly, default: null },
-    endsAt: { type: DateOnly, default: null },
+    startAt: { type: Date, default: null },
+    endsAt: { type: Date, default: null },
     startTime: {
-        type: String, default: null,
-        validate: {
+        type: Date, default: null,
+        /* validate: {
             validator: function (v) {
                 return /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(v); // Validates HH:MM format
             },
             message: (props: { value: any; }) => `${props.value} is not a valid time format!`
-        }
+        } */
     },
     endTime: {
-        type: String, default: null,
-        validate: {
+        type: Date, default: null,
+        /* validate: {
             validator: function (v) {
                 return /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(v); // Validates HH:MM format
             },
             message: (props: { value: any; }) => `${props.value} is not a valid time format!`
-        }
+        } */
     },
     cost: { type: mongoose.Types.Decimal128, default: null },
     planItems: [{ type: PlanItemSchema, default: null }]
@@ -60,7 +62,7 @@ export const TripSchema: Schema = new Schema({
     /**
      * Disabled _id field from default schema
      */
-    _id: false
+    // _id: false
 });
 
 /**

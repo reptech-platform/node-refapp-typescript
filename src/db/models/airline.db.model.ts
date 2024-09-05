@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import PersonTripSchema, { IPersonTripSchema } from "./persontrip.db.model";
+
+import { CEOSchema, ICEOSchema } from "./ceo.db.model";
 
 /**
  * Interface to validate schema field construction
@@ -12,11 +13,11 @@ export interface IAirlineSchema extends Document {
     /**
      * Embeded collection inside the collection
      */
-    CEO: IPersonTripSchema;
+    CEO: ICEOSchema;
     /**
      * Referencing the _id from Airport collection
      */
-    airport: String;
+    airports: String;
 }
 
 /**
@@ -29,17 +30,17 @@ export const AirlineSchema: Schema = new Schema({
     /**
      * Embeded collection inside the collection
      */
-    CEO: { type: PersonTripSchema, default: null },
+    CEO: { type: CEOSchema, default: null },
     /**
      * Referencing the _id from Airport collection
      */
-    airport: { type: Schema.Types.ObjectId, default: null }
+    airports: { type: Schema.Types.ObjectId, default: null }
 }, {
     timestamps: true,
     /**
     * Disabled _id field from default schema
     */
-    _id: false
+    // _id: false
 });
 
 /**

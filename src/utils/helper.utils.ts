@@ -1,5 +1,6 @@
 const Types = require('mongoose').Types;
 import { provideSingleton } from "../utils/provideSingleton";
+import moment from "moment";
 
 @provideSingleton(Helper)
 export default class Helper {
@@ -76,5 +77,10 @@ export default class Helper {
 
     public ObjectId(id: any): any {
         return new Types.ObjectId(id);
+    };
+
+    public ToDateOnly = (e: any) => {
+        if (this.IsNullValue(e)) return null;
+        return new Date(e);
     };
 }

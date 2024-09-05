@@ -6,7 +6,7 @@ const AutoIncrement = AutoIncrementFactory(mongoose);
 /**
  * Interface to validate schema field construction
  */
-export interface IDocumentSchema extends Document {
+export interface IPersonAttachmentSchema extends Document {
     /**
      * Auto increment docId
      */
@@ -19,7 +19,7 @@ export interface IDocumentSchema extends Document {
 /**
  * Schema defination to store the document
  */
-export const DocumentSchema: Schema = new Schema({
+export const PersonAttachmentSchema: Schema = new Schema({
     /**
      * Auto increment id
      */
@@ -28,20 +28,21 @@ export const DocumentSchema: Schema = new Schema({
     docLocation: { type: String, default: null },
     docFileType: { type: String, default: null }
 }, {
-    timestamps: true
+    timestamps: true,
+    _id: false
 });
 
 /**
  * Define auto increment number
  */
-DocumentSchema.plugin(AutoIncrement, { inc_field: 'docId' });
+// PersonAttachmentSchema.plugin(AutoIncrement, { inc_field: 'docId' });
 
 /**
  * Setting function to onvert $numberDecimal to actual decimal values
  */
-new Helper().SetToJSON(DocumentSchema);
+new Helper().SetToJSON(PersonAttachmentSchema);
 
 /**
  * Export as default schema with assigning interface validation
  */
-export default mongoose.model<IDocumentSchema>("Document", DocumentSchema);
+// export default mongoose.model<IPersonAttachmentSchema>("PersonAttachment", PersonAttachmentSchema);

@@ -6,25 +6,25 @@ import { IPlanItems } from "./planitem.model";
  * Interface to validate model field construction
  */
 export interface ITrip {
-    tripId: string;
-    shareId: string;
-    name: string;
-    budget: number;
-    description: string;
-    tags: string[];
-    startAt: Date;
-    endsAt: Date;
+    tripId?: string;
+    shareId?: string;
+    name?: string;
+    budget?: number;
+    description?: string;
+    tags?: string[];
+    startAt?: Date;
+    endsAt?: Date;
     /**
      * To store only time, declare as string and use field validation at DB
      */
-    startTime: string;
+    startTime?: Date;
     /**
      * To store only time, declare as string and use field validation at DB
      */
-    endTime: string;
-    cost: number;
-    planItems?: IPlanItems[];
-    travellers?: IPerson[];
+    endTime?: Date;
+    cost?: number;
+    //planItems?: IPlanItems[];
+    //travellers?: IPerson[];
 }
 
 /**
@@ -32,25 +32,25 @@ export interface ITrip {
  */
 @injectable()
 export class Trip implements ITrip {
-    tripId: string;
-    shareId: string;
-    name: string;
-    budget: number;
-    description: string;
-    tags: string[];
-    startAt: Date;
-    endsAt: Date;
+    tripId?: string;
+    shareId?: string;
+    name?: string;
+    budget?: number;
+    description?: string;
+    tags?: string[];
+    startAt?: Date;
+    endsAt?: Date;
     /**
      * To store only time, declare as string and use field validation at DB
      */
-    startTime: string;
+    startTime?: Date;
     /**
      * To store only time, declare as string and use field validation at DB
      */
-    endTime: string;
-    cost: number;
-    planItems?: IPlanItems[];
-    travellers?: IPerson[];
+    endTime?: Date;
+    cost?: number;
+    //planItems?: IPlanItems[];
+    //travellers?: IPerson[];
 
     constructor() { }
 }

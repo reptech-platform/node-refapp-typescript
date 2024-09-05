@@ -5,19 +5,16 @@ import Helper from "../../utils/helper.utils";
 import { PersonAttachmentSchema, IPersonAttachmentSchema } from "./personattachment.db.model";
 
 const DateOnly = DateOnlyFactory(mongoose);
-
-const helper = new Helper();
-
 /**
  * Interface to validate schema field construction
  */
-export interface IPersonSchema extends Document {
+export interface ICEOSchema extends Document {
     userName: String;
     firstName: String;
     middleName: String;
     lastName: String;
     income: Number;
-    dateOfBirth: Date;
+    dateOfBirth: typeof DateOnly;
     gender: Number;
     age: Number,
     emails: String[];
@@ -31,14 +28,7 @@ export interface IPersonSchema extends Document {
     homeAddress: ILocationSchema;
     favoriteFeature: Number;
     features: Number[];
-    /**
-     * Referencing the userName from Person collection
-     */
     bestFriend: String;
-    /**
-     * Referencing the userName from Person collection
-     */
-    friends: [String];
     /**
      * Embeded collection of array inside the collection
      */
@@ -48,13 +38,13 @@ export interface IPersonSchema extends Document {
 /**
  * Schema defination to store the document
  */
-export const PersonSchema: Schema = new Schema({
+export const CEOSchema: Schema = new Schema({
     userName: { type: String },
     firstName: { type: String, default: null },
     middleName: { type: String, default: null },
     lastName: { type: String, default: null },
     income: { type: mongoose.Types.Decimal128, default: null },
-    dateOfBirth: { type: Date, default: null },
+    dateOfBirth: { type: DateOnly, default: null },
     gender: { type: Number, default: null },
     age: { type: Number, default: null },
     emails: [{ type: String, default: null }],
@@ -73,28 +63,28 @@ export const PersonSchema: Schema = new Schema({
      */
     bestFriend: { type: String, default: null },
     /**
-     * Referencing the userName from Person collection
-     */
-    friends: [String],
-    /**
      * Embeded collection of array inside the collection
      */
     personAttachments: [PersonAttachmentSchema]
 }, {
     timestamps: true,
+    /**
+     * Disabled _id field from default schema
+     */
+    _id: false
 });
 
 /**
  * Defining combination key with multiple fields
  */
-PersonSchema.index({ userName: 1 }, { unique: true });
+// CEOSchema.index({ userName: 1 }, { unique: true });
 
 /**
  * Setting function to onvert $numberDecimal to actual decimal values
  */
-helper.SetToJSON(PersonSchema);
+new Helper().SetToJSON(CEOSchema);
 
 /**
  * Export as default schema with assigning interface validation
  */
-export default mongoose.model<IPersonSchema>("Person", PersonSchema, 'persons');
+// export default mongoose.model<IPersonSchema>("Person", PersonSchema, 'persons');

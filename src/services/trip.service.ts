@@ -11,7 +11,7 @@ export default class TripsService {
     constructor(@inject(Helper) private helper: Helper) { }
 
     public async getTrips(): Promise<ITrip[]> {
-        return TripSchema.find()
+        return TripSchema.find({}, { _id: 0 })
             .then((data: ITripSchema[]) => {
                 let results = this.helper.GetItemFromArray(data, -1, []);
                 return results as ITrip[];
@@ -21,8 +21,8 @@ export default class TripsService {
             });
     }
 
-    public async getTrip(id: string): Promise<ITrip> {
-        return TripSchema.find({ _id: id })
+    public async getTrip(tripId: string): Promise<ITrip> {
+        return TripSchema.find({ tripId }, { _id: 0 })
             .then((data: ITripSchema[]) => {
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as ITrip;
@@ -73,7 +73,7 @@ export default class TripsService {
             });
     }
 
-    public async getTripTravellers(id: string): Promise<ITrip> {
+    public async getTripTraveller(id: string): Promise<ITrip> {
 
         let $pipeline = [
 
@@ -127,8 +127,8 @@ export default class TripsService {
             });
     }
 
-    public async updateTrip(id: string, trip: any): Promise<ITrip> {
-        return TripSchema.findOneAndUpdate({ _id: id }, trip, { new: true })
+    public async updateTrip(tripId: string, trip: any): Promise<ITrip> {
+        return TripSchema.findOneAndUpdate({ tripId }, trip, { new: true })
             .then((data: any) => {
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as ITrip;
@@ -138,8 +138,8 @@ export default class TripsService {
             });
     }
 
-    public async deleteTrip(id: string): Promise<boolean> {
-        return TripSchema.findOneAndDelete({ _id: id })
+    public async deleteTrip(tripId: string): Promise<boolean> {
+        return TripSchema.findOneAndDelete({ tripId })
             .then(() => {
                 return true;
             })
@@ -239,7 +239,7 @@ export default class TripsService {
             });
     }
 
-    public async getTripsTravellers(): Promise<ITrip[]> {
+    /* public async getTripsTravellers(): Promise<ITrip[]> {
 
-    }
+    } */
 }

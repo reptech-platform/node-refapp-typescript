@@ -4,10 +4,10 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "start": "node build/server.js",
+    "start": "npm run start:dev",
     "dev": "tsoa spec-and-routes && nodemon server.ts",
     "build": "tsoa spec-and-routes && tsc",
-    "start:dev": "tsoa spec-and-routes && nodemon server.ts"
+    "start:dev": "del build\\*.* /q && tsoa spec-and-routes && nodemon server.ts"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +19,7 @@
     "inversify": "^6.0.2",
     "inversify-binding-decorators": "^4.0.0",
     "joi": "^17.13.3",
+    "moment": "^2.30.1",
     "mongoose": "^8.4.3",
     "mongoose-dateonly": "^1.0.6",
     "mongoose-sequence": "^6.0.1",

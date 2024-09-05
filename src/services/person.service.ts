@@ -12,7 +12,7 @@ export default class PersonsService {
     }
 
     public async getPersons(): Promise<IPerson[]> {
-        return PersonSchema.find()
+        return PersonSchema.find({}, { _id: 0 })
             .then((data: IPersonSchema[]) => {
                 let results = this.helper.GetItemFromArray(data, -1, []);
                 return results as IPerson[];
@@ -22,8 +22,8 @@ export default class PersonsService {
             });
     }
 
-    public async getPerson(id: string): Promise<IPerson> {
-        return PersonSchema.find({ _id: id })
+    public async getPerson(userName: string): Promise<IPerson> {
+        return PersonSchema.find({ userName }, { _id: 0 })
             .then((data: IPersonSchema[]) => {
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as IPerson;
@@ -128,8 +128,8 @@ export default class PersonsService {
             });
     }
 
-    public async updatePerson(id: string, person: any): Promise<IPerson> {
-        return PersonSchema.findOneAndUpdate({ _id: id }, person, { new: true })
+    public async updatePerson(userName: string, person: any): Promise<IPerson> {
+        return PersonSchema.findOneAndUpdate({ userName }, person, { new: true })
             .then((data: any) => {
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as IPerson;
@@ -139,8 +139,8 @@ export default class PersonsService {
             });
     }
 
-    public async deletePerson(id: string): Promise<boolean> {
-        return PersonSchema.findOneAndDelete({ _id: id })
+    public async deletePerson(userName: string): Promise<boolean> {
+        return PersonSchema.findOneAndDelete({ userName })
             .then(() => {
                 return true;
             })
