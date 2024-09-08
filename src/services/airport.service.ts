@@ -28,6 +28,20 @@ export default class AirportsService {
             });
     }
 
+    // Method to get a specific airport by its ICAO and IATA codes
+    public async getAirportId(icaoCode: string, iataCode: string): Promise<string> {
+        return await AirportSchema.find({ icaoCode, iataCode }, { _id: 1 })
+            .then((data: IAirportSchema[]) => {
+                // Get the first item from the array or return an empty object
+                let results = this.helper.GetItemFromArray(data, 0, { _id: null });
+                return results._id;
+            })
+            .catch((error: Error) => {
+                // Handle any errors that occur during the query
+                throw error;
+            });
+    }
+
     // Method to get all airports
     public async getAirports(): Promise<IAirport[]> {
         return await AirportSchema.find({}, { _id: 0 })

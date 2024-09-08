@@ -88,16 +88,7 @@ export class AirlinesController extends Controller {
 
         try {
 
-            let airline: IAirline = body;
-
-            /*const airport: IAirport | undefined = airline.airports;
-    
-            if (airport) {
-                const tmp = await this.airportsService.createAirport(airport);
-                airline.airports = tmp;
-            }*/
-
-            await this.airlinesService.createAirline(airline);
+            await this.airlinesService.createAirline(body);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);
@@ -217,24 +208,34 @@ export class AirlinesController extends Controller {
         }
     }
 
-    /* @Post("/search/count")
+    /**
+     * Define a POST endpoint to search airlines count
+     * @param body 
+     * @returns number
+     */
+    @Post("/search/count")
     public async searchAirlinesCount(@Body() body: Search): Promise<number> {
         return await this.airlinesService.searchAirlineCount(body);
     }
 
+    /**
+     * Define a POST endpoint to search airlines
+     * @param body 
+     * @returns SearchResults
+     */
     @Post("/search")
     public async searchAirline(@Body() body: Search): Promise<SearchResults> {
         return await this.airlinesService.searchAirline(body);
     }
 
-    @Get("/airports")
-    public async getAirlinesAirports(): Promise<IAirline[]> {
-        return await this.airlinesService.getAirlinesAirports();
+    /**
+     * Define a POST endpoint to get airports for a airline
+     * @param airlineCode 
+     * @returns IAirline[]
+     */
+    @Get("/:airlineCode/airports")
+    public async getAirlineAirports(@Path() airlineCode: string): Promise<IAirline[]> {
+        return await this.airlinesService.getAirlineAirports(airlineCode);
     }
-
-    @Get("/:id/airports")
-    public async getAirlineAirports(@Path() id: string): Promise<IAirline> {
-        return await this.airlinesService.getAirlineAirports(id);
-    } */
 
 }

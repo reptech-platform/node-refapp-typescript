@@ -17,7 +17,7 @@ export interface IAirlineSchema extends Document {
     /**
      * Referencing the _id from Airport collection
      */
-    airports: String;
+    airportId: String;
 }
 
 /**
@@ -34,13 +34,9 @@ export const AirlineSchema: Schema = new Schema({
     /**
      * Referencing the _id from Airport collection
      */
-    airports: { type: Schema.Types.ObjectId, default: null }
+    airportId: { type: Schema.Types.ObjectId, default: null, ref: 'airport' }
 }, {
-    timestamps: true,
-    /**
-    * Disabled _id field from default schema
-    */
-    // _id: false
+    timestamps: true
 });
 
 /**

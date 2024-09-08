@@ -30,6 +30,9 @@ export interface IAirport {
 
     // Optional property representing the airlines associated with the airport
     airlines?: IAirline;
+
+    // Optional property to store airline reference id
+    airlineId?: string;
 }
 
 // Class implementing the IAirport interface
@@ -65,5 +68,8 @@ export class Airport implements IAirport {
 
     // Optional property representing the airlines associated with the airport
     airlines?: IAirline;
+
+    // Optional property to store airline reference id
+    airlineId?: string;
 }
 

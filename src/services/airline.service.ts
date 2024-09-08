@@ -3,14 +3,20 @@ import { provideSingleton, inject } from "../utils/provideSingleton";
 import Helper from "../utils/helper.utils";;
 import AirlineSchema, { IAirlineSchema } from "../db/models/airline.db.model";
 import { IAirline } from "../models/airline.model";
+import { IAirport } from "../models/airport.model";
 import { FilterBy, Pagination, Search, SearchResults, SortBy } from "../models/search.model";
+import AirportsService from "../services/airport.service";
+import RequestResponse from "../utils/request.response";
 
 // This decorator ensures that AirlinesService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @provideSingleton(AirlinesService)
 export default class AirlinesService {
 
-    // Injecting the Helper service
-    constructor(@inject(Helper) private helper: Helper) { }
+    // Injecting the Helper and AirportsService service
+    constructor(
+        @inject(AirportsService) private airportsService: AirportsService,
+        @inject(Helper) private helper: Helper) {
+    }
 
     // Method to check if an airline exists by its code
     public async isAirlineExist(airlineCode: string): Promise<boolean> {
@@ -30,8 +36,36 @@ export default class AirlinesService {
 
     // Method to get all airlines
     public async getAirlines(): Promise<IAirline[]> {
-        return await AirlineSchema.find({}, { _id: 0 })
-            .then((data: IAirlineSchema[]) => {
+
+        let $pipeline = [
+            {
+                $lookup: {
+                    from: "airports", localField: "airportId", foreignField: "_id", as: "Airports",
+                    pipeline: [
+                        {
+                            $project: {
+                                "airline": 0,
+                                "_id": 0,
+                                "__v": 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$Airports", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "airports": "$Airports" } },
+            {
+                $project: {
+                    "_id": 0,
+                    "airportId": 0,
+                    "Airports": 0,
+                    "__v": 0
+                }
+            }
+        ];
+
+        return await AirlineSchema.aggregate($pipeline)
+            .then((data: any) => {
                 // Get all items from the array or return an empty array
                 let results = this.helper.GetItemFromArray(data, -1, []);
                 return results as IAirline[];
@@ -44,28 +78,17 @@ export default class AirlinesService {
 
     // Method to get a specific airline by its code
     public async getAirline(airlineCode: string): Promise<IAirline> {
-        return await AirlineSchema.find({ airlineCode }, { _id: 0 })
-            .then((data: IAirlineSchema[]) => {
-                // Get all items from the array or return an empty array
-                let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as IAirline;
-            })
-            .catch((error: Error) => {
-                // Handle any errors that occur during the query
-                throw error;
-            });
-    }
-
-    // Method to get all airlines along with their associated airports
-    public async getAirlinesAirports(): Promise<IAirline[]> {
 
         let $pipeline = [
+            { $match: { airlineCode } },
             {
                 $lookup: {
                     from: "airports", localField: "airportId", foreignField: "_id", as: "Airports",
                     pipeline: [
                         {
                             $project: {
+                                "airline": 0,
+                                "_id": 0,
                                 "__v": 0
                             }
                         }
@@ -76,46 +99,8 @@ export default class AirlinesService {
             { "$addFields": { "airports": "$Airports" } },
             {
                 $project: {
-                    "Airports": 0,
-                    "__v": 0
-                }
-            }
-
-        ];
-
-        return await AirlineSchema.aggregate($pipeline)
-            .then((data: IAirlineSchema[]) => {
-                // Get all items from the array or return an empty array
-                let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as IAirline[];
-            })
-            .catch((error: Error) => {
-                // Handle any errors that occur during the query
-                throw error;
-            });
-    }
-
-    // Method to get a specific airline along with its associated airports by airline ID
-    public async getAirlineAirports(id: string): Promise<IAirline> {
-
-        let $pipeline = [
-            { $match: { _id: this.helper.ObjectId(id) } },
-            {
-                $lookup: {
-                    from: "airports", localField: "airportId", foreignField: "_id", as: "Airports",
-                    pipeline: [
-                        {
-                            $project: {
-                                "__v": 0
-                            }
-                        }
-                    ]
-                }
-            },
-            { $unwind: { path: "$Airports", preserveNullAndEmptyArrays: true } },
-            { "$addFields": { "airports": "$Airports" } },
-            {
-                $project: {
+                    "_id": 0,
+                    "airportId": 0,
                     "Airports": 0,
                     "__v": 0
                 }
@@ -125,8 +110,53 @@ export default class AirlinesService {
         return await AirlineSchema.aggregate($pipeline)
             .then((data: any) => {
                 // Get all items from the array or return an empty array
-                let results = this.helper.GetItemFromArray(data, -1, []);
+                let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as IAirline;
+            })
+            .catch((error: Error) => {
+                // Handle any errors that occur during the query
+                throw error;
+            });
+    }
+
+    // Method to get a specific airline along with its associated airports by airline ID
+    public async getAirlineAirports(airlineCode: string): Promise<IAirline[]> {
+
+        let $pipeline = [
+            { $match: { airlineCode } },
+            {
+                $lookup: {
+                    from: "airports",
+                    localField: "airportId",
+                    foreignField: "_id",
+                    as: "mapItems",
+                    pipeline: [
+                        {
+                            $project: {
+                                "airline": 0,
+                                "_id": 0,
+                                "__v": 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$mapItems", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "items": "$mapItems" } },
+            {
+                $project: {
+                    "_id": 0,
+                    "airportId": 0,
+                    "mapItems": 0,
+                    "__v": 0
+                }
+            }
+        ];
+
+        return await AirlineSchema.aggregate($pipeline)
+            .then((data: any[]) => {
+                // Get all items from the array or return an empty array
+                return data.map(x => x.items);
             })
             .catch((error: Error) => {
                 // Handle any errors that occur during the query
@@ -136,7 +166,20 @@ export default class AirlinesService {
     }
 
     // Method to create a new airline
-    public async createAirline(airline: IAirline | IAirline): Promise<IAirline> {
+    public async createAirline(airline: IAirline): Promise<IAirline> {
+
+        const airport: IAirport | undefined = airline.airports;
+
+        if (airport) {
+            const isExist = await this.airportsService.isAirportExist(airport.icaoCode, airport.iataCode);
+
+            if (!isExist) {
+                await this.airportsService.createAirport(airport);
+            }
+
+            airline.airportId = await this.airportsService.getAirportId(airport.icaoCode, airport.iataCode);
+        }
+
         return await AirlineSchema.create(airline)
             .then((data: IAirlineSchema) => {
                 // Get the first item from the array or return an empty object
@@ -149,9 +192,23 @@ export default class AirlinesService {
             });
     }
 
-
     // Updates an airline's information based on the provided airline code.
-    public async updateAirline(airlineCode: string, airline: IAirline): Promise<IAirline> {
+    public async updateAirline(airlineCode: string, airline: IAirline): Promise<IAirline | RequestResponse> {
+
+        const airport: IAirport | undefined = airline.airports;
+
+        if (airport) {
+            const isExist = await this.airportsService.isAirportExist(airport.icaoCode, airport.iataCode);
+
+            if (!isExist) {
+                throw { status: 400, message: `Provided ${airport.icaoCode} and ${airport.iataCode} airport does not exist` };
+            }
+
+            airline.airportId = await this.airportsService.getAirportId(airport.icaoCode, airport.iataCode);
+
+            await this.airportsService.updateAirport(airport.icaoCode, airport.iataCode, airport);
+        }
+
         // Find and update the airline document with the new data.
         return await AirlineSchema.findOneAndUpdate({ airlineCode }, airline, { new: true })
             .then((data: any) => {
@@ -239,7 +296,6 @@ export default class AirlinesService {
                 throw error;
             });
     }
-
 
     // Counts the number of airlines based on the provided search criteria.
     public async searchAirlineCount(search: Search): Promise<number> {

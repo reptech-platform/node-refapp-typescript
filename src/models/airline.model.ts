@@ -22,6 +22,10 @@ export interface IAirline {
 
     // The airports associated with the airline, represented by an IAirport interface
     airports?: IAirport;
+
+    // Store airport reference id
+    airportId?: string;
+
 }
 
 // The Airline class implements the IAirline interface
@@ -44,6 +48,9 @@ export class Airline implements IAirline {
 
     // The airports associated with the airline, represented by an IAirport interface
     airports?: IAirport;
+
+    // Store airport reference id
+    airportId?: string;
 
     // Constructor for the Airline class
     constructor() { }

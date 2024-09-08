@@ -1,11 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
-import DateOnlyFactory from "mongoose-dateonly";
-import AutoIncrementFactory from "mongoose-sequence";
 import Helper from "../../utils/helper.utils";
 import { PlanItemSchema, IPlanItemSchema } from "./planitem.db.model";
-
-const AutoIncrement = AutoIncrementFactory(mongoose);
-const DateOnly = DateOnlyFactory(mongoose);
 
 /**
  * Interface to validate schema field construction
@@ -65,7 +60,9 @@ export const TripSchema: Schema = new Schema({
     // _id: false
 });
 
-
+/**
+ * Generate unique sequence number before saving
+ */
 TripSchema.pre('save', async function (next) {
     if (this.isNew) {
         this.tripId = await getNextSequenceValue();
@@ -74,18 +71,16 @@ TripSchema.pre('save', async function (next) {
 });
 
 /**
- * Define auto increment number
- */
-// TripSchema.plugin(AutoIncrement, { inc_field: 'tripId' });
-
-
-/**
  * Setting function to onvert $numberDecimal to actual decimal values
  */
 new Helper().SetToJSON(TripSchema);
 
 const schemaModal = mongoose.model<ITripSchema>("Trip", TripSchema);
 
+/**
+ * Generate next sequence value
+ * @returns number
+ */
 async function getNextSequenceValue() {
     const maxDoc = await schemaModal.findOne().sort({ tripId: -1 });
     let lastNumber: any = 0;
