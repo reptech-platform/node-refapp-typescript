@@ -2,7 +2,7 @@ import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path, SuccessRes
 import PersonsService from "../services/person.service";
 import TripService from "../services/trip.service";
 import Helper from "../utils/helper.utils";
-import ErrorResponse from "../utils/error.response";
+import RequestResponse from "../utils/request.response";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { IPerson } from "../models/person.model";
 import { Search, SearchResults } from "../models/search.model";
@@ -27,7 +27,7 @@ export class PersonsController extends Controller {
      * @returns
      */
     @Get()
-    public async getPersons(): Promise<IPerson[] | ErrorResponse> {
+    public async getPersons(): Promise<IPerson[] | RequestResponse> {
 
         try {
 
@@ -48,7 +48,28 @@ export class PersonsController extends Controller {
      * @returns 
      */
     @Get("/:userName")
-    public async getPerson(@Path() userName: string): Promise<IPerson | ErrorResponse> {
+    public async getPerson(@Path() userName: string): Promise<IPerson | RequestResponse> {
+
+        try {
+
+            // Await the result of the getAirlines method from the airlinesService
+            return await this.personsService.getPerson(userName);
+
+        } catch (ex: any) {
+
+            this.setStatus(400);
+            return { status: 400, message: ex.message };
+
+        }
+    }
+
+    /**
+     * Get the specific person details
+     * @param userName
+     * @returns 
+     */
+    @Get("({:userName})/trips")
+    public async getPersonTrip(@Path() userName: string): Promise<IPerson | RequestResponse> {
 
         try {
 
@@ -70,7 +91,7 @@ export class PersonsController extends Controller {
      */
     @Post()
     @SuccessResponse("201", "Created")
-    public async createPerson(@Body() body: IPerson): Promise<IPerson | ErrorResponse> {
+    public async createPerson(@Body() body: IPerson): Promise<IPerson | RequestResponse> {
 
         try {
             let person: IPerson = body;
@@ -115,7 +136,7 @@ export class PersonsController extends Controller {
      * @returns 
      */
     @Put("/:userName")
-    public async updatePerson(@Path() userName: string, @Body() body: IPerson): Promise<IPerson | ErrorResponse> {
+    public async updatePerson(@Path() userName: string, @Body() body: IPerson): Promise<IPerson | RequestResponse> {
 
         try {
 
@@ -136,7 +157,7 @@ export class PersonsController extends Controller {
      * @returns 
      */
     @Delete("/:userName")
-    public async deletePerson(@Path() userName: string): Promise<boolean | ErrorResponse> {
+    public async deletePerson(@Path() userName: string): Promise<boolean | RequestResponse> {
 
         try {
 
@@ -155,12 +176,56 @@ export class PersonsController extends Controller {
      * Get persons count
      */
     @Get("/records/count")
-    public async getPersonCount(): Promise<number | ErrorResponse> {
+    public async getPersonCount(): Promise<number | RequestResponse> {
 
         try {
 
             // Await the result of the getAirlines method from the airlinesService
             return await this.personsService.getPersonCount();
+
+        } catch (ex: any) {
+
+            this.setStatus(400);
+            return { status: 400, message: ex.message };
+
+        }
+    }
+
+    /**
+     * Update existing persion
+     * @param userName 
+     * @param body 
+     * @returns 
+     */
+    @Post("/document/:userName")
+    public async updatePersonDocument(@Path() userName: string, @Body() body: IPerson): Promise<IPerson | RequestResponse> {
+
+        try {
+
+            // Await the result of the getAirlines method from the airlinesService
+            return await this.personsService.updatePersonDocument(userName, body.personAttachments);
+
+        } catch (ex: any) {
+
+            this.setStatus(400);
+            return { status: 400, message: ex.message };
+
+        }
+    }
+
+    /**
+     * Update existing persion
+     * @param userName 
+     * @param body 
+     * @returns 
+     */
+    @Delete("/document/:userName")
+    public async deletePersonDocument(@Path() userName: string, @Body() body: IPerson): Promise<IPerson | RequestResponse> {
+
+        try {
+
+            // Await the result of the getAirlines method from the airlinesService
+            return await this.personsService.deletePersonDocument(userName, body.personAttachments);
 
         } catch (ex: any) {
 

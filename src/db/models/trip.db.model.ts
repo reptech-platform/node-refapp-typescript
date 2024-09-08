@@ -65,17 +65,37 @@ export const TripSchema: Schema = new Schema({
     // _id: false
 });
 
+
+TripSchema.pre('save', async function (next) {
+    if (this.isNew) {
+        this.tripId = await getNextSequenceValue();
+    }
+    next();
+});
+
 /**
  * Define auto increment number
  */
-TripSchema.plugin(AutoIncrement, { inc_field: 'tripId' });
+// TripSchema.plugin(AutoIncrement, { inc_field: 'tripId' });
+
 
 /**
  * Setting function to onvert $numberDecimal to actual decimal values
  */
 new Helper().SetToJSON(TripSchema);
 
+const schemaModal = mongoose.model<ITripSchema>("Trip", TripSchema);
+
+async function getNextSequenceValue() {
+    const maxDoc = await schemaModal.findOne().sort({ tripId: -1 });
+    let lastNumber: any = 0;
+    if (maxDoc) lastNumber = maxDoc.tripId;
+    return ++lastNumber;
+}
+
+export default schemaModal;
+
 /**
  * Export as default schema with assigning interface validation
  */
-export default mongoose.model<ITripSchema>("Trip", TripSchema);
+//export default mongoose.model<ITripSchema>("Trip", TripSchema);

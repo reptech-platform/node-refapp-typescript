@@ -28,7 +28,6 @@ export const PersonAttachmentSchema: Schema = new Schema({
     docLocation: { type: String, default: null },
     docFileType: { type: String, default: null }
 }, {
-    timestamps: true,
     _id: false
 });
 

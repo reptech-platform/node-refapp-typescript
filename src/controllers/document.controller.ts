@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Delete, Tags, Route, Path, FormField, Response, UploadedFile, SuccessResponse } from "tsoa";
+import { Controller, Get, Post, Delete, Tags, Route, Path, UploadedFile, SuccessResponse } from "tsoa";
 import { provideSingleton, inject } from "../utils/provideSingleton";
-import Helper from "../utils/helper.utils";
-import ErrorResponse from "../utils/error.response";
+import RequestResponse from "../utils/request.response";
 import DocumentsService from "../services/document.service";
 import { IDocument } from "../models/document.model";
 import fs from "fs";
@@ -11,13 +10,12 @@ import fs from "fs";
 @provideSingleton(DocumentsController)
 export class DocumentsController extends Controller {
     constructor(
-        @inject(DocumentsService) private documentsService: DocumentsService,
-        @inject(Helper) private helper: Helper) {
+        @inject(DocumentsService) private documentsService: DocumentsService) {
         super();
     }
 
     @Get()
-    public async getDocuments(): Promise<IDocument[] | ErrorResponse> {
+    public async getDocuments(): Promise<IDocument[] | RequestResponse> {
 
         try {
 
@@ -33,7 +31,7 @@ export class DocumentsController extends Controller {
     }
 
     @Get("/:docId")
-    public async getDocument(@Path() docId: number): Promise<IDocument | ErrorResponse> {
+    public async getDocument(@Path() docId: number): Promise<IDocument | RequestResponse> {
 
         try {
 
@@ -50,24 +48,15 @@ export class DocumentsController extends Controller {
 
     @Post()
     @SuccessResponse("201", "Created")
-    @Response(400, "Bad Request")
-    @Response(500, "Internal Error")
-    public async createDocument(
-        @FormField() personId: string,
-        @UploadedFile() file: Express.Multer.File): Promise<any | ErrorResponse> {
+    public async createDocument(@UploadedFile() file: Express.Multer.File): Promise<any | RequestResponse> {
 
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
 
             try {
                 if (!file) {
-                    return resolve(this.setStatus(400));
+                    this.setStatus(400);
+                    return resolve({ message: "Invalid file stream object" });
                 }
-
-                if (this.helper.IsNullValue(personId)) {
-                    return resolve(this.setStatus(400));
-                }
-
-                personId = this.helper.ObjectId(personId);
 
                 const uploadFolder = "./uploads/";
 
@@ -75,23 +64,18 @@ export class DocumentsController extends Controller {
                     fs.mkdirSync(uploadFolder);
                 }
 
-                const uploadPath = "./uploads/" + file.filename;
+                const fileName = file.filename || file.originalname;
+                const uploadPath = "./uploads/" + file.originalname;
 
                 let input: any = {
-                    docName: file.filename,
+                    docName: fileName,
                     docFileType: file.mimetype,
                     docLocation: uploadPath
                 };
 
                 const content = await this.documentsService.createDocument(input);
 
-                const documentId = content.docid;
-
-                input = { personId, documentId };
-
-                //await this.personAttachmentsService.createPersonAttachment(input);
-
-                return resolve(this.setStatus(201));
+                return resolve(content);
 
             } catch (ex: any) {
 
@@ -103,17 +87,8 @@ export class DocumentsController extends Controller {
 
     }
 
-    /* // Updated document should not be allowed. Because, if you update the document existing document will become orphan
-    @Put("/:id")
-    public async updateDocument(): Promise<JsonResult> {
-        const content = await this.documentsService.updateDocument(req.params.id, req.body);
-        const statusCode = 200;
-        return this.json(content, statusCode);
-    } */
-
     @Delete("/:docId")
-    public async deleteDocument(@Path() docId: number): Promise<boolean | ErrorResponse> {
-        //await this.personAttachmentsService.deletePersonAttachmentByDocId(id);
+    public async deleteDocument(@Path() docId: number): Promise<boolean | RequestResponse> {
 
         try {
 

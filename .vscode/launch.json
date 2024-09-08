@@ -15,7 +15,7 @@
             "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run-script",
-                "start:dev"
+                "start"
             ]
         }
     ]

@@ -1,7 +1,7 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path, SuccessResponse } from "tsoa";
 import TripService from "../services/trip.service";
 import PersonsService from "../services/person.service";
-import ErrorResponse from "../utils/error.response";
+import RequestResponse from "../utils/request.response";
 //import TripTravellersService from "../services/triptraveller.service";
 import Helper from "../utils/helper.utils";
 import { provideSingleton, inject } from "../utils/provideSingleton";
@@ -24,10 +24,10 @@ export class TripsController extends Controller {
 
     /**
      * Get all list of trips
-     * @returns 
+     * @returns ITrip[] | RequestResponse
      */
     @Get()
-    public async getTrips(): Promise<ITrip[] | ErrorResponse> {
+    public async getTrips(): Promise<ITrip[] | RequestResponse> {
 
         try {
 
@@ -45,10 +45,10 @@ export class TripsController extends Controller {
     /**
      * Get specific trip by passing the tripId
      * @param tripId 
-     * @returns 
+     * @returns ITrip | RequestResponse
      */
     @Get("/:tripId")
-    public async getTrip(@Path() tripId: string): Promise<ITrip | ErrorResponse> {
+    public async getTrip(@Path() tripId: number): Promise<ITrip | RequestResponse> {
 
         try {
 
@@ -66,12 +66,11 @@ export class TripsController extends Controller {
     /**
      * Create new trip along with travellers
      * @param body 
-     * @returns 
+     * @returns ITrip | RequestResponse
      */
-
     @Post()
     @SuccessResponse("201", "Created")
-    public async createTrip(@Body() body: ITrip): Promise<ITrip | ErrorResponse> {
+    public async createTrip(@Body() body: ITrip): Promise<ITrip | RequestResponse> {
 
         try {
             let trip: ITrip = body;
@@ -110,10 +109,10 @@ export class TripsController extends Controller {
      * Update existing trip
      * @param tripId 
      * @param body 
-     * @returns 
+     * @returns ITrip | RequestResponse
      */
     @Put("/:tripId")
-    public async updateTrip(@Path() tripId: string, @Body() body: ITrip): Promise<ITrip | ErrorResponse> {
+    public async updateTrip(@Path() tripId: number, @Body() body: ITrip): Promise<ITrip | RequestResponse> {
 
         try {
 
@@ -129,11 +128,12 @@ export class TripsController extends Controller {
     }
 
     /**
-     * Delete Trip 
+     * Delete a trip
+     * @param tripId 
+     * @returns boolean | RequestResponse
      */
-
     @Delete("/:tripId")
-    public async deleteTrip(@Path() tripId: string): Promise<boolean | ErrorResponse> {
+    public async deleteTrip(@Path() tripId: number): Promise<boolean | RequestResponse> {
 
         try {
 
@@ -150,10 +150,10 @@ export class TripsController extends Controller {
 
     /**
      * Get list of trips
-     * @returns 
+     * @returns number | RequestResponse
      */
     @Get("/records/count")
-    public async getTripCount(): Promise<number | ErrorResponse> {
+    public async getTripCount(): Promise<number | RequestResponse> {
 
         try {
 
