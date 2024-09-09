@@ -34,7 +34,7 @@ export const AirlineSchema: Schema = new Schema({
     /**
      * Referencing the _id from Airport collection
      */
-    airportId: { type: Schema.Types.ObjectId, default: null, ref: 'airport' }
+    airportId: { type: Schema.Types.ObjectId, default: null }
 }, {
     timestamps: true
 });
