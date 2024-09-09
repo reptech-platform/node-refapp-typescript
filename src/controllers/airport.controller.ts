@@ -89,23 +89,14 @@ export class AirportsController extends Controller {
 
         try {
 
-            let airport: IAirport = body;
-
-            /* const airline: IAirline | undefined = airport.airlines;
-
-            if (airline) {
-                const tmp = await this.airlinesService.createAirline(airline);
-                airport.airlines = tmp;
-            } */
-
             // Await the result of the createAirport method from the airportsService
-            await this.airportsService.createAirport(airport);
+            await this.airportsService.createAirport(body);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);
 
             // Return an success response with the status and status message
-            return { status: 201, message: `Added airport ${airport.icaoCode} and ${airport.iataCode} successfuly.` };
+            return { status: 201, message: `Added airport ${body.icaoCode} and ${body.iataCode} successfuly.` };
 
         } catch (ex: any) {
 
@@ -198,6 +189,64 @@ export class AirportsController extends Controller {
 
     /**
      * Define a GET endpoint
+     * @returns IAirport[] | RequestResponse
+     */
+    @Get("/airlines")
+    public async getAriportsAirlines(): Promise<IAirport[] | RequestResponse> {
+
+        try {
+
+            // Await the result of the getAriportsAirlines method from the airportsService
+            return await this.airportsService.getAriportsAirlines();
+
+        } catch (ex: any) {
+
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
+            this.setStatus(400);
+
+            // Return an error response with the status and error message
+            return { status: 400, message: ex.message };
+
+        }
+    }
+
+    /**
+     * Define a GET endpoint with the path parameter airportid
+     * @param id 
+     * @returns IAirport | RequestResponse
+     */
+    @Get("/:icaoCode/:iataCode/airlines")
+    public async getAriportAirlines(@Path() icaoCode: string, @Path() iataCode: string): Promise<IAirport | RequestResponse> {
+
+        try {
+
+            // Validated the provided Airport is exist in the database or not
+            const isExist = await this.airportsService.isAirportExist(icaoCode, iataCode);
+
+            if (!isExist) {
+                // If no airport is exist , set the HTTP status to 400 (Bad Request)
+                this.setStatus(400);
+
+                // Return an error response with the status and error message
+                return { status: 400, message: `Provided ${icaoCode} and ${iataCode} airport does not exist` };
+            }
+
+            // Await the result of the getAriportAirlines method from the airportsService
+            return await this.airportsService.getAriportAirlines(icaoCode, iataCode);
+
+        } catch (ex: any) {
+
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
+            this.setStatus(400);
+
+            // Return an error response with the status and error message
+            return { status: 400, message: ex.message };
+
+        }
+    }
+
+    /**
+     * Define a GET endpoint
      * @returns number | RequestResponse
      */
     @Get("/records/count")
@@ -255,54 +304,6 @@ export class AirportsController extends Controller {
 
             // Await the result of the searchAirport method from the airportsService
             return await this.airportsService.searchAirport(body);
-
-        } catch (ex: any) {
-
-            // If an error occurs, set the HTTP status to 400 (Bad Request)
-            this.setStatus(400);
-
-            // Return an error response with the status and error message
-            return { status: 400, message: ex.message };
-
-        }
-    }
-
-
-    /**
-     * Define a GET endpoint
-     * @returns IAirport[] | RequestResponse
-     */
-    @Get("/airlines")
-    public async getAriportsAirlines(): Promise<IAirport[] | RequestResponse> {
-
-        try {
-
-            // Await the result of the getAriportsAirlines method from the airportsService
-            return await this.airportsService.getAriportsAirlines();
-
-        } catch (ex: any) {
-
-            // If an error occurs, set the HTTP status to 400 (Bad Request)
-            this.setStatus(400);
-
-            // Return an error response with the status and error message
-            return { status: 400, message: ex.message };
-
-        }
-    }
-
-    /**
-     * Define a GET endpoint with the path parameter airportid
-     * @param id 
-     * @returns IAirport | RequestResponse
-     */
-    @Get("/:id/airlines")
-    public async getAriportAirlines(@Path() id: string): Promise<IAirport | RequestResponse> {
-
-        try {
-
-            // Await the result of the getAriportAirlines method from the airportsService
-            return await this.airportsService.getAriportAirlines(id);
 
         } catch (ex: any) {
 

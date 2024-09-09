@@ -1,16 +1,23 @@
 import { Error } from "mongoose";
+import { LazyServiceIdentifier } from "inversify";
 import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import Helper from "../utils/helper.utils";;
 import AirportSchema, { IAirportSchema } from "../db/models/airport.db.model";
 import { IAirport } from "../models/airport.model";
+import { IAirline } from "../models/airline.model";
+import AirlinesService from "../services/airline.service";
 
 // This decorator ensures that AirportsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @provideSingleton(AirportsService)
 export default class AirportsService {
 
     // Injecting the Helper service
-    constructor(@inject(Helper) private helper: Helper) { }
+    constructor(
+        @inject(Helper) private helper: Helper,
+        // AirlinesService has a circular dependency
+        @inject(new LazyServiceIdentifier(() => AirlinesService)) private airlinesService: AirlinesService
+    ) { }
 
     // Method to check if an airport exists by its ICAO and IATA codes
     public async isAirportExist(icaoCode: string, iataCode: string): Promise<boolean> {
@@ -42,10 +49,52 @@ export default class AirportsService {
             });
     }
 
+    // Method to get a specific airport airline id by its ICAO and IATA codes
+    public async getAirportAirlineId(icaoCode: string, iataCode: string): Promise<string> {
+        return await AirportSchema.find({ icaoCode, iataCode }, { airline: 1 })
+            .then((data: IAirportSchema[]) => {
+                // Get the first item from the array or return an empty object
+                let results = this.helper.GetItemFromArray(data, 0, { airline: null });
+                return results.airline;
+            })
+            .catch((error: Error) => {
+                // Handle any errors that occur during the query
+                throw error;
+            });
+    }
+
     // Method to get all airports
     public async getAirports(): Promise<IAirport[]> {
-        return await AirportSchema.find({}, { _id: 0 })
-            .then((data: IAirportSchema[]) => {
+
+        let $pipeline = [
+            {
+                $lookup: {
+                    from: "airlines", localField: "airlineId", foreignField: "_id", as: "Airlines",
+                    pipeline: [
+                        {
+                            $project: {
+                                "airports": 0,
+                                "_id": 0,
+                                "__v": 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$Airlines", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "airlines": "$Airlines" } },
+            {
+                $project: {
+                    "_id": 0,
+                    "airlineId": 0,
+                    "Airlines": 0,
+                    "__v": 0
+                }
+            }
+        ];
+
+        return await AirportSchema.aggregate($pipeline)
+            .then((data: any) => {
                 // Get all items from the array or return an empty array
                 let results = this.helper.GetItemFromArray(data, -1, []);
                 return results as IAirport[];
@@ -58,9 +107,38 @@ export default class AirportsService {
 
     // Method to get a specific airport by its ICAO and IATA codes
     public async getAirport(icaoCode: string, iataCode: string): Promise<IAirport> {
-        return await AirportSchema.find({ icaoCode, iataCode }, { _id: 0 })
-            .then((data: IAirportSchema[]) => {
-                // Get the first item from the array or return an empty object
+
+        let $pipeline = [
+            { $match: { icaoCode, iataCode } },
+            {
+                $lookup: {
+                    from: "airlines", localField: "airlineId", foreignField: "_id", as: "Airlines",
+                    pipeline: [
+                        {
+                            $project: {
+                                "airports": 0,
+                                "_id": 0,
+                                "__v": 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$Airlines", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "airlines": "$Airlines" } },
+            {
+                $project: {
+                    "_id": 0,
+                    "airlineId": 0,
+                    "Airlines": 0,
+                    "__v": 0
+                }
+            }
+        ];
+
+        return await AirportSchema.aggregate($pipeline)
+            .then((data: any) => {
+                // Get all items from the array or return an empty array
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as IAirport;
             })
@@ -68,12 +146,13 @@ export default class AirportsService {
                 // Handle any errors that occur during the query
                 throw error;
             });
+
     }
 
     // Method to get a specific airport along with its associated airlines by airport ID
-    public async getAriportAirlines(id: string): Promise<IAirport> {
+    public async getAriportAirlines(icaoCode: string, iataCode: string): Promise<IAirport> {
         let $pipeline = [
-            { $match: { _id: this.helper.ObjectId(id) } },
+            { $match: { icaoCode, iataCode } },
             {
                 $lookup: {
                     from: "airlines", localField: "airlineId", foreignField: "_id", as: "Airlines",
@@ -146,7 +225,25 @@ export default class AirportsService {
     }
 
     // Method to create a new airport
-    public async createAirport(airport: IAirportSchema | IAirport): Promise<IAirport> {
+    public async createAirport(airport: IAirport): Promise<IAirport> {
+
+        // Retrieve the airline information from the airport object, which may be undefined
+        const airline: IAirline | undefined = airport.airlines;
+
+        if (airline) {
+            // Check if the airline already exists in the database using its airline code
+            const isExist = await this.airlinesService.isAirlineExist(airline.airlineCode);
+
+            // If the airline does not exist, create a new airline entry in the database
+            if (!isExist) {
+                await this.airlinesService.createAirline(airline);
+            }
+
+            // Retrieve the airline ID using the airline code and assign it to the airport object
+            airport.airlineId = await this.airlinesService.getAirlineId(airline.airlineCode);
+        }
+
+        // create the airport document with the new data.
         return await AirportSchema.create(airport)
             .then((data: IAirportSchema) => {
                 // Get the first item from the array or return an empty object
@@ -161,6 +258,26 @@ export default class AirportsService {
 
     // Updates an airport's information based on the provided ICAO and IATA codes.
     public async updateAirport(icaoCode: string, iataCode: string, airport: IAirport): Promise<IAirport> {
+
+        // Retrieve the airline information from the airport object, which may be undefined
+        const airline: IAirline | undefined = airport.airlines;
+
+        if (airline) {
+            // Check if the airline already exists in the database using its airline code
+            const isExist = await this.airlinesService.isAirlineExist(airline.airlineCode);
+
+            // If the airline does not exist, throw error message
+            if (!isExist) {
+                throw { status: 400, message: `Provided ${airline.airlineCode} airline does not exist` };
+            }
+
+            // Retrieve the airline ID using the airline code and assign it to the airport object
+            airport.airlineId = await this.airlinesService.getAirlineId(airline.airlineCode);
+
+            // Update airport object using the icaoCode and  iataCode in the database
+            await this.airlinesService.updateAirline(airline.airlineCode, airline);
+        }
+
         // Find and update the airport document with the new data.
         return await AirportSchema.findOneAndUpdate({ icaoCode, iataCode }, airport, { new: true })
             .then((data: any) => {
@@ -177,8 +294,32 @@ export default class AirportsService {
 
     // Deletes an airport based on the provided ICAO and IATA codes.
     public async deleteAirport(icaoCode: string, iataCode: string): Promise<boolean> {
+
+        // Retrieve the airline id information from the database, which may be undefined
+        const airlineId: string = await this.getAirportAirlineId(icaoCode, iataCode);
+
+        // Check if the airlineId exists in the database using its airlineId
+        if (!this.helper.IsNullValue(airlineId)) {
+            // Delete airline in the database using airline id
+            await this.airlinesService.deleteAirlineById(airlineId);
+        }
+
         // Find and delete the airport document.
         return await AirportSchema.findOneAndDelete({ icaoCode, iataCode })
+            .then(() => {
+                // Return true if the deletion was successful.
+                return true;
+            })
+            .catch((error: Error) => {
+                // Throw an error if the deletion operation fails.
+                throw error;
+            });
+    }
+
+    // Deletes an airport based on the provided airport id.
+    public async deleteAirportById(_id: string): Promise<boolean> {
+        // Find and delete the airport document.
+        return await AirportSchema.findOneAndDelete({ _id })
             .then(() => {
                 // Return true if the deletion was successful.
                 return true;
@@ -305,7 +446,4 @@ export default class AirportsService {
                 throw error;
             });
     }
-
-
-
 }

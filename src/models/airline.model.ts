@@ -6,7 +6,7 @@ import { IAirport } from "./airport.model";
 export interface IAirline {
 
     // The unique code for the airline
-    airlineCode?: string;
+    airlineCode: string;
 
     // The name of the airline
     name?: string;
@@ -32,7 +32,7 @@ export interface IAirline {
 @injectable()
 export class Airline implements IAirline {
     // The unique code for the airline
-    airlineCode?: string;
+    airlineCode: string;
 
     // The name of the airline
     name?: string;

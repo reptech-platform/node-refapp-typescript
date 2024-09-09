@@ -88,6 +88,7 @@ export class AirlinesController extends Controller {
 
         try {
 
+            // Await the result of the createAirline method from the airlinesService
             await this.airlinesService.createAirline(body);
 
             // set the HTTP status to 201 (Created)
@@ -186,6 +187,41 @@ export class AirlinesController extends Controller {
     }
 
     /**
+     * Define a POST endpoint to get airports for a airline
+     * @param airlineCode 
+     * @returns IAirline[]
+     */
+    @Get("/airports")
+    public async getAirlinesAirports(): Promise<IAirline[] | RequestResponse> {
+
+        try {
+
+            // Await the result of the getAirlinesAirports method from the airlinesService
+            return await this.airlinesService.getAirlinesAirports();
+
+        } catch (ex: any) {
+
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
+            this.setStatus(400);
+
+            // Return an error response with the status and error message
+            return { status: 400, message: ex.message };
+
+        }
+
+    }
+
+    /**
+     * Define a POST endpoint to get airports for a airline
+     * @param airlineCode 
+     * @returns IAirline[]
+     */
+    @Get("/:airlineCode/airports")
+    public async getAirlineAirports(@Path() airlineCode: string): Promise<IAirline[]> {
+        return await this.airlinesService.getAirlineAirports(airlineCode);
+    }
+
+    /**
      * Define a GET endpoint to get airlines count
      * @returns number | RequestResponse
      */
@@ -226,16 +262,6 @@ export class AirlinesController extends Controller {
     @Post("/search")
     public async searchAirline(@Body() body: Search): Promise<SearchResults> {
         return await this.airlinesService.searchAirline(body);
-    }
-
-    /**
-     * Define a POST endpoint to get airports for a airline
-     * @param airlineCode 
-     * @returns IAirline[]
-     */
-    @Get("/:airlineCode/airports")
-    public async getAirlineAirports(@Path() airlineCode: string): Promise<IAirline[]> {
-        return await this.airlinesService.getAirlineAirports(airlineCode);
     }
 
 }
