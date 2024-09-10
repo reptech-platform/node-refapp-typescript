@@ -2,15 +2,21 @@ import { Error } from "mongoose";
 import Helper from "../utils/helper.utils";
 import TripSchema, { ITripSchema } from "../db/models/trip.db.model";
 import { ITrip } from "../models/trip.model";
+import { IPerson } from "../models/person.model";
 import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
 import { provideSingleton, inject } from "../utils/provideSingleton";
+import PersonTripsService from "./persontrip.service";
+import { LazyServiceIdentifier } from "inversify";
 
 // This decorator ensures that TripsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @provideSingleton(TripsService)
 export default class TripsService {
 
     // Injecting the Helper service
-    constructor(@inject(Helper) private helper: Helper) { }
+    constructor(
+        // PersonTripsService has a circular dependency
+        @inject(new LazyServiceIdentifier(() => PersonTripsService)) private personTripsService: PersonTripsService,
+        @inject(Helper) private helper: Helper) { }
 
     // Checks if a trip with the given tripId exists in the database.
     public async isTripExist(tripId: number): Promise<boolean> {
@@ -31,7 +37,7 @@ export default class TripsService {
     // Fetches all trips from the database, excluding the _id field.
     public async getTrips(): Promise<ITrip[]> {
 
-        return TripSchema.find({}, { _id: 0 })
+        return await TripSchema.find({}, { _id: 0 })
             .then((data: ITripSchema[]) => {
                 // Uses the helper to process the array of trips.
                 let results = this.helper.GetItemFromArray(data, -1, []);
@@ -46,7 +52,7 @@ export default class TripsService {
     // Fetches a single trip by its tripId, excluding the _id field.
     public async getTrip(tripId: number): Promise<ITrip> {
 
-        return TripSchema.find({ tripId }, { _id: 0 })
+        return await TripSchema.find({ tripId }, { _id: 0 })
             .then((data: ITripSchema[]) => {
                 // Uses the helper to process the trip.
                 let results = this.helper.GetItemFromArray(data, 0, {});
@@ -59,9 +65,9 @@ export default class TripsService {
     }
 
     // Creates a new trip in the database.
-    public async createTrip(trip: ITripSchema | ITrip): Promise<ITrip> {
+    public async createTrip(trip: ITrip): Promise<ITrip> {
 
-        return TripSchema.create(trip)
+        let newTrip = await TripSchema.create(trip)
             .then((data: any) => {
                 return data as ITrip;
             })
@@ -69,12 +75,23 @@ export default class TripsService {
                 // Throws an error if the operation fails.
                 throw error;
             });
+
+        // Retrieve the travellers information from the trip object, which may be undefined
+        const travellers: IPerson[] | undefined = trip.travellers;
+
+        if (travellers && travellers.length > 0) {
+            // Add or update travellers and map the trip travellers
+            await this.personTripsService.addOrUpdateTripTravellers(trip.tripId, travellers);
+        }
+
+        // Returns newly created trip object
+        return newTrip;
     }
 
     // Updates an existing trip by its tripId and returns the updated trip.
     public async updateTrip(tripId: number, trip: any): Promise<ITrip> {
 
-        return TripSchema.findOneAndUpdate({ tripId }, trip, { new: true })
+        let updatedTrip = await TripSchema.findOneAndUpdate({ tripId }, trip, { new: true })
             .then((data: any) => {
                 return data as ITrip;
             })
@@ -82,12 +99,22 @@ export default class TripsService {
                 // Throws an error if the operation fails.
                 throw error;
             });
+
+        // Retrieve the travellers information from the trip object, which may be undefined
+        const travellers: IPerson[] | undefined = trip.travellers;
+
+        if (travellers && travellers.length > 0) {
+            // Add or update travellers and map the trip travellers
+            await this.personTripsService.addOrUpdateTripTravellers(trip.tripId, travellers);
+        }
+
+        return updatedTrip;
     }
 
     // Deletes a trip by its tripId.
     public async deleteTrip(tripId: number): Promise<boolean> {
 
-        return TripSchema.findOneAndDelete({ tripId })
+        let boolDeleted: boolean = await TripSchema.findOneAndDelete({ tripId })
             .then(() => {
                 // Returns true if the deletion is successful.
                 return true;
@@ -96,6 +123,11 @@ export default class TripsService {
                 // Throws an error if the operation fails.
                 throw error;
             });
+
+        // delete all trip travellers from the database
+        await this.personTripsService.deleteAllTripTravellers(tripId);
+
+        return boolDeleted;
     }
 
     // Searches for trips based on the provided search criteria.
@@ -138,7 +170,7 @@ export default class TripsService {
         if ($skip) $pipeline.push($skip);
 
         // Executes the aggregation pipeline.
-        return TripSchema.aggregate($pipeline)
+        return await TripSchema.aggregate($pipeline)
             .then((data: ITripSchema[]) => {
                 let results: SearchResults = new SearchResults();
                 results.count = recordCount;
@@ -165,7 +197,7 @@ export default class TripsService {
         }
 
         // Executes the count query.
-        return TripSchema.countDocuments($match)
+        return await TripSchema.countDocuments($match)
             .then((count: number) => {
                 return count;
             })
@@ -186,7 +218,7 @@ export default class TripsService {
         ];
 
         // Executes the aggregation pipeline.
-        return TripSchema.aggregate($pipeline)
+        return await TripSchema.aggregate($pipeline)
             .then((data: ITripSchema[]) => {
                 // Uses the helper to process the result and extract the recordCount.
                 let dbRst = this.helper.GetItemFromArray(data, 0, { recordCount: 0 });

@@ -10,7 +10,7 @@ import { ITrip } from "../models/trip.model";
 /**
  * Person and Trip mapping controller
  */
-@Tags("Trips")
+@Tags("PersonsTrips")
 @Route("/persontrip")
 @provideSingleton(PersonTripController)
 export class PersonTripController extends Controller {
@@ -27,11 +27,10 @@ export class PersonTripController extends Controller {
 
     /**
      * Define a GET endpoint with the path parameter 'userName'
-     * Get all trips for a person
      * @param userName 
      * @returns ITrip[] | RequestResponse
      */
-    @Get("/person/:userName")
+    @Get("/:userName/person")
     public async getPersonTrips(@Path() userName: string): Promise<ITrip[] | RequestResponse> {
 
         try {
@@ -64,12 +63,11 @@ export class PersonTripController extends Controller {
 
     /**
      * Define a POST endpoint with the path parameter 'userName' and 'Trip' body
-     * Add trips to the existing persion
      * @param userName
      * @param body 
      * @returns RequestResponse
      */
-    @Post("/person/:userName")
+    @Post("/:userName/person")
     public async addPersonTrips(@Path() userName: string, @Body() body: ITrip[]): Promise<RequestResponse> {
 
         try {
@@ -103,53 +101,14 @@ export class PersonTripController extends Controller {
         }
     }
 
-    /**
-     * Define a DELETE endpoint with the path parameter 'userName' and 'tripId'
-     * Delete a trip from a person
-     * @param userName 
-     * @param tripId 
-     * @returns RequestResponse
-     */
-    @Delete("/person/:userName/:tripId")
-    public async deletePersonTrip(@Path() userName: string, @Path() tripId: number): Promise<RequestResponse> {
-
-        try {
-
-            // Validated the provided person and trip is mapped in the database or not
-            const isExist = await this.personTripsService.isPersonAndTripExist(userName, tripId);
-
-            if (!isExist) {
-                // If no person and trip is mapped , set the HTTP status to 400 (Bad Request)
-                this.setStatus(400);
-
-                // Return an error response with the status and error message
-                return { status: 400, message: `Provided ${userName} and ${tripId} relation does not exist` };
-            }
-
-            // Call the deletePersonTrip method from personsService with the provided tripId
-            // Await the result and return it
-            await this.personTripsService.deletePersonTrip(userName, tripId);
-
-            // Return an success response with the status and status message
-            return { status: 200, message: `Deleted a trip for a person ${userName} successfuly.` };
-
-        } catch (ex: any) {
-
-            this.setStatus(400);
-            return { status: 400, message: ex.message };
-
-        }
-    }
-
     // Trip mapping actions
 
     /**
      * Define a GET endpoint with the path parameter 'tripId'
-     * Get all travellers for a trip
      * @param tripId 
      * @returns IPerson[] | RequestResponse
      */
-    @Get("/trip/:tripId")
+    @Get("/:tripId/trip")
     public async getTripTravellers(@Path() tripId: number): Promise<IPerson[] | RequestResponse> {
 
         try {
@@ -182,12 +141,11 @@ export class PersonTripController extends Controller {
 
     /**
      * Define a POST endpoint with the path parameter 'tripId' and 'Person' body
-     * Add travellers to the existing trip
      * @param tripId 
      * @param body 
      * @returns RequestResponse
      */
-    @Post("/trip/:tripId")
+    @Post("/:tripId/trip")
     public async addTripTravellers(@Path() tripId: number, @Body() body: IPerson[]): Promise<RequestResponse> {
 
         try {
@@ -203,9 +161,9 @@ export class PersonTripController extends Controller {
                 return { status: 400, message: `Provided ${tripId} trip does not exist` };
             }
 
-            // Call the addTripTravellers method from personsService with the provided tripId and list of persons
+            // Call the addOrUpdateTripTravellers method from personsService with the provided tripId and list of persons
             // Await the result and return it
-            await this.personTripsService.addTripTravellers(tripId, body);
+            await this.personTripsService.addOrUpdateTripTravellers(tripId, body);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Added travellers to a trip ${tripId} successfuly.` };
@@ -222,14 +180,14 @@ export class PersonTripController extends Controller {
     }
 
     /**
-     * Define a DELETE endpoint with the path parameter 'tripId' and 'userName'
-     * Delete a traveller from a trip
+     * Define a DELETE endpoint with the path parameter 'userName' and 'tripId'
+     * Common single method to delete against tripId and userName
      * @param userName 
      * @param tripId 
      * @returns RequestResponse
      */
-    @Delete("/trip/:tripId/:userName")
-    public async deleteTripTraveller(@Path() userName: string, @Path() tripId: number): Promise<RequestResponse> {
+    @Delete("/:userName/:tripId")
+    public async deletePersonTrip(@Path() userName: string, @Path() tripId: number): Promise<RequestResponse> {
 
         try {
 
@@ -244,9 +202,9 @@ export class PersonTripController extends Controller {
                 return { status: 400, message: `Provided ${userName} and ${tripId} relation does not exist` };
             }
 
-            // Call the deleteTripTraveller method from personsService with the provided userName
+            // Call the deletePersonTrip method from personsService with the provided tripId
             // Await the result and return it
-            await this.personTripsService.deleteTripTraveller(userName);
+            await this.personTripsService.deletePersonTrip(userName, tripId);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted a trip for a person ${userName} successfuly.` };

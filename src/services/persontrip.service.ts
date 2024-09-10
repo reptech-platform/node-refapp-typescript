@@ -17,7 +17,8 @@ export default class PersonTripsService {
         @inject(Helper) private helper: Helper,
         // PersonsService has a circular dependency
         @inject(new LazyServiceIdentifier(() => PersonsService)) private personsService: PersonsService,
-        @inject(TripsService) private tripsService: TripsService
+        // TripsService has a circular dependency
+        @inject(new LazyServiceIdentifier(() => TripsService)) private tripsService: TripsService
     ) { }
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
@@ -95,7 +96,7 @@ export default class PersonTripsService {
         let mapItems: any[] = [];
 
         if (trips && trips.length > 0) {
-            // Loop Check if the trips already exists in the database using its tripId
+            // Loop Check if the trips already exists in the database using its userName
             for (let index = 0; index < trips.length; index++) {
 
                 // Read trip based on index loop
@@ -201,14 +202,36 @@ export default class PersonTripsService {
     }
 
     // This method adds multiple travellers to a trip.
-    public async addTripTravellers(tripId: number, travellers: IPerson[] | any[]): Promise<void> {
+    public async addOrUpdateTripTravellers(tripId: number, travellers: IPerson[] | any[]): Promise<void> {
 
         let mapItems: any[] = [];
 
-        for (let traveller of travellers) {
-            // Creates a new person for each traveller and adds their userName and tripId to mapItems.
-            let newDoc = await this.personsService.createPerson(traveller);
-            mapItems.push({ userName: newDoc.userName, tripId });
+        if (travellers && travellers.length > 0) {
+            // Loop Check if the travellers are already exists in the database using its tripId
+            for (let index = 0; index < travellers.length; index++) {
+
+                // Read traveller based on index loop
+                let currentTraveller = travellers[index];
+
+                // Check the traveller is exist in the database
+                let isExist = await this.personsService.isPersonExist(currentTraveller.userName);
+
+                if (!isExist) {
+                    // If the traveller does not exist, create a new traveller entry in the database
+                    currentTraveller = await this.personsService.createPerson(currentTraveller);
+                } else {
+                    // If the trip exist, update trip entry in the database
+                    await this.personsService.updatePerson(currentTraveller.userName, currentTraveller);
+                }
+
+                // Check person and trip is already mapped
+                isExist = await this.isPersonAndTripExist(currentTraveller.userName, tripId);
+
+                if (!isExist) {
+                    // Add tripId to array of id list for person trip mapping
+                    mapItems.push({ userName: currentTraveller.userName, tripId });
+                }
+            }
         }
 
         // Inserts the mapItems into the PersonTripSchema collection.
@@ -218,14 +241,11 @@ export default class PersonTripsService {
         });
     }
 
-    // This method deletes a traveller from a trip.
-    public async deleteTripTraveller(userName: string): Promise<void> {
+    // This method deletes a all travellers for a tripe.
+    public async deleteAllTripTravellers(tripId: number): Promise<void> {
 
-        // Deletes the person from the personsService.
-        await this.personsService.deletePerson(userName);
-
-        // Deletes the person from the PersonTripSchema collection.
-        await PersonTripSchema.findByIdAndDelete({ userName }).catch((error: Error) => {
+        // Deletes the trip from the PersonTripSchema collection.
+        await PersonTripSchema.deleteMany({ tripId }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
