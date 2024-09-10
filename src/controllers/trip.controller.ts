@@ -1,13 +1,9 @@
-import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path, SuccessResponse } from "tsoa";
-import TripService from "../services/trip.service";
-import PersonsService from "../services/person.service";
+import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
+import TripsService from "../services/trip.service";
 import RequestResponse from "../utils/request.response";
-//import TripTravellersService from "../services/triptraveller.service";
-import Helper from "../utils/helper.utils";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { ITrip } from "../models/trip.model";
 import { Search, SearchResults } from "../models/search.model";
-import { IPerson } from "../models/person.model";
 
 @Tags("Trips")
 @Route("/trips")
@@ -15,15 +11,12 @@ import { IPerson } from "../models/person.model";
 export class TripsController extends Controller {
 
     constructor(
-        @inject(TripService) private tripService: TripService,
-        @inject(PersonsService) private personsService: PersonsService,
-        //@inject(TripTravellersService) private tripTravellersService: TripTravellersService,
-        @inject(Helper) private helper: Helper) {
+        @inject(TripsService) private tripsService: TripsService) {
         super();
     }
 
     /**
-     * Get all list of trips
+     * Define a GET endpoint to get all Get all list of trips
      * @returns ITrip[] | RequestResponse
      */
     @Get()
@@ -31,19 +24,22 @@ export class TripsController extends Controller {
 
         try {
 
-            // Await the result of the getAirlines method from the airlinesService
-            return await this.tripService.getTrips();
+            // Await the result of the getTrips method from the tripsService
+            return await this.tripsService.getTrips();
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
     }
 
     /**
-     * Get specific trip by passing the tripId
+     * Define a GET endpoint with the path parameter 'tripId'
      * @param tripId 
      * @returns ITrip | RequestResponse
      */
@@ -52,104 +48,140 @@ export class TripsController extends Controller {
 
         try {
 
-            // Await the result of the getAirlines method from the airlinesService
-            return await this.tripService.getTrip(tripId);
+            // Validated the provided tripId is exist in the database or not
+            const isExist = await this.tripsService.isTripExist(tripId);
+
+            if (!isExist) {
+                // If no trip is exist , set the HTTP status to 400 (Bad Request)
+                this.setStatus(400);
+
+                // Return an error response with the status and error message
+                return { status: 400, message: `Provided ${tripId} trip does not exist` };
+            }
+
+            // Await the result of the getTrip method from the tripsService
+            return await this.tripsService.getTrip(tripId);
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
     }
 
     /**
-     * Create new trip along with travellers
+     * Define a POST endpoint with the body parameter 'ITrip'
      * @param body 
-     * @returns ITrip | RequestResponse
+     * @returns RequestResponse
      */
     @Post()
-    @SuccessResponse("201", "Created")
-    public async createTrip(@Body() body: ITrip): Promise<ITrip | RequestResponse> {
+    public async createTrip(@Body() body: ITrip): Promise<RequestResponse> {
 
         try {
-            let trip: ITrip = body;
-            /* let travellersId: any[] = [];
-    
-            const persons: IPerson[] | undefined = trip.travellers;
-    
-            if (persons && !this.helper.IsArrayNull(persons)) {
-    
-                for (var iTraveller = 0; iTraveller < persons.length; iTraveller++) {
-                    const tmp = await this.personsService.createPerson(persons[iTraveller]);
-                    const mapItem = { personId: tmp.userName, tripId: null };
-                    travellersId.push(mapItem);
-                };
-    
-            } */
 
-            const content = await this.tripService.createTrip(trip);
+            // Await the result of the createTrip method from the tripsService
+            await this.tripsService.createTrip(body);
 
-            /* if (!this.helper.IsArrayNull(travellersId)) {
-                travellersId.forEach(x => x.tripId = content.tripId);
-                await this.tripTravellersService.createTravellers(travellersId);
-            } */
+            // set the HTTP status to 201 (Created)
+            this.setStatus(201);
 
-            return content;
+            // Return an success response with the status and status message
+            return { status: 201, message: `Added trip ${body.tripId} successfuly.` };
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
     }
 
     /**
-     * Update existing trip
+     * Define a PUT endpoint with the parameter 'tripId' and body parameter 'ITrip'
      * @param tripId 
      * @param body 
-     * @returns ITrip | RequestResponse
+     * @returns RequestResponse
      */
     @Put("/:tripId")
-    public async updateTrip(@Path() tripId: number, @Body() body: ITrip): Promise<ITrip | RequestResponse> {
+    public async updateTrip(@Path() tripId: number, @Body() body: ITrip): Promise<RequestResponse> {
 
         try {
 
-            // Await the result of the getAirlines method from the airlinesService
-            return await this.tripService.updateTrip(tripId, body);
+            // Validated the provided tripId is exist in the database or not
+            const isExist = await this.tripsService.isTripExist(tripId);
+
+            if (!isExist) {
+                // If no trip is exist , set the HTTP status to 400 (Bad Request)
+                this.setStatus(400);
+
+                // Return an error response with the status and error message
+                return { status: 400, message: `Provided ${tripId} trip does not exist` };
+            }
+
+            // Await the result of the updateTrip method from the tripsService
+            await this.tripsService.updateTrip(tripId, body);
+
+            // Return an success response with the status and status message
+            return { status: 200, message: `Updated trip ${tripId} successfuly.` };
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
     }
 
     /**
-     * Delete a trip
+     * Define a DELETE endpoint with the parameter 'tripId'
      * @param tripId 
-     * @returns boolean | RequestResponse
+     * @returns RequestResponse
      */
     @Delete("/:tripId")
-    public async deleteTrip(@Path() tripId: number): Promise<boolean | RequestResponse> {
+    public async deleteTrip(@Path() tripId: number): Promise<RequestResponse> {
 
         try {
 
-            // Await the result of the getAirlines method from the airlinesService
-            return await this.tripService.deleteTrip(tripId);
+            // Validated the provided tripId is exist in the database or not
+            const isExist = await this.tripsService.isTripExist(tripId);
+
+            if (!isExist) {
+                // If no trip is exist , set the HTTP status to 400 (Bad Request)
+                this.setStatus(400);
+
+                // Return an error response with the status and error message
+                return { status: 400, message: `Provided ${tripId} trip does not exist` };
+            }
+
+            // Await the result of the deleteTrip method from the tripsService
+            await this.tripsService.deleteTrip(tripId);
+
+            // Return an success response with the status and status message
+            return { status: 200, message: `Deleted trip ${tripId} successfuly.` };
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
     }
 
     /**
-     * Get list of trips
+     * Define a GET endpoint to get trips count
      * @returns number | RequestResponse
      */
     @Get("/records/count")
@@ -157,80 +189,65 @@ export class TripsController extends Controller {
 
         try {
 
-            // Await the result of the getAirlines method from the airlinesService
-            return await this.tripService.getTripCount();
+            // Await the result of the getTripCount method from the tripsService
+            return await this.tripsService.getTripCount();
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
     }
 
     /**
-     * 
+     * Define a POST endpoint to search persons count
      * @param body 
-     * @returns 
+     * @returns number | RequestResponse
      */
-    /* @Post("/search/count")
-    public async searchTripCount(@Body() body: Search): Promise<number> {
-        return await this.tripService.searchTripCount(body);
-    } */
+    @Post("/search/count")
+    public async searchTripCount(@Body() body: Search): Promise<number | RequestResponse> {
+
+        try {
+
+            // Await the result of the searchTripCount method from the tripsService
+            return await this.tripsService.searchTripCount(body);
+
+        } catch (ex: any) {
+
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
+            this.setStatus(400);
+
+            // Return an error response with the status and error message
+            return { status: 400, message: ex.message };
+
+        }
+    }
 
     /**
-     * 
+     * Define a POST endpoint to search trips
      * @param body 
-     * @returns 
+     * @returns SearchResults | RequestResponse
      */
-    /* @Post("/search")
-    public async searchTrip(@Body() body: Search): Promise<SearchResults> {
-        return await this.tripService.searchTrip(body);
-    } */
+    @Post("/search")
+    public async searchTrip(@Body() body: Search): Promise<SearchResults | RequestResponse> {
 
-    /**
-     * Get All trips and their travellers
-     * @returns 
-     */
-    /* @Get("/travellers")
-    public async getTripsTravellers(): Promise<ITrip[]> {
-        return await this.tripService.getTripsTravellers();
-    } */
+        try {
 
-    /**
-     * Delete traveller from trip travellers
-     * @returns 
-     */
-    /* @Delete("/travellers/${tripId}/{$travellerId")
-    public async getTripsTravellers(): Promise<ITrip[]> {
-        return await this.tripService.getTripsTravellers();
-    } */
+            // Await the result of the searchTrip method from the tripsService
+            return await this.tripsService.searchTrip(body);
 
-    /**
-     * Update traveller for trip traveller
-     * @returns 
-     */
-    /* @Patch("/travellers/${tripId}/{$travellerId")
-    public async getTripsTravellers(): Promise<ITrip[]> {
-        return await this.tripService.getTripsTravellers();
-    } */
+        } catch (ex: any) {
 
-    /**
-     * Add new traveller to trip travellers
-     * @returns 
-     */
-    /* @Post("/travellers/${tripId}")
-    public async getTripsTravellers(): Promise<ITrip[]> {
-        return await this.tripService.getTripsTravellers();
-    } */
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
+            this.setStatus(400);
 
-    /**
-     * Get specific trip's travellers
-     * @param id 
-     * @returns 
-     */
-    /* @Get("/:tripId/travellers")
-    public async getTripTravellers(@Path() id: string): Promise<ITrip> {
-        return await this.tripService.getTripTravellers(id);
-    } */
+            // Return an error response with the status and error message
+            return { status: 400, message: ex.message };
+
+        }
+    }
 }
