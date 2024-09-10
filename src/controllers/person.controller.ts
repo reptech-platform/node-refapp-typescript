@@ -1,30 +1,23 @@
-import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path, SuccessResponse } from "tsoa";
+import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
 import PersonsService from "../services/person.service";
-import TripService from "../services/trip.service";
-import Helper from "../utils/helper.utils";
 import RequestResponse from "../utils/request.response";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { IPerson } from "../models/person.model";
 import { Search, SearchResults } from "../models/search.model";
-import { ITrip } from "../models/trip.model";
-import PersonTripsService from "../services/persontrip.service";
 
 @Tags("Persons")
 @Route("persons")
 @provideSingleton(PersonsController)
 export class PersonsController extends Controller {
     constructor(
-        @inject(PersonsService) private personsService: PersonsService,
-        @inject(PersonTripsService) private personTripsService: PersonTripsService,
-        @inject(TripService) private tripService: TripService,
-        @inject(Helper) private helper: Helper
+        @inject(PersonsService) private personsService: PersonsService
     ) {
         super();
     }
 
     /**
-     * Get all list of persons
-     * @returns
+     * Define a GET endpoint to get all persons
+     * @returns IPerson[] | RequestResponse
      */
     @Get()
     public async getPersons(): Promise<IPerson[] | RequestResponse> {
@@ -36,93 +29,75 @@ export class PersonsController extends Controller {
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
     }
 
     /**
-     * Get the specific person details
+     * Define a GET endpoint with the path parameter 'userName'
      * @param userName
-     * @returns 
+     * @returns IPerson | RequestResponse
      */
     @Get("/:userName")
     public async getPerson(@Path() userName: string): Promise<IPerson | RequestResponse> {
 
         try {
 
-            // Await the result of the getAirlines method from the airlinesService
+            // Validated the provided userName is exist in the database or not
+            const isExist = await this.personsService.isPersonExist(userName);
+
+            if (!isExist) {
+                // If no person is exist , set the HTTP status to 400 (Bad Request)
+                this.setStatus(400);
+
+                // Return an error response with the status and error message
+                return { status: 400, message: `Provided ${userName} person does not exist` };
+            }
+
+            // Await the result of the getPerson method from the personsService
             return await this.personsService.getPerson(userName);
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
     }
 
     /**
-     * Get the specific person details
-     * @param userName
-     * @returns 
-     */
-    @Get("({:userName})/trips")
-    public async getPersonTrip(@Path() userName: string): Promise<IPerson | RequestResponse> {
-
-        try {
-
-            // Await the result of the getAirlines method from the airlinesService
-            return await this.personsService.getPerson(userName);
-
-        } catch (ex: any) {
-
-            this.setStatus(400);
-            return { status: 400, message: ex.message };
-
-        }
-    }
-
-    /**
-     * Create the person with trips
+     * Define a POST endpoint with the body parameter 'IPerson'
      * @param body 
      * @returns 
      */
     @Post()
-    @SuccessResponse("201", "Created")
-    public async createPerson(@Body() body: IPerson): Promise<IPerson | RequestResponse> {
+    public async createPerson(@Body() body: IPerson): Promise<RequestResponse> {
 
         try {
-            let person: IPerson = body;
-            /* let personTrips: any[] = [];
-    
-            const trips: ITrip[] | undefined = person.trips;
-    
-            if (trips && !this.helper.IsArrayNull(trips)) {
-    
-                for (var iTrip = 0; iTrip < trips.length; iTrip++) {
-                    const tmp = await this.tripService.createTrip(trips[iTrip]);
-                    const mapItem = { personId: null, tripId: tmp.tripId };
-                    personTrips.push(mapItem);
-                };
-    
-            } */
 
-            const content = await this.personsService.createPerson(person);
+            // Await the result of the createPerson method from the personsService
+            await this.personsService.createPerson(body);
 
-            /* if (!this.helper.IsArrayNull(personTrips)) {
-    
-                personTrips.forEach(x => x.personId = content.userName);
-                await this.personTripsService.createPersonTrips(personTrips);
-    
-            } */
+            // set the HTTP status to 201 (Created)
+            this.setStatus(201);
 
-            return content;
+            // Return an success response with the status and status message
+            return { status: 201, message: `Added persion ${body.userName} successfuly.` };
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
@@ -130,136 +105,207 @@ export class PersonsController extends Controller {
     }
 
     /**
-     * Update existing persion
+     * Define a PUT endpoint with the parameter 'userName' and body parameter 'IPerson'
      * @param userName 
      * @param body 
-     * @returns 
+     * @returns RequestResponse
      */
     @Put("/:userName")
-    public async updatePerson(@Path() userName: string, @Body() body: IPerson): Promise<IPerson | RequestResponse> {
+    public async updatePerson(@Path() userName: string, @Body() body: IPerson): Promise<RequestResponse> {
 
         try {
 
-            // Await the result of the getAirlines method from the airlinesService
-            return await this.personsService.updatePerson(userName, body);
+            // Validated the provided userName is exist in the database or not
+            const isExist = await this.personsService.isPersonExist(userName);
+
+            if (!isExist) {
+                // If no person is exist , set the HTTP status to 400 (Bad Request)
+                this.setStatus(400);
+
+                // Return an error response with the status and error message
+                return { status: 400, message: `Provided ${userName} person does not exist` };
+            }
+
+            // Await the result of the updatePerson method from the personsService
+            await this.personsService.updatePerson(userName, body);
+
+            // Return an success response with the status and status message
+            return { status: 200, message: `Updated person ${userName} successfuly.` };
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
     }
 
     /**
-     * Delete existig persion
+     * Define a DELETE endpoint with the parameter 'userName'
      * @param userName 
-     * @returns 
+     * @returns RequestResponse
      */
     @Delete("/:userName")
-    public async deletePerson(@Path() userName: string): Promise<boolean | RequestResponse> {
+    public async deletePerson(@Path() userName: string): Promise<RequestResponse> {
 
         try {
 
+            // Validated the provided userName is exist in the database or not
+            const isExist = await this.personsService.isPersonExist(userName);
+
+            if (!isExist) {
+                // If no person is exist , set the HTTP status to 400 (Bad Request)
+                this.setStatus(400);
+
+                // Return an error response with the status and error message
+                return { status: 400, message: `Provided ${userName} person does not exist` };
+            }
+
             // Await the result of the getAirlines method from the airlinesService
-            return await this.personsService.deletePerson(userName);
+            await this.personsService.deletePerson(userName);
+
+            // Return an success response with the status and status message
+            return { status: 200, message: `Deleted person ${userName} successfuly.` };
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
     }
 
     /**
-     * Get persons count
+     * Define a POST endpoint to add persons's documents
+     * @param userName 
+     * @param body 
+     * @returns RequestResponse
+     */
+    @Post("/:userName/document")
+    public async updatePersonDocument(@Path() userName: string, @Body() body: IPerson): Promise<RequestResponse> {
+
+        try {
+
+            // Await the result of the getAirlines method from the airlinesService
+            await this.personsService.updatePersonDocument(userName, body.personAttachments);
+
+            // Return an success response with the status and status message
+            return { status: 200, message: `Updated ${userName} person documents successfuly.` };
+
+        } catch (ex: any) {
+
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
+            this.setStatus(400);
+
+            // Return an error response with the status and error message
+            return { status: 400, message: ex.message };
+
+        }
+    }
+
+    /**
+     * Define a DELETE endpoint to delete persons's documents
+     * @param userName 
+     * @param body 
+     * @returns RequestResponse
+     */
+    @Delete("/:userName/document")
+    public async deletePersonDocument(@Path() userName: string, @Body() body: IPerson): Promise<RequestResponse> {
+
+        try {
+
+            // Await the result of the getAirlines method from the airlinesService
+            await this.personsService.deletePersonDocument(userName, body.personAttachments);
+
+            // Return an success response with the status and status message
+            return { status: 200, message: `Deleted ${userName} person documents successfuly.` };
+
+        } catch (ex: any) {
+
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
+            this.setStatus(400);
+
+            // Return an error response with the status and error message
+            return { status: 400, message: ex.message };
+
+        }
+    }
+
+    /**
+     * Define a GET endpoint to get persons count
+     * @returns number | RequestResponse
      */
     @Get("/records/count")
     public async getPersonCount(): Promise<number | RequestResponse> {
 
         try {
 
-            // Await the result of the getAirlines method from the airlinesService
+            // Await the result of the getPersonCount method from the personsService
             return await this.personsService.getPersonCount();
 
         } catch (ex: any) {
 
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
             this.setStatus(400);
+
+            // Return an error response with the status and error message
             return { status: 400, message: ex.message };
 
         }
     }
 
     /**
-     * Update existing persion
-     * @param userName 
+     * Define a POST endpoint to search persons count
      * @param body 
-     * @returns 
+     * @returns number | RequestResponse
      */
-    @Post("/document/:userName")
-    public async updatePersonDocument(@Path() userName: string, @Body() body: IPerson): Promise<IPerson | RequestResponse> {
-
-        try {
-
-            // Await the result of the getAirlines method from the airlinesService
-            return await this.personsService.updatePersonDocument(userName, body.personAttachments);
-
-        } catch (ex: any) {
-
-            this.setStatus(400);
-            return { status: 400, message: ex.message };
-
-        }
-    }
-
-    /**
-     * Update existing persion
-     * @param userName 
-     * @param body 
-     * @returns 
-     */
-    @Delete("/document/:userName")
-    public async deletePersonDocument(@Path() userName: string, @Body() body: IPerson): Promise<IPerson | RequestResponse> {
-
-        try {
-
-            // Await the result of the getAirlines method from the airlinesService
-            return await this.personsService.deletePersonDocument(userName, body.personAttachments);
-
-        } catch (ex: any) {
-
-            this.setStatus(400);
-            return { status: 400, message: ex.message };
-
-        }
-    }
-
-    /*
-
     @Post("/search/count")
-    public async searchPersonCount(@Body() body: Search): Promise<number> {
-        return await this.personsService.searchPersonCount(body);
+    public async searchPersonCount(@Body() body: Search): Promise<number | RequestResponse> {
+
+        try {
+
+            // Await the result of the searchPersonCount method from the personsService
+            return await this.personsService.searchPersonCount(body);
+
+        } catch (ex: any) {
+
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
+            this.setStatus(400);
+
+            // Return an error response with the status and error message
+            return { status: 400, message: ex.message };
+
+        }
+
     }
 
+    /**
+     * Define a POST endpoint to search persons
+     * @param body 
+     * @returns SearchResults | RequestResponse
+     */
     @Post("/search")
-    public async searchPerson(@Body() body: Search): Promise<SearchResults> {
-        return await this.personsService.searchPerson(body);
-    } */
+    public async searchPerson(@Body() body: Search): Promise<SearchResults | RequestResponse> {
 
-    /*
-    Get All persons and their trips
-     */
-    /* @Get("/trips")
-    public async getPersonsTrips(): Promise<IPerson[]> {
-        return await this.personsService.getPersonsTrips();
-    } */
+        try {
 
-    /*
-     * Get specific person's trips
-     */
-    /* @Get("/:id/trips")
-    public async getPersonTrips(@Path() id: string): Promise<IPerson> {
-        return await this.personsService.getPersonTrips(id);
-    } */
+            // Await the result of the searchPerson method from the personsService
+            return await this.personsService.searchPerson(body);
+
+        } catch (ex: any) {
+
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
+            this.setStatus(400);
+
+            // Return an error response with the status and error message
+            return { status: 400, message: ex.message };
+
+        }
+    }
 }

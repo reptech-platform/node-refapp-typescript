@@ -2,16 +2,22 @@ import { Error } from "mongoose";
 import PersonSchema, { IPersonSchema } from "../db/models/person.db.model";
 import Helper from "../utils/helper.utils";
 import { IPerson } from "../models/person.model";
+import { ITrip } from "../models/trip.model";
 import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { IPersonAttachmentSchema } from "src/db/models/personattachment.db.model";
+import PersonTripsService from "./persontrip.service";
+import { LazyServiceIdentifier } from "inversify";
 
 // This decorator ensures that PersonsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @provideSingleton(PersonsService)
 export default class PersonsService {
 
     // Injecting the Helper service
-    constructor(@inject(Helper) private helper: Helper) { }
+    constructor(
+        // PersonTripsService has a circular dependency
+        @inject(new LazyServiceIdentifier(() => PersonTripsService)) private personTripsService: PersonTripsService,
+        @inject(Helper) private helper: Helper) { }
 
     // Checks if a person with the given userName exists in the database.
     public async isPersonExist(userName: string): Promise<boolean> {
@@ -58,8 +64,10 @@ export default class PersonsService {
     }
 
     // Creates a new person in the database.
-    public async createPerson(person: IPersonSchema | IPerson): Promise<IPerson> {
-        return await PersonSchema.create(person)
+    public async createPerson(person: IPerson): Promise<IPerson> {
+
+        // create new person entry in the database
+        let newPerson = await PersonSchema.create(person)
             .then((data: any) => {
                 return data as IPerson;
             })
@@ -67,11 +75,24 @@ export default class PersonsService {
                 // Throws an error if the operation fails.
                 throw error;
             });
+
+
+        // Retrieve the trip information from the person object, which may be undefined
+        const trips: ITrip[] | undefined = person.trips;
+
+        if (trips && trips.length > 0) {
+            // Add or update trips and map the person trips
+            await this.personTripsService.addOrUpadatePersonTrips(person.userName, trips);
+        }
+
+        // Returns newly created person object
+        return newPerson;
     }
 
     // Updates an existing person by their userName and returns the updated person.
     public async updatePerson(userName: string, person: any): Promise<IPerson> {
-        return await PersonSchema.findOneAndUpdate({ userName }, person, { new: true })
+
+        let updatedPerson = await PersonSchema.findOneAndUpdate({ userName }, person, { new: true })
             .then((data: any) => {
                 // Uses the helper to process the updated person.
                 let results = this.helper.GetItemFromArray(data, 0, {});
@@ -81,6 +102,16 @@ export default class PersonsService {
                 // Throws an error if the operation fails.
                 throw error;
             });
+
+        // Retrieve the trip information from the person object, which may be undefined
+        const trips: ITrip[] | undefined = person.trips;
+
+        if (trips && trips.length > 0) {
+            // Add or update trips and map the person trips
+            await this.personTripsService.addOrUpadatePersonTrips(userName, trips);
+        }
+
+        return updatedPerson;
     }
 
     // Updates or adds documents to a person's attachments.
@@ -129,7 +160,8 @@ export default class PersonsService {
 
     // Deletes a person by their userName.
     public async deletePerson(userName: string): Promise<boolean> {
-        return await PersonSchema.findOneAndDelete({ userName })
+
+        let boolDeleted: boolean = await PersonSchema.findOneAndDelete({ userName })
             .then(() => {
                 // Returns true if the deletion is successful.
                 return true;
@@ -138,6 +170,11 @@ export default class PersonsService {
                 // Throws an error if the operation fails.
                 throw error;
             });
+
+        // delete all person trips from the database
+        await this.personTripsService.deleteAllPersonTrips(userName);
+
+        return boolDeleted;
     }
 
     // Searches for persons based on the provided search criteria.

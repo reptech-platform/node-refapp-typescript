@@ -5,7 +5,7 @@ import { IPlanItems } from "./planitem.model";
 // Interface representing a trip
 export interface ITrip {
     // Optional unique identifier for the trip
-    tripId?: string;
+    tripId: number;
 
     // Optional share identifier for the trip
     shareId?: string;
@@ -50,7 +50,7 @@ export interface ITrip {
 @injectable()
 export class Trip implements ITrip {
     // Optional unique identifier for the trip
-    tripId?: string;
+    tripId: number;
 
     // Optional share identifier for the trip
     shareId?: string;

@@ -8,7 +8,7 @@ import { IDocument } from "./document.model";
 // Interface representing a person
 export interface IPerson {
     // Optional username of the person
-    userName?: string;
+    userName: string;
 
     // Optional first name of the person
     firstName?: string;
@@ -63,7 +63,7 @@ export interface IPerson {
 @injectable()
 export class Person implements IPerson {
     // Optional unique identifier username of the person
-    userName?: string;
+    userName: string;
 
     // Optional first name of the person
     firstName?: string;

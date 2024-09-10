@@ -1,14 +1,12 @@
 import { Error } from "mongoose";
 import { provideSingleton, inject } from "../utils/provideSingleton";
-import TripService from "../services/trip.service";
+import TripsService from "../services/trip.service";
 import PersonsService from "../services/person.service";
-import PersonSchema from "../db/models/person.db.model";
-import PersonTripSchema, { IPersonTripSchema } from "../db/models/persontrip.db.model";
-import TripSchema from "../db/models/trip.db.model";
+import PersonTripSchema from "../db/models/persontrip.db.model";
 import { IPerson } from "../models/person.model";
 import { ITrip } from "../models/trip.model";
 import Helper from "../utils/helper.utils";
-import { any } from "joi";
+import { LazyServiceIdentifier } from "inversify";
 
 // This decorator ensures that PersonTripsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @provideSingleton(PersonTripsService)
@@ -17,8 +15,9 @@ export default class PersonTripsService {
     // Injecting the Helper, PersonsService and TripService services
     constructor(
         @inject(Helper) private helper: Helper,
-        @inject(PersonsService) private personsService: PersonsService,
-        @inject(TripService) private tripService: TripService
+        // PersonsService has a circular dependency
+        @inject(new LazyServiceIdentifier(() => PersonsService)) private personsService: PersonsService,
+        @inject(TripsService) private tripsService: TripsService
     ) { }
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
@@ -91,14 +90,36 @@ export default class PersonTripsService {
     }
 
     // This method adds multiple trips for a person.
-    public async addPersonTrips(userName: string, trips: ITrip[] | any[]): Promise<void> {
+    public async addOrUpadatePersonTrips(userName: string, trips: ITrip[] | any[]): Promise<void> {
 
         let mapItems: any[] = [];
 
-        for (let trip of trips) {
-            // Creates a new trip for each trip in the array and adds the userName and tripId to mapItems.
-            let newDoc = await this.tripService.createTrip(trip);
-            mapItems.push({ userName, tripId: newDoc.tripId });
+        if (trips && trips.length > 0) {
+            // Loop Check if the trips already exists in the database using its tripId
+            for (let index = 0; index < trips.length; index++) {
+
+                // Read trip based on index loop
+                let currentTrip = trips[index];
+
+                // Check the trip is exist in the database
+                let isExist = await this.tripsService.isTripExist(currentTrip.tripId);
+
+                if (!isExist) {
+                    // If the trip does not exist, create a new trip entry in the database
+                    currentTrip = await this.tripsService.createTrip(currentTrip);
+                } else {
+                    // If the trip exist, update trip entry in the database
+                    await this.tripsService.updateTrip(currentTrip.tripId, currentTrip);
+                }
+
+                // Check person and trip is already mapped
+                isExist = await this.isPersonAndTripExist(userName, currentTrip.tripId);
+
+                if (!isExist) {
+                    // Add tripId to array of id list for person trip mapping
+                    mapItems.push({ userName, tripId: currentTrip.tripId });
+                }
+            }
         }
 
         // Inserts the mapItems into the PersonTripSchema collection.
@@ -109,18 +130,24 @@ export default class PersonTripsService {
     }
 
     // This method deletes a trip for a person.
-    public async deletePersonTrip(tripId: number): Promise<void> {
-
-        // Deletes the trip from the tripService.
-        await this.tripService.deleteTrip(tripId);
+    public async deletePersonTrip(userName: string, tripId: number): Promise<void> {
 
         // Deletes the trip from the PersonTripSchema collection.
-        await PersonTripSchema.findByIdAndDelete({ tripId }).catch((error: Error) => {
+        await PersonTripSchema.deleteOne({ userName, tripId }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
     }
 
+    // This method deletes a all trips for a person.
+    public async deleteAllPersonTrips(userName: string): Promise<void> {
+
+        // Deletes the trip from the PersonTripSchema collection.
+        await PersonTripSchema.deleteMany({ userName }).catch((error: Error) => {
+            // Throws an error if the operation fails.
+            throw error;
+        });
+    }
 
     // This method get multiple travellers to a trip.
     public async getTripTravellers(tripId: number): Promise<IPerson[]> {
