@@ -181,7 +181,6 @@ export class PersonTripController extends Controller {
 
     /**
      * Define a DELETE endpoint with the path parameter 'userName' and 'tripId'
-     * Common single method to delete against tripId and userName
      * @param userName 
      * @param tripId 
      * @returns RequestResponse
