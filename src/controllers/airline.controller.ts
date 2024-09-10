@@ -125,7 +125,7 @@ export class AirlinesController extends Controller {
                 return { status: 400, message: `Provided ${airlineCode} airline does not exist` };
             }
 
-            // Await the result of the getAirline method from the airlinesService
+            // Await the result of the updateAirline method from the airlinesService
             await this.airlinesService.updateAirline(airlineCode, body);
 
             // Return an success response with the status and status message
@@ -224,7 +224,7 @@ export class AirlinesController extends Controller {
 
         try {
 
-            // Await the result of the getAirline method from the airlinesService
+            // Await the result of the getAirlineCount method from the airlinesService
             return await this.airlinesService.getAirlineCount();
 
         } catch (ex: any) {
@@ -241,21 +241,50 @@ export class AirlinesController extends Controller {
     /**
      * Define a POST endpoint to search airlines count
      * @param body 
-     * @returns number
+     * @returns number | RequestResponse
      */
     @Post("/search/count")
-    public async searchAirlinesCount(@Body() body: Search): Promise<number> {
-        return await this.airlinesService.searchAirlineCount(body);
+    public async searchAirlinesCount(@Body() body: Search): Promise<number | RequestResponse> {
+
+        try {
+
+            // Await the result of the searchAirlineCount method from the airlinesService
+            return await this.airlinesService.searchAirlineCount(body);
+
+        } catch (ex: any) {
+
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
+            this.setStatus(400);
+
+            // Return an error response with the status and error message
+            return { status: 400, message: ex.message };
+
+        }
+
     }
 
     /**
      * Define a POST endpoint to search airlines
      * @param body 
-     * @returns SearchResults
+     * @returns SearchResults | RequestResponse
      */
     @Post("/search")
-    public async searchAirline(@Body() body: Search): Promise<SearchResults> {
-        return await this.airlinesService.searchAirline(body);
+    public async searchAirline(@Body() body: Search): Promise<SearchResults | RequestResponse> {
+
+        try {
+
+            // Await the result of the searchAirline method from the airlinesService
+            return await this.airlinesService.searchAirline(body);
+
+        } catch (ex: any) {
+
+            // If an error occurs, set the HTTP status to 400 (Bad Request)
+            this.setStatus(400);
+
+            // Return an error response with the status and error message
+            return { status: 400, message: ex.message };
+
+        }
     }
 
 }
