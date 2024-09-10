@@ -1,11 +1,8 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
-import AirportsService from "../services/airport.service";
 import AirlinesService from "../services/airline.service";
-import Helper from "../utils/helper.utils";
 import RequestResponse from "../utils/request.response";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { IAirline } from "../models/airline.model";
-import { IAirport } from "../models/airport.model";
 import { Search, SearchResults } from "../models/search.model";
 
 @Tags("Airlines")
@@ -13,10 +10,7 @@ import { Search, SearchResults } from "../models/search.model";
 @provideSingleton(AirlinesController)
 export class AirlinesController extends Controller {
 
-    constructor(
-        @inject(AirportsService) private airportsService: AirportsService,
-        @inject(AirlinesService) private airlinesService: AirlinesService,
-        @inject(Helper) private helper: Helper) {
+    constructor(@inject(AirlinesService) private airlinesService: AirlinesService) {
         super();
     }
 
