@@ -1,5 +1,5 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
-import TripsService from "../services/trip.service";
+import TripService from "../services/trip.service";
 import RequestResponse from "../utils/request.response";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { ITrip } from "../models/trip.model";
@@ -7,11 +7,11 @@ import { Search, SearchResults } from "../models/search.model";
 
 @Tags("Trips")
 @Route("/trips")
-@provideSingleton(TripsController)
-export class TripsController extends Controller {
+@provideSingleton(TripController)
+export class TripController extends Controller {
 
     constructor(
-        @inject(TripsService) private tripsService: TripsService) {
+        @inject(TripService) private tripService: TripService) {
         super();
     }
 
@@ -24,8 +24,8 @@ export class TripsController extends Controller {
 
         try {
 
-            // Await the result of the getTrips method from the tripsService
-            return await this.tripsService.getTrips();
+            // Await the result of the getTrips method from the tripService
+            return await this.tripService.getTrips();
 
         } catch (ex: any) {
 
@@ -49,7 +49,7 @@ export class TripsController extends Controller {
         try {
 
             // Validated the provided tripId is exist in the database or not
-            const isExist = await this.tripsService.isTripExist(tripId);
+            const isExist = await this.tripService.isTripExist(tripId);
 
             if (!isExist) {
                 // If no trip is exist , set the HTTP status to 400 (Bad Request)
@@ -59,8 +59,8 @@ export class TripsController extends Controller {
                 return { status: 400, message: `Provided ${tripId} trip does not exist` };
             }
 
-            // Await the result of the getTrip method from the tripsService
-            return await this.tripsService.getTrip(tripId);
+            // Await the result of the getTrip method from the tripService
+            return await this.tripService.getTrip(tripId);
 
         } catch (ex: any) {
 
@@ -83,8 +83,8 @@ export class TripsController extends Controller {
 
         try {
 
-            // Await the result of the createTrip method from the tripsService
-            await this.tripsService.createTrip(body);
+            // Await the result of the createTrip method from the tripService
+            await this.tripService.createTrip(body);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);
@@ -115,7 +115,7 @@ export class TripsController extends Controller {
         try {
 
             // Validated the provided tripId is exist in the database or not
-            const isExist = await this.tripsService.isTripExist(tripId);
+            const isExist = await this.tripService.isTripExist(tripId);
 
             if (!isExist) {
                 // If no trip is exist , set the HTTP status to 400 (Bad Request)
@@ -125,8 +125,8 @@ export class TripsController extends Controller {
                 return { status: 400, message: `Provided ${tripId} trip does not exist` };
             }
 
-            // Await the result of the updateTrip method from the tripsService
-            await this.tripsService.updateTrip(tripId, body);
+            // Await the result of the updateTrip method from the tripService
+            await this.tripService.updateTrip(tripId, body);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Updated trip ${tripId} successfuly.` };
@@ -153,7 +153,7 @@ export class TripsController extends Controller {
         try {
 
             // Validated the provided tripId is exist in the database or not
-            const isExist = await this.tripsService.isTripExist(tripId);
+            const isExist = await this.tripService.isTripExist(tripId);
 
             if (!isExist) {
                 // If no trip is exist , set the HTTP status to 400 (Bad Request)
@@ -163,8 +163,8 @@ export class TripsController extends Controller {
                 return { status: 400, message: `Provided ${tripId} trip does not exist` };
             }
 
-            // Await the result of the deleteTrip method from the tripsService
-            await this.tripsService.deleteTrip(tripId);
+            // Await the result of the deleteTrip method from the tripService
+            await this.tripService.deleteTrip(tripId);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted trip ${tripId} successfuly.` };
@@ -189,8 +189,8 @@ export class TripsController extends Controller {
 
         try {
 
-            // Await the result of the getTripCount method from the tripsService
-            return await this.tripsService.getTripCount();
+            // Await the result of the getTripCount method from the tripService
+            return await this.tripService.getTripCount();
 
         } catch (ex: any) {
 
@@ -213,8 +213,8 @@ export class TripsController extends Controller {
 
         try {
 
-            // Await the result of the searchTripCount method from the tripsService
-            return await this.tripsService.searchTripCount(body);
+            // Await the result of the searchTripCount method from the tripService
+            return await this.tripService.searchTripCount(body);
 
         } catch (ex: any) {
 
@@ -237,8 +237,8 @@ export class TripsController extends Controller {
 
         try {
 
-            // Await the result of the searchTrip method from the tripsService
-            return await this.tripsService.searchTrip(body);
+            // Await the result of the searchTrip method from the tripService
+            return await this.tripService.searchTrip(body);
 
         } catch (ex: any) {
 

@@ -1,5 +1,5 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
-import PersonsService from "../services/person.service";
+import PersonService from "../services/person.service";
 import RequestResponse from "../utils/request.response";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { IPerson } from "../models/person.model";
@@ -7,10 +7,10 @@ import { Search, SearchResults } from "../models/search.model";
 
 @Tags("Persons")
 @Route("persons")
-@provideSingleton(PersonsController)
-export class PersonsController extends Controller {
+@provideSingleton(PersonController)
+export class PersonController extends Controller {
     constructor(
-        @inject(PersonsService) private personsService: PersonsService
+        @inject(PersonService) private personService: PersonService
     ) {
         super();
     }
@@ -25,7 +25,7 @@ export class PersonsController extends Controller {
         try {
 
             // Await the result of the getAirlines method from the airlinesService
-            return await this.personsService.getPersons();
+            return await this.personService.getPersons();
 
         } catch (ex: any) {
 
@@ -49,7 +49,7 @@ export class PersonsController extends Controller {
         try {
 
             // Validated the provided userName is exist in the database or not
-            const isExist = await this.personsService.isPersonExist(userName);
+            const isExist = await this.personService.isPersonExist(userName);
 
             if (!isExist) {
                 // If no person is exist , set the HTTP status to 400 (Bad Request)
@@ -59,8 +59,8 @@ export class PersonsController extends Controller {
                 return { status: 400, message: `Provided ${userName} person does not exist` };
             }
 
-            // Await the result of the getPerson method from the personsService
-            return await this.personsService.getPerson(userName);
+            // Await the result of the getPerson method from the personService
+            return await this.personService.getPerson(userName);
 
         } catch (ex: any) {
 
@@ -83,8 +83,8 @@ export class PersonsController extends Controller {
 
         try {
 
-            // Await the result of the createPerson method from the personsService
-            await this.personsService.createPerson(body);
+            // Await the result of the createPerson method from the personService
+            await this.personService.createPerson(body);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);
@@ -116,7 +116,7 @@ export class PersonsController extends Controller {
         try {
 
             // Validated the provided userName is exist in the database or not
-            const isExist = await this.personsService.isPersonExist(userName);
+            const isExist = await this.personService.isPersonExist(userName);
 
             if (!isExist) {
                 // If no person is exist , set the HTTP status to 400 (Bad Request)
@@ -126,8 +126,8 @@ export class PersonsController extends Controller {
                 return { status: 400, message: `Provided ${userName} person does not exist` };
             }
 
-            // Await the result of the updatePerson method from the personsService
-            await this.personsService.updatePerson(userName, body);
+            // Await the result of the updatePerson method from the personService
+            await this.personService.updatePerson(userName, body);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Updated person ${userName} successfuly.` };
@@ -154,7 +154,7 @@ export class PersonsController extends Controller {
         try {
 
             // Validated the provided userName is exist in the database or not
-            const isExist = await this.personsService.isPersonExist(userName);
+            const isExist = await this.personService.isPersonExist(userName);
 
             if (!isExist) {
                 // If no person is exist , set the HTTP status to 400 (Bad Request)
@@ -165,7 +165,7 @@ export class PersonsController extends Controller {
             }
 
             // Await the result of the getAirlines method from the airlinesService
-            await this.personsService.deletePerson(userName);
+            await this.personService.deletePerson(userName);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted person ${userName} successfuly.` };
@@ -193,7 +193,7 @@ export class PersonsController extends Controller {
         try {
 
             // Await the result of the getAirlines method from the airlinesService
-            await this.personsService.updatePersonDocument(userName, body.personAttachments);
+            await this.personService.updatePersonDocument(userName, body.personAttachments);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Updated ${userName} person documents successfuly.` };
@@ -221,7 +221,7 @@ export class PersonsController extends Controller {
         try {
 
             // Await the result of the getAirlines method from the airlinesService
-            await this.personsService.deletePersonDocument(userName, body.personAttachments);
+            await this.personService.deletePersonDocument(userName, body.personAttachments);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted ${userName} person documents successfuly.` };
@@ -246,8 +246,8 @@ export class PersonsController extends Controller {
 
         try {
 
-            // Await the result of the getPersonCount method from the personsService
-            return await this.personsService.getPersonCount();
+            // Await the result of the getPersonCount method from the personService
+            return await this.personService.getPersonCount();
 
         } catch (ex: any) {
 
@@ -270,8 +270,8 @@ export class PersonsController extends Controller {
 
         try {
 
-            // Await the result of the searchPersonCount method from the personsService
-            return await this.personsService.searchPersonCount(body);
+            // Await the result of the searchPersonCount method from the personService
+            return await this.personService.searchPersonCount(body);
 
         } catch (ex: any) {
 
@@ -295,8 +295,8 @@ export class PersonsController extends Controller {
 
         try {
 
-            // Await the result of the searchPerson method from the personsService
-            return await this.personsService.searchPerson(body);
+            // Await the result of the searchPerson method from the personService
+            return await this.personService.searchPerson(body);
 
         } catch (ex: any) {
 

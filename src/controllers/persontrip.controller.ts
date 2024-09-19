@@ -1,9 +1,9 @@
-import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
+import { Controller, Body, Get, Post, Delete, Tags, Route, Path } from "tsoa";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import RequestResponse from "../utils/request.response";
-import PersonTripsService from "../services/persontrip.service";
-import TripsService from "../services/trip.service";
-import PersonsService from "../services/person.service";
+import PersonTripService from "../services/persontrip.service";
+import TripService from "../services/trip.service";
+import PersonService from "../services/person.service";
 import { IPerson } from "../models/person.model";
 import { ITrip } from "../models/trip.model";
 
@@ -16,9 +16,9 @@ import { ITrip } from "../models/trip.model";
 export class PersonTripController extends Controller {
 
     constructor(
-        @inject(PersonTripsService) private personTripsService: PersonTripsService,
-        @inject(PersonsService) private personsService: PersonsService,
-        @inject(TripsService) private tripsService: TripsService
+        @inject(PersonTripService) private personTripService: PersonTripService,
+        @inject(PersonService) private personService: PersonService,
+        @inject(TripService) private tripService: TripService
     ) {
         super();
     }
@@ -36,7 +36,7 @@ export class PersonTripController extends Controller {
         try {
 
             // Validated the provided person is exist in the database or not
-            const isExist = await this.personsService.isPersonExist(userName);
+            const isExist = await this.personService.isPersonExist(userName);
 
             if (!isExist) {
                 // If no person is exist , set the HTTP status to 400 (Bad Request)
@@ -46,9 +46,9 @@ export class PersonTripController extends Controller {
                 return { status: 400, message: `Provided ${userName} person does not exist` };
             }
 
-            // Call the getPersonTrips method from personsService with the provided userName
+            // Call the getPersonTrips method from personService with the provided userName
             // Await the result and return it
-            return await this.personTripsService.getPersonTrips(userName);
+            return await this.personTripService.getPersonTrips(userName);
 
         } catch (ex: any) {
 
@@ -73,7 +73,7 @@ export class PersonTripController extends Controller {
         try {
 
             // Validated the provided person is exist in the database or not
-            const isExist = await this.personsService.isPersonExist(userName);
+            const isExist = await this.personService.isPersonExist(userName);
 
             if (!isExist) {
                 // If no person is exist , set the HTTP status to 400 (Bad Request)
@@ -83,9 +83,9 @@ export class PersonTripController extends Controller {
                 return { status: 400, message: `Provided ${userName} person does not exist` };
             }
 
-            // Call the addOrUpadatePersonTrips method from personsService with the provided userName and list of trips
+            // Call the addOrUpadatePersonTrips method from personService with the provided userName and list of trips
             // Await the result and return it
-            await this.personTripsService.addOrUpadatePersonTrips(userName, body);
+            await this.personTripService.addOrUpadatePersonTrips(userName, body);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Added trips to person ${userName} successfuly.` };
@@ -114,7 +114,7 @@ export class PersonTripController extends Controller {
         try {
 
             // Validated the provided trip is exist in the database or not
-            const isExist = await this.tripsService.isTripExist(tripId);
+            const isExist = await this.tripService.isTripExist(tripId);
 
             if (!isExist) {
                 // If no trip is exist , set the HTTP status to 400 (Bad Request)
@@ -124,9 +124,9 @@ export class PersonTripController extends Controller {
                 return { status: 400, message: `Provided ${tripId} trip does not exist` };
             }
 
-            // Call the getTripTravellers method from personsService with the provided tripId
+            // Call the getTripTravellers method from personService with the provided tripId
             // Await the result and return it
-            return await this.personTripsService.getTripTravellers(tripId);
+            return await this.personTripService.getTripTravellers(tripId);
 
         } catch (ex: any) {
 
@@ -151,7 +151,7 @@ export class PersonTripController extends Controller {
         try {
 
             // Validated the provided trip is exist in the database or not
-            const isExist = await this.tripsService.isTripExist(tripId);
+            const isExist = await this.tripService.isTripExist(tripId);
 
             if (!isExist) {
                 // If no trip is exist , set the HTTP status to 400 (Bad Request)
@@ -161,9 +161,9 @@ export class PersonTripController extends Controller {
                 return { status: 400, message: `Provided ${tripId} trip does not exist` };
             }
 
-            // Call the addOrUpdateTripTravellers method from personsService with the provided tripId and list of persons
+            // Call the addOrUpdateTripTravellers method from personService with the provided tripId and list of persons
             // Await the result and return it
-            await this.personTripsService.addOrUpdateTripTravellers(tripId, body);
+            await this.personTripService.addOrUpdateTripTravellers(tripId, body);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Added travellers to a trip ${tripId} successfuly.` };
@@ -191,7 +191,7 @@ export class PersonTripController extends Controller {
         try {
 
             // Validated the provided person and trip is mapped in the database or not
-            const isExist = await this.personTripsService.isPersonAndTripExist(userName, tripId);
+            const isExist = await this.personTripService.isPersonAndTripExist(userName, tripId);
 
             if (!isExist) {
                 // If no person and trip is mapped , set the HTTP status to 400 (Bad Request)
@@ -201,9 +201,9 @@ export class PersonTripController extends Controller {
                 return { status: 400, message: `Provided ${userName} and ${tripId} relation does not exist` };
             }
 
-            // Call the deletePersonTrip method from personsService with the provided tripId
+            // Call the deletePersonTrip method from personService with the provided tripId
             // Await the result and return it
-            await this.personTripsService.deletePersonTrip(userName, tripId);
+            await this.personTripService.deletePersonTrip(userName, tripId);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted a trip for a person ${userName} successfuly.` };

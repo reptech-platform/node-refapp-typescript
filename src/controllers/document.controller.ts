@@ -1,16 +1,16 @@
 import { Controller, Get, Post, Delete, Tags, Route, Path, UploadedFile, SuccessResponse } from "tsoa";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import RequestResponse from "../utils/request.response";
-import DocumentsService from "../services/document.service";
+import DocumentService from "../services/document.service";
 import { IDocument } from "../models/document.model";
 import fs from "fs";
 
 @Tags("Documents")
 @Route("documents")
-@provideSingleton(DocumentsController)
-export class DocumentsController extends Controller {
+@provideSingleton(DocumentController)
+export class DocumentController extends Controller {
     constructor(
-        @inject(DocumentsService) private documentsService: DocumentsService) {
+        @inject(DocumentService) private documentService: DocumentService) {
         super();
     }
 
@@ -20,7 +20,7 @@ export class DocumentsController extends Controller {
         try {
 
             // Await the result of the getAirlines method from the airlinesService
-            return await this.documentsService.getDocuments();
+            return await this.documentService.getDocuments();
 
         } catch (ex: any) {
 
@@ -36,7 +36,7 @@ export class DocumentsController extends Controller {
         try {
 
             // Await the result of the getAirlines method from the airlinesService
-            return await this.documentsService.getDocument(docId);
+            return await this.documentService.getDocument(docId);
 
         } catch (ex: any) {
 
@@ -73,7 +73,7 @@ export class DocumentsController extends Controller {
                     docLocation: uploadPath
                 };
 
-                const content = await this.documentsService.createDocument(input);
+                const content = await this.documentService.createDocument(input);
 
                 return resolve(content);
 
@@ -93,7 +93,7 @@ export class DocumentsController extends Controller {
         try {
 
             // Await the result of the getAirlines method from the airlinesService
-            return await this.documentsService.deleteDocument(docId);
+            return await this.documentService.deleteDocument(docId);
 
         } catch (ex: any) {
 

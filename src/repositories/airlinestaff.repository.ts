@@ -1,30 +1,21 @@
 import { Error } from "mongoose";
 import { provideSingleton, inject } from "../utils/provideSingleton";
-import AirlinesService from "../services/airline.service";
-import PersonsService from "../services/person.service";
-import AirportStaffSchema from "../db/models/airportstaff.db.model";
+import AirlineStaffSchema from "../db/models/airlinestaff.db.model";
 import { IPerson } from "../models/person.model";
 import { IAirline } from "../models/airline.model";
 import Helper from "../utils/helper.utils";
-import { LazyServiceIdentifier } from "inversify";
 
 // This decorator ensures that AirlineStaffsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
-@provideSingleton(AirlineStaffsService)
-export default class AirlineStaffsService {
+@provideSingleton(AirlineStaffRepository)
+export default class AirlineStaffRepository {
 
     // Injecting the Helper, PersonsService and TripService services
-    constructor(
-        @inject(Helper) private helper: Helper,
-        // PersonsService has a circular dependency
-        @inject(new LazyServiceIdentifier(() => PersonsService)) private personsService: PersonsService,
-        // AirlinesService has a circular dependency
-        @inject(new LazyServiceIdentifier(() => AirlinesService)) private airlinesService: AirlinesService
-    ) { }
+    constructor(@inject(Helper) private helper: Helper) { }
 
     // This method checks if a person with the given userName is associated with a airline with the given airlineCode.
     public async isAirlineAndStaffExist(airlineCode: string, userName: string): Promise<boolean> {
 
-        return await AirportStaffSchema.find({ airlineCode, userName }, { _id: 1 })
+        return await AirlineStaffSchema.find({ airlineCode, userName }, { _id: 1 })
             .then((data: any[]) => {
                 // Uses the helper to process the array of results.
                 let results = this.helper.GetItemFromArray(data, 0, { _id: null });
@@ -78,7 +69,7 @@ export default class AirlineStaffsService {
         ];
 
         // Execute the aggregation pipeline on the AirportStaffSchema
-        return await AirportStaffSchema.aggregate($pipeline)
+        return await AirlineStaffSchema.aggregate($pipeline)
             .then((data: any[]) => {
                 // Resolve the promise with the resulting data
                 return data.map(x => x.items);
@@ -90,11 +81,10 @@ export default class AirlineStaffsService {
     }
 
     // This method adds multiple staff for a airline.
-    public async addOrUpadateAirlineStaffs(airlineCode: string, persons: IPerson[] | any[]): Promise<void> {
+    public async addOrUpadateAirlineStaffs(mapItems: [] | any[]): Promise<void> {
 
-        let mapItems: any[] = [];
 
-        if (persons && persons.length > 0) {
+        /* if (persons && persons.length > 0) {
             // Loop Check if the persons already exists in the database using its userName
             for (let index = 0; index < persons.length; index++) {
 
@@ -120,10 +110,10 @@ export default class AirlineStaffsService {
                     mapItems.push({ airlineCode, userName: currentPerson.userName });
                 }
             }
-        }
+        } */
 
         // Inserts the mapItems into the AirportStaffSchema collection.
-        await AirportStaffSchema.insertMany(mapItems).catch((error: Error) => {
+        await AirlineStaffSchema.insertMany(mapItems).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
@@ -133,7 +123,7 @@ export default class AirlineStaffsService {
     public async deleteStaffStaff(airlineCode: string, userName: string): Promise<void> {
 
         // Deletes the userName from the AirportStaffSchema collection.
-        await AirportStaffSchema.deleteOne({ airlineCode, userName }).catch((error: Error) => {
+        await AirlineStaffSchema.deleteOne({ airlineCode, userName }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
@@ -143,7 +133,7 @@ export default class AirlineStaffsService {
     public async deleteAllAirlineStaff(airlineCode: string): Promise<void> {
 
         // Deletes the person from the AirportStaffSchema collection.
-        await AirportStaffSchema.deleteMany({ airlineCode }).catch((error: Error) => {
+        await AirlineStaffSchema.deleteMany({ airlineCode }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
@@ -189,7 +179,7 @@ export default class AirlineStaffsService {
         ];
 
         // Execute the aggregation pipeline on the PersonTripSchema
-        return await AirportStaffSchema.aggregate($pipeline)
+        return await AirlineStaffSchema.aggregate($pipeline)
             .then((data: any[]) => {
                 // Resolve the promise with the resulting data
                 return data.map(x => x.items);
@@ -201,11 +191,9 @@ export default class AirlineStaffsService {
     }
 
     // This method adds multiple airlines to a staff.
-    public async addOrUpdateStaffAirlines(userName: string, airlines: IAirline[] | any[]): Promise<void> {
+    public async addOrUpdateStaffAirlines(mapItems: [] | any[]): Promise<void> {
 
-        let mapItems: any[] = [];
-
-        if (airlines && airlines.length > 0) {
+        /* if (airlines && airlines.length > 0) {
             // Loop Check if the travellers are already exists in the database using its tripId
             for (let index = 0; index < airlines.length; index++) {
 
@@ -231,10 +219,10 @@ export default class AirlineStaffsService {
                     mapItems.push({ airlineCode: currentAirline.airlineCode, userName });
                 }
             }
-        }
+        } */
 
         // Inserts the mapItems into the PersonTripSchema collection.
-        await AirportStaffSchema.insertMany(mapItems).catch((error: Error) => {
+        await AirlineStaffSchema.insertMany(mapItems).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
@@ -244,7 +232,7 @@ export default class AirlineStaffsService {
     public async deleteAllStaffAirlines(userName: string): Promise<void> {
 
         // Deletes the trip from the AirportStaffSchema collection.
-        await AirportStaffSchema.deleteMany({ userName }).catch((error: Error) => {
+        await AirlineStaffSchema.deleteMany({ userName }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });

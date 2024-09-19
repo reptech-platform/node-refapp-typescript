@@ -1,88 +1,43 @@
-import { Error } from "mongoose";
-import Helper from "../utils/helper.utils";
-import TripSchema, { ITripSchema } from "../db/models/trip.db.model";
 import { ITrip } from "../models/trip.model";
-import { IPerson } from "../models/person.model";
-import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
+import { Search, SearchResults } from "../models/search.model";
 import { provideSingleton, inject } from "../utils/provideSingleton";
-import PersonTripsService from "./persontrip.service";
-import { LazyServiceIdentifier } from "inversify";
+import TripRepository from "../repositories/trip.repository";
 
 // This decorator ensures that TripsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
-@provideSingleton(TripsService)
-export default class TripsService {
+@provideSingleton(TripService)
+export default class TripService {
 
     // Injecting the Helper service
     constructor(
-        // PersonTripsService has a circular dependency
-        @inject(new LazyServiceIdentifier(() => PersonTripsService)) private personTripsService: PersonTripsService,
-        @inject(Helper) private helper: Helper) { }
+        @inject(TripRepository) private tripRepository: TripRepository) { }
 
     // Checks if a trip with the given tripId exists in the database.
     public async isTripExist(tripId: number): Promise<boolean> {
-        return await TripSchema.find({ tripId }, { _id: 1 })
-            .then((data: ITripSchema[]) => {
-                // Uses the helper to process the array of trips.
-                let results = this.helper.GetItemFromArray(data, 0, { _id: null });
-                // Returns true if the trip exists, otherwise false.
-                if (!this.helper.IsNullValue(results._id)) return true;
-                return false;
-            })
-            .catch((error: Error) => {
-                // Throws an error if the operation fails.
-                throw error;
-            });
+        return await this.tripRepository.isTripExist(tripId);
     }
 
     // Fetches all trips from the database, excluding the _id field.
     public async getTrips(): Promise<ITrip[]> {
-
-        return await TripSchema.find({}, { _id: 0 })
-            .then((data: ITripSchema[]) => {
-                // Uses the helper to process the array of trips.
-                let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as ITrip[];
-            })
-            .catch((error: Error) => {
-                // Throws an error if the operation fails.
-                throw error;
-            });
+        return await this.tripRepository.getTrips();
     }
 
     // Fetches a single trip by its tripId, excluding the _id field.
     public async getTrip(tripId: number): Promise<ITrip> {
-
-        return await TripSchema.find({ tripId }, { _id: 0 })
-            .then((data: ITripSchema[]) => {
-                // Uses the helper to process the trip.
-                let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as ITrip;
-            })
-            .catch((error: Error) => {
-                // Throws an error if the operation fails.
-                throw error;
-            });
+        return await this.tripRepository.getTrip(tripId);
     }
 
     // Creates a new trip in the database.
     public async createTrip(trip: ITrip): Promise<ITrip> {
 
-        let newTrip = await TripSchema.create(trip)
-            .then((data: any) => {
-                return data as ITrip;
-            })
-            .catch((error: Error) => {
-                // Throws an error if the operation fails.
-                throw error;
-            });
+        let newTrip = await this.tripRepository.createTrip(trip);
 
         // Retrieve the travellers information from the trip object, which may be undefined
-        const travellers: IPerson[] | undefined = trip.travellers;
+        /* const travellers: IPerson[] | undefined = trip.travellers;
 
         if (travellers && travellers.length > 0) {
             // Add or update travellers and map the trip travellers
             await this.personTripsService.addOrUpdateTripTravellers(trip.tripId, travellers);
-        }
+        } */
 
         // Returns newly created trip object
         return newTrip;
@@ -91,22 +46,15 @@ export default class TripsService {
     // Updates an existing trip by its tripId and returns the updated trip.
     public async updateTrip(tripId: number, trip: any): Promise<ITrip> {
 
-        let updatedTrip = await TripSchema.findOneAndUpdate({ tripId }, trip, { new: true })
-            .then((data: any) => {
-                return data as ITrip;
-            })
-            .catch((error: Error) => {
-                // Throws an error if the operation fails.
-                throw error;
-            });
+        let updatedTrip = await this.tripRepository.updateTrip(tripId, trip);
 
-        // Retrieve the travellers information from the trip object, which may be undefined
+        /* // Retrieve the travellers information from the trip object, which may be undefined
         const travellers: IPerson[] | undefined = trip.travellers;
 
         if (travellers && travellers.length > 0) {
             // Add or update travellers and map the trip travellers
             await this.personTripsService.addOrUpdateTripTravellers(trip.tripId, travellers);
-        }
+        } */
 
         return updatedTrip;
     }
@@ -114,120 +62,27 @@ export default class TripsService {
     // Deletes a trip by its tripId.
     public async deleteTrip(tripId: number): Promise<boolean> {
 
-        let boolDeleted: boolean = await TripSchema.findOneAndDelete({ tripId })
-            .then(() => {
-                // Returns true if the deletion is successful.
-                return true;
-            })
-            .catch((error: Error) => {
-                // Throws an error if the operation fails.
-                throw error;
-            });
+        let boolDeleted: boolean = await this.tripRepository.deleteTrip(tripId);
 
         // delete all trip travellers from the database
-        await this.personTripsService.deleteAllTripTravellers(tripId);
+        // await this.personTripsService.deleteAllTripTravellers(tripId);
 
         return boolDeleted;
     }
 
     // Searches for trips based on the provided search criteria.
     public async searchTrip(search: Search): Promise<SearchResults> {
-
-        let $sort: any = undefined, $match: any = undefined, $limit: any = undefined, $skip: any = undefined;
-
-        // Processes the sort criteria.
-        if (!this.helper.IsArrayNull(search.sort)) {
-            search.sort?.forEach((e: SortBy) => {
-                let sortBy: SortBy = new SortBy(e);
-                $sort = { ...$sort, [sortBy.name]: sortBy.getOrder() };
-            });
-        }
-
-        // Processes the filter criteria.
-        if (!this.helper.IsArrayNull(search.filter)) {
-            search.filter?.forEach((e: FilterBy) => {
-                let filterBy: FilterBy = new FilterBy(e);
-                $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
-            });
-        }
-
-        // Processes the pagination criteria.
-        if (!this.helper.IsJsonNull(search.pagination)) {
-            let pagination: Pagination = new Pagination(search.pagination);
-            $limit = { $limit: pagination.getLimit() };
-            $skip = { $skip: pagination.getOffset() };
-        }
-
-        // Gets the total count of records matching the search criteria.
-        let recordCount = await this.searchTripCount(search);
-
-        let $pipeline: any = [];
-
-        // Builds the aggregation pipeline.
-        if ($match) $pipeline.push({ $match });
-        if ($sort) $pipeline.push({ $sort });
-        if ($limit) $pipeline.push($limit);
-        if ($skip) $pipeline.push($skip);
-
-        // Executes the aggregation pipeline.
-        return await TripSchema.aggregate($pipeline)
-            .then((data: ITripSchema[]) => {
-                let results: SearchResults = new SearchResults();
-                results.count = recordCount;
-                results.data = this.helper.GetItemFromArray(data, -1, []);
-                return results;
-            })
-            .catch((error: Error) => {
-                // Throws an error if the operation fails.
-                throw error;
-            });
+        return await this.tripRepository.searchTrip(search);
     }
 
     // Gets the total count of trips matching the search criteria.
     public async searchTripCount(search: Search): Promise<number> {
-
-        let $match = {};
-
-        // Processes the filter criteria.
-        if (!this.helper.IsArrayNull(search.filter)) {
-            search.filter?.forEach((e: FilterBy) => {
-                let filterBy: FilterBy = new FilterBy(e);
-                $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
-            });
-        }
-
-        // Executes the count query.
-        return await TripSchema.countDocuments($match)
-            .then((count: number) => {
-                return count;
-            })
-            .catch((error: Error) => {
-                // Throws an error if the operation fails.
-                throw error;
-            });
+        return await this.tripRepository.searchTripCount(search);
     }
 
     // This method returns the total count of trips in the database.
     public async getTripCount(): Promise<number> {
-
-        let $pipeline = [
-            // Groups all documents and calculates the total count.
-            { $group: { _id: null, recordCount: { $sum: 1 } } },
-            // Projects the result to include only the recordCount field.
-            { $project: { _id: 0 } }
-        ];
-
-        // Executes the aggregation pipeline.
-        return await TripSchema.aggregate($pipeline)
-            .then((data: ITripSchema[]) => {
-                // Uses the helper to process the result and extract the recordCount.
-                let dbRst = this.helper.GetItemFromArray(data, 0, { recordCount: 0 });
-                return dbRst.recordCount as number;
-            })
-            .catch((error: Error) => {
-                // Throws an error if the operation fails.
-                throw error;
-            });
+        return await this.tripRepository.getTripCount();
     }
 
 }

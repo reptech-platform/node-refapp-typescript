@@ -51,7 +51,7 @@ export const PlanItemSchema: Schema = new Schema({
     confirmationCode: { type: String, default: null },
     startsAt: { type: Date, default: null },
     endsAt: { type: Date, default: null },
-    duaration: { type: String, default: null },
+    duaration: { type: Number, default: null },
     /**
      * Referencing the _id from Airline collection
      */

@@ -1,5 +1,5 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
-import AirlinesService from "../services/airline.service";
+import AirlineService from "../services/airline.service";
 import RequestResponse from "../utils/request.response";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { IAirline } from "../models/airline.model";
@@ -7,10 +7,10 @@ import { Search, SearchResults } from "../models/search.model";
 
 @Tags("Airlines")
 @Route("airlines")
-@provideSingleton(AirlinesController)
-export class AirlinesController extends Controller {
+@provideSingleton(AirlineController)
+export class AirlineController extends Controller {
 
-    constructor(@inject(AirlinesService) private airlinesService: AirlinesService) {
+    constructor(@inject(AirlineService) private airlineService: AirlineService) {
         super();
     }
 
@@ -23,8 +23,8 @@ export class AirlinesController extends Controller {
 
         try {
 
-            // Await the result of the getAirlines method from the airlinesService
-            return await this.airlinesService.getAirlines();
+            // Await the result of the getAirlines method from the airlineService
+            return await this.airlineService.getAirlines();
 
         } catch (ex: any) {
 
@@ -48,7 +48,7 @@ export class AirlinesController extends Controller {
         try {
 
             // Validated the provided Airline is exist in the database or not
-            const isExist = await this.airlinesService.isAirlineExist(airlineCode);
+            const isExist = await this.airlineService.isAirlineExist(airlineCode);
 
             if (!isExist) {
                 // If no airline is exist , set the HTTP status to 400 (Bad Request)
@@ -58,8 +58,8 @@ export class AirlinesController extends Controller {
                 return { status: 400, message: `Provided ${airlineCode} airline does not exist` };
             }
 
-            // Await the result of the getAirline method from the airlinesService
-            return await this.airlinesService.getAirline(airlineCode);
+            // Await the result of the getAirline method from the airlineService
+            return await this.airlineService.getAirline(airlineCode);
 
         } catch (ex: any) {
 
@@ -82,8 +82,8 @@ export class AirlinesController extends Controller {
 
         try {
 
-            // Await the result of the createAirline method from the airlinesService
-            await this.airlinesService.createAirline(body);
+            // Await the result of the createAirline method from the airlineService
+            await this.airlineService.createAirline(body);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);
@@ -115,7 +115,7 @@ export class AirlinesController extends Controller {
         try {
 
             // Validated the provided Airline is exist in the database or not
-            const isExist = await this.airlinesService.isAirlineExist(airlineCode);
+            const isExist = await this.airlineService.isAirlineExist(airlineCode);
 
             if (!isExist) {
                 // If no airline is exist , set the HTTP status to 400 (Bad Request)
@@ -125,8 +125,8 @@ export class AirlinesController extends Controller {
                 return { status: 400, message: `Provided ${airlineCode} airline does not exist` };
             }
 
-            // Await the result of the updateAirline method from the airlinesService
-            await this.airlinesService.updateAirline(airlineCode, body);
+            // Await the result of the updateAirline method from the airlineService
+            await this.airlineService.updateAirline(airlineCode, body);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Updated airline ${airlineCode} successfuly.` };
@@ -153,7 +153,7 @@ export class AirlinesController extends Controller {
         try {
 
             // Validated the provided Airline is exist in the database or not
-            const isExist = await this.airlinesService.isAirlineExist(airlineCode);
+            const isExist = await this.airlineService.isAirlineExist(airlineCode);
 
             if (!isExist) {
                 // If no airline is exist , set the HTTP status to 400 (Bad Request)
@@ -163,8 +163,8 @@ export class AirlinesController extends Controller {
                 return { status: 400, message: `Provided ${airlineCode} airline does not exist` };
             }
 
-            // Await the result of the getAirline method from the airlinesService
-            await this.airlinesService.deleteAirline(airlineCode);
+            // Await the result of the getAirline method from the airlineService
+            await this.airlineService.deleteAirline(airlineCode);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted airline ${airlineCode} successfuly.` };
@@ -190,8 +190,8 @@ export class AirlinesController extends Controller {
 
         try {
 
-            // Await the result of the getAirlinesAirports method from the airlinesService
-            return await this.airlinesService.getAirlinesAirports();
+            // Await the result of the getAirlinesAirports method from the airlineService
+            return await this.airlineService.getAirlinesAirports();
 
         } catch (ex: any) {
 
@@ -212,7 +212,7 @@ export class AirlinesController extends Controller {
      */
     @Get("/:airlineCode/airports")
     public async getAirlineAirports(@Path() airlineCode: string): Promise<IAirline[]> {
-        return await this.airlinesService.getAirlineAirports(airlineCode);
+        return await this.airlineService.getAirlineAirports(airlineCode);
     }
 
     /**
@@ -224,8 +224,8 @@ export class AirlinesController extends Controller {
 
         try {
 
-            // Await the result of the getAirlineCount method from the airlinesService
-            return await this.airlinesService.getAirlineCount();
+            // Await the result of the getAirlineCount method from the airlineService
+            return await this.airlineService.getAirlineCount();
 
         } catch (ex: any) {
 
@@ -248,8 +248,8 @@ export class AirlinesController extends Controller {
 
         try {
 
-            // Await the result of the searchAirlineCount method from the airlinesService
-            return await this.airlinesService.searchAirlineCount(body);
+            // Await the result of the searchAirlineCount method from the airlineService
+            return await this.airlineService.searchAirlineCount(body);
 
         } catch (ex: any) {
 
@@ -273,8 +273,8 @@ export class AirlinesController extends Controller {
 
         try {
 
-            // Await the result of the searchAirline method from the airlinesService
-            return await this.airlinesService.searchAirline(body);
+            // Await the result of the searchAirline method from the airlineService
+            return await this.airlineService.searchAirline(body);
 
         } catch (ex: any) {
 

@@ -1,17 +1,17 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
 import RequestResponse from "../utils/request.response";
 import { provideSingleton, inject } from "../utils/provideSingleton";
-import AirportsService from "../services/airport.service";
+import AirportService from "../services/airport.service";
 import { IAirport } from "../models/airport.model";
 import { Search, SearchResults } from "../models/search.model";
 
 @Tags("Airports")
 @Route("airports")
-@provideSingleton(AirportsController)
-export class AirportsController extends Controller {
+@provideSingleton(AirportController)
+export class AirportController extends Controller {
 
     constructor(
-        @inject(AirportsService) private airportsService: AirportsService) {
+        @inject(AirportService) private airportService: AirportService) {
         super();
     }
 
@@ -24,8 +24,8 @@ export class AirportsController extends Controller {
 
         try {
 
-            // Await the result of the getAirports method from the airportsService
-            return await this.airportsService.getAirports();
+            // Await the result of the getAirports method from the airportService
+            return await this.airportService.getAirports();
 
         } catch (ex: any) {
 
@@ -50,7 +50,7 @@ export class AirportsController extends Controller {
         try {
 
             // Validated the provided Airport is exist in the database or not
-            const isExist = await this.airportsService.isAirportExist(icaoCode, iataCode);
+            const isExist = await this.airportService.isAirportExist(icaoCode, iataCode);
 
             if (!isExist) {
                 // If no airport is exist , set the HTTP status to 400 (Bad Request)
@@ -60,8 +60,8 @@ export class AirportsController extends Controller {
                 return { status: 400, message: `Provided ${icaoCode} and ${iataCode} airport does not exist` };
             }
 
-            // Await the result of the getAirport method from the airportsService
-            return await this.airportsService.getAirport(icaoCode, iataCode);
+            // Await the result of the getAirport method from the airportService
+            return await this.airportService.getAirport(icaoCode, iataCode);
 
         } catch (ex: any) {
 
@@ -84,8 +84,8 @@ export class AirportsController extends Controller {
 
         try {
 
-            // Await the result of the createAirport method from the airportsService
-            await this.airportsService.createAirport(body);
+            // Await the result of the createAirport method from the airportService
+            await this.airportService.createAirport(body);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);
@@ -118,7 +118,7 @@ export class AirportsController extends Controller {
         try {
 
             // Validated the provided Airport is exist in the database or not
-            const isExist = await this.airportsService.isAirportExist(icaoCode, iataCode);
+            const isExist = await this.airportService.isAirportExist(icaoCode, iataCode);
 
             if (!isExist) {
                 // If no airport is exist , set the HTTP status to 400 (Bad Request)
@@ -128,8 +128,8 @@ export class AirportsController extends Controller {
                 return { status: 400, message: `Provided ${icaoCode} and ${iataCode} airport does not exist` };
             }
 
-            // Await the result of the updateAirport method from the airportsService
-            await this.airportsService.updateAirport(icaoCode, iataCode, body);
+            // Await the result of the updateAirport method from the airportService
+            await this.airportService.updateAirport(icaoCode, iataCode, body);
 
             return { status: 200, message: `Updated airport ${icaoCode} and ${iataCode} successfuly` };
 
@@ -156,7 +156,7 @@ export class AirportsController extends Controller {
         try {
 
             // Validated the provided Airport is exist in the database or not
-            const isExist = await this.airportsService.isAirportExist(icaoCode, iataCode);
+            const isExist = await this.airportService.isAirportExist(icaoCode, iataCode);
 
             if (!isExist) {
                 // If no airport is exist , set the HTTP status to 400 (Bad Request)
@@ -166,8 +166,8 @@ export class AirportsController extends Controller {
                 return { status: 400, message: `Provided ${icaoCode} and ${iataCode} airport does not exist` };
             }
 
-            // Await the result of the deleteAirport method from the airportsService
-            await this.airportsService.deleteAirport(icaoCode, iataCode);
+            // Await the result of the deleteAirport method from the airportService
+            await this.airportService.deleteAirport(icaoCode, iataCode);
 
             return { status: 200, message: `Deleted airport ${icaoCode} and ${iataCode} successfuly` };
 
@@ -191,8 +191,8 @@ export class AirportsController extends Controller {
 
         try {
 
-            // Await the result of the getAriportsAirlines method from the airportsService
-            return await this.airportsService.getAriportsAirlines();
+            // Await the result of the getAriportsAirlines method from the airportService
+            return await this.airportService.getAriportsAirlines();
 
         } catch (ex: any) {
 
@@ -216,7 +216,7 @@ export class AirportsController extends Controller {
         try {
 
             // Validated the provided Airport is exist in the database or not
-            const isExist = await this.airportsService.isAirportExist(icaoCode, iataCode);
+            const isExist = await this.airportService.isAirportExist(icaoCode, iataCode);
 
             if (!isExist) {
                 // If no airport is exist , set the HTTP status to 400 (Bad Request)
@@ -226,8 +226,8 @@ export class AirportsController extends Controller {
                 return { status: 400, message: `Provided ${icaoCode} and ${iataCode} airport does not exist` };
             }
 
-            // Await the result of the getAriportAirlines method from the airportsService
-            return await this.airportsService.getAriportAirlines(icaoCode, iataCode);
+            // Await the result of the getAriportAirlines method from the airportService
+            return await this.airportService.getAriportAirlines(icaoCode, iataCode);
 
         } catch (ex: any) {
 
@@ -249,8 +249,8 @@ export class AirportsController extends Controller {
 
         try {
 
-            // Await the result of the getAirportCount method from the airportsService
-            return await this.airportsService.getAirportCount();
+            // Await the result of the getAirportCount method from the airportService
+            return await this.airportService.getAirportCount();
 
         } catch (ex: any) {
 
@@ -273,8 +273,8 @@ export class AirportsController extends Controller {
 
         try {
 
-            // Await the result of the searchAirportCount method from the airportsService
-            return await this.airportsService.searchAirportCount(body);
+            // Await the result of the searchAirportCount method from the airportService
+            return await this.airportService.searchAirportCount(body);
 
         } catch (ex: any) {
 
@@ -297,8 +297,8 @@ export class AirportsController extends Controller {
 
         try {
 
-            // Await the result of the searchAirport method from the airportsService
-            return await this.airportsService.searchAirport(body);
+            // Await the result of the searchAirport method from the airportService
+            return await this.airportService.searchAirport(body);
 
         } catch (ex: any) {
 

@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from "mongoose";
 /**
  * Interface to validate schema field construction
  */
-export interface IAirportStaffSchema extends Document {
+export interface IAirlineStaffSchema extends Document {
     /**
      * Referencing the userName from Person collection
      */
@@ -17,7 +17,7 @@ export interface IAirportStaffSchema extends Document {
 /**
  * Schema defination to store the document
  */
-export const AirportStaffSchema: Schema = new Schema({
+export const AirlineStaffSchema: Schema = new Schema({
     /**
      * Referencing the userName from Person collection
      */
@@ -33,4 +33,4 @@ export const AirportStaffSchema: Schema = new Schema({
 /**
  * Export as default schema with assigning interface validation
  */
-export default mongoose.model<IAirportStaffSchema>("AirportStaff", AirportStaffSchema);
+export default mongoose.model<IAirlineStaffSchema>("AirlineStaff", AirlineStaffSchema);
