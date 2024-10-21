@@ -1,9 +1,9 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
-import TripService from "../services/trip.service";
 import RequestResponse from "../utils/request.response";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { ITrip } from "../models/trip.model";
 import { Search, SearchResults } from "../models/search.model";
+import ITripService from "../services/trip.interface";
 
 @Tags("Trips")
 @Route("/trips")
@@ -11,7 +11,7 @@ import { Search, SearchResults } from "../models/search.model";
 export class TripController extends Controller {
 
     constructor(
-        @inject(TripService) private tripService: TripService) {
+        @inject("ITripService") private tripService: ITripService) {
         super();
     }
 
@@ -84,7 +84,7 @@ export class TripController extends Controller {
         try {
 
             // Await the result of the createTrip method from the tripService
-            await this.tripService.createTrip(body);
+            await this.tripService.createTrip(body, undefined);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);
@@ -126,7 +126,7 @@ export class TripController extends Controller {
             }
 
             // Await the result of the updateTrip method from the tripService
-            await this.tripService.updateTrip(tripId, body);
+            await this.tripService.updateTrip(tripId, body, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Updated trip ${tripId} successfuly.` };
@@ -164,7 +164,7 @@ export class TripController extends Controller {
             }
 
             // Await the result of the deleteTrip method from the tripService
-            await this.tripService.deleteTrip(tripId);
+            await this.tripService.deleteTrip(tripId, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted trip ${tripId} successfuly.` };

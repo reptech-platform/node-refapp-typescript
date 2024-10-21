@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 mongoose.set('strictQuery', false);
 mongoose.set('strictPopulate', false);
 
-export class DbConnection {
+export default class DbConnection {
 
     public static async initConnection() {
         await DbConnection.connect(process.env.DB_CONN_URL || "");

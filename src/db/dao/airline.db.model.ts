@@ -52,4 +52,6 @@ new Helper().SetToJSON(AirlineSchema);
 /**
  * Export as default schema with assigning interface validation
  */
-export default mongoose.model<IAirlineSchema>("Airline", AirlineSchema);
+const schemaModal = mongoose.model<IAirlineSchema>("Airline", AirlineSchema);
+
+export default schemaModal;

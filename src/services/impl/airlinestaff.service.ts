@@ -1,14 +1,19 @@
-import { provideSingleton, inject } from "../utils/provideSingleton";
-import { IPerson } from "../models/person.model";
-import { IAirline } from "../models/airline.model";
-import AirlineStaffRepository from "../repositories/airlinestaff.repository";
+import { IPerson } from "../../models/person.model";
+import { IAirline } from "../../models/airline.model";
+import AirlineStaffRepository from "../../repositories/airlinestaff.repository";
+import { inject, injectable } from "inversify";
+import IAirlineStaffService from "../airlinestaff.interface";
+import { ClientSession } from "mongoose";
+import Helper from "../../utils/helper.utils";
+import DbSession from "../../db/utils/dbsession.db";
 
 // This decorator ensures that AirlineStaffsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
-@provideSingleton(AirlineStaffService)
-export default class AirlineStaffService {
+@injectable()
+export default class AirlineStaffService implements IAirlineStaffService {
 
     // Injecting the Helper, PersonsService and TripService services
     constructor(
+        @inject(Helper) private helper: Helper,
         @inject(AirlineStaffRepository) private airlineStaffRepository: AirlineStaffRepository
     ) { }
 
@@ -23,9 +28,15 @@ export default class AirlineStaffService {
     }
 
     // This method adds multiple staff for a airline.
-    public async addOrUpadateAirlineStaffs(airlineCode: string, persons: IPerson[] | any[]): Promise<void> {
+    public async addOrUpadateAirlineStaffs(airlineCode: string, persons: IPerson[] | any[], dbSession: ClientSession | undefined): Promise<void> {
 
         let mapItems: any[] = [];
+
+        // Create a new session for transaction if session is null
+        if (this.helper.IsNullValue(dbSession)) {
+            dbSession = await DbSession.Session();
+            DbSession.Start(dbSession);
+        }
 
         /* if (persons && persons.length > 0) {
             // Loop Check if the persons already exists in the database using its userName
@@ -55,17 +66,38 @@ export default class AirlineStaffService {
             }
         } */
 
-        return await this.airlineStaffRepository.addOrUpadateAirlineStaffs(mapItems);
+        await this.airlineStaffRepository.addOrUpadateAirlineStaffs(mapItems, dbSession);
+
+        DbSession.Commit(dbSession);
+
     }
 
     // This method deletes a staff for a ailine.
-    public async deleteStaffStaff(airlineCode: string, userName: string): Promise<void> {
-        return await this.airlineStaffRepository.deleteStaffStaff(airlineCode, userName);
+    public async deleteStaffStaff(airlineCode: string, userName: string, dbSession: ClientSession | undefined): Promise<void> {
+
+        // Create a new session for transaction if session is null
+        if (this.helper.IsNullValue(dbSession)) {
+            dbSession = await DbSession.Session();
+            DbSession.Start(dbSession);
+        }
+
+        await this.airlineStaffRepository.deleteStaffStaff(airlineCode, userName, dbSession);
+
+        DbSession.Commit(dbSession);
     }
 
     // This method deletes a all staffs for a airline.
-    public async deleteAllAirlineStaff(airlineCode: string): Promise<void> {
-        return await this.airlineStaffRepository.deleteAllAirlineStaff(airlineCode);
+    public async deleteAllAirlineStaff(airlineCode: string, dbSession: ClientSession | undefined): Promise<void> {
+
+        // Create a new session for transaction if session is null
+        if (this.helper.IsNullValue(dbSession)) {
+            dbSession = await DbSession.Session();
+            DbSession.Start(dbSession);
+        }
+
+        await this.airlineStaffRepository.deleteAllAirlineStaff(airlineCode, dbSession);
+
+        DbSession.Commit(dbSession);
     }
 
     // This method get multiple staff to a airline.
@@ -74,9 +106,15 @@ export default class AirlineStaffService {
     }
 
     // This method adds multiple airlines to a staff.
-    public async addOrUpdateStaffAirlines(userName: string, airlines: IAirline[] | any[]): Promise<void> {
+    public async addOrUpdateStaffAirlines(userName: string, airlines: IAirline[] | any[], dbSession: ClientSession | undefined): Promise<void> {
 
         let mapItems: any[] = [];
+
+        // Create a new session for transaction if session is null
+        if (this.helper.IsNullValue(dbSession)) {
+            dbSession = await DbSession.Session();
+            DbSession.Start(dbSession);
+        }
 
         /* if (airlines && airlines.length > 0) {
             // Loop Check if the travellers are already exists in the database using its tripId
@@ -106,12 +144,23 @@ export default class AirlineStaffService {
             }
         } */
 
-        return await this.airlineStaffRepository.addOrUpdateStaffAirlines(mapItems);
+        await this.airlineStaffRepository.addOrUpdateStaffAirlines(mapItems, dbSession);
+
+        DbSession.Commit(dbSession);
     }
 
     // This method deletes a all airlines for a staff.
-    public async deleteAllStaffAirlines(userName: string): Promise<void> {
-        return await this.airlineStaffRepository.deleteAllStaffAirlines(userName);
+    public async deleteAllStaffAirlines(userName: string, dbSession: ClientSession | undefined): Promise<void> {
+
+        // Create a new session for transaction if session is null
+        if (this.helper.IsNullValue(dbSession)) {
+            dbSession = await DbSession.Session();
+            DbSession.Start(dbSession);
+        }
+
+        await this.airlineStaffRepository.deleteAllStaffAirlines(userName, dbSession);
+
+        DbSession.Commit(dbSession);
     }
 
 }

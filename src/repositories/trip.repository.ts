@@ -1,12 +1,13 @@
-import { Error } from "mongoose";
+import { ClientSession, Error } from "mongoose";
 import Helper from "../utils/helper.utils";
-import TripSchema, { ITripSchema } from "../db/models/trip.db.model";
+import TripSchema, { ITripSchema } from "../db/dao/trip.db.model";
 import { ITrip } from "../models/trip.model";
 import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
-import { provideSingleton, inject } from "../utils/provideSingleton";
+import DbSession from "../db/utils/dbsession.db";
+import { injectable, inject } from "inversify";
 
 // This decorator ensures that TripsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
-@provideSingleton(TripRepository)
+@injectable()
 export default class TripRepository {
 
     // Injecting the Helper service
@@ -59,33 +60,30 @@ export default class TripRepository {
     }
 
     // Creates a new trip in the database.
-    public async createTrip(trip: ITrip): Promise<ITrip> {
+    public async createTrip(trip: ITrip, session: ClientSession | undefined): Promise<ITrip> {
 
-        let newTrip = await TripSchema.create(trip)
+        // Save the document for the model
+        let newTrip = await TripSchema.create([trip], { session })
             .then((data: any) => {
-                return data as ITrip;
+                // Uses the helper to process the trip.
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as ITrip;
             })
             .catch((error: Error) => {
+                // Abort Client Session
+                DbSession.Abort(session);
                 // Throws an error if the operation fails.
                 throw error;
             });
-
-        /* // Retrieve the travellers information from the trip object, which may be undefined
-        const travellers: IPerson[] | undefined = trip.travellers;
-
-        if (travellers && travellers.length > 0) {
-            // Add or update travellers and map the trip travellers
-            await this.personTripsService.addOrUpdateTripTravellers(trip.tripId, travellers);
-        } */
 
         // Returns newly created trip object
         return newTrip;
     }
 
     // Updates an existing trip by its tripId and returns the updated trip.
-    public async updateTrip(tripId: number, trip: any): Promise<ITrip> {
+    public async updateTrip(tripId: number, trip: any, session: ClientSession | undefined): Promise<ITrip> {
 
-        let updatedTrip = await TripSchema.findOneAndUpdate({ tripId }, trip, { new: true })
+        let updatedTrip = await TripSchema.findOneAndUpdate({ tripId }, trip, { new: true, session })
             .then((data: any) => {
                 return data as ITrip;
             })
@@ -94,21 +92,13 @@ export default class TripRepository {
                 throw error;
             });
 
-        /* // Retrieve the travellers information from the trip object, which may be undefined
-        const travellers: IPerson[] | undefined = trip.travellers;
-
-        if (travellers && travellers.length > 0) {
-            // Add or update travellers and map the trip travellers
-            await this.personTripsService.addOrUpdateTripTravellers(trip.tripId, travellers);
-        } */
-
         return updatedTrip;
     }
 
     // Deletes a trip by its tripId.
-    public async deleteTrip(tripId: number): Promise<boolean> {
+    public async deleteTrip(tripId: number, session: ClientSession | undefined): Promise<boolean> {
 
-        let boolDeleted: boolean = await TripSchema.findOneAndDelete({ tripId })
+        let boolDeleted: boolean = await TripSchema.findOneAndDelete({ tripId }, { session })
             .then(() => {
                 // Returns true if the deletion is successful.
                 return true;
@@ -117,9 +107,6 @@ export default class TripRepository {
                 // Throws an error if the operation fails.
                 throw error;
             });
-
-        // delete all trip travellers from the database
-        // await this.personTripsService.deleteAllTripTravellers(tripId);
 
         return boolDeleted;
     }

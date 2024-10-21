@@ -3,29 +3,29 @@ import mongoose, { Document, Schema } from "mongoose";
 /**
  * Interface to validate schema field construction
  */
-export interface IPersonTripSchema extends Document {
+export interface IAirlineStaffSchema extends Document {
     /**
      * Referencing the userName from Person collection
      */
     userName: string;
     /**
-     * Referencing the tripId from Trip collection
+     * Referencing the airline code from Airline collection
      */
-    tripId: Number;
+    airlineCode: String;
 }
 
 /**
  * Schema defination to store the document
  */
-export const PersonTripSchema: Schema = new Schema({
+export const AirlineStaffSchema: Schema = new Schema({
     /**
      * Referencing the userName from Person collection
      */
     userName: { type: String },
     /**
-     * Referencing the tripId from Trip collection
+     * Referencing the airline code from Airline collection
      */
-    tripId: { type: Number }
+    airlineCode: { type: String }
 }, {
     timestamps: true
 });
@@ -33,4 +33,6 @@ export const PersonTripSchema: Schema = new Schema({
 /**
  * Export as default schema with assigning interface validation
  */
-export default mongoose.model<IPersonTripSchema>("PersonTrip", PersonTripSchema);
+const schemaModal = mongoose.model<IAirlineStaffSchema>("AirlineStaff", AirlineStaffSchema);
+
+export default schemaModal;

@@ -1,16 +1,15 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
-import AirlineService from "../services/airline.service";
 import RequestResponse from "../utils/request.response";
-import { provideSingleton, inject } from "../utils/provideSingleton";
 import { IAirline } from "../models/airline.model";
 import { Search, SearchResults } from "../models/search.model";
+import IAirlineService from "../services/airline.interface";
+import { inject } from "inversify";
 
 @Tags("Airlines")
 @Route("airlines")
-@provideSingleton(AirlineController)
 export class AirlineController extends Controller {
 
-    constructor(@inject(AirlineService) private airlineService: AirlineService) {
+    constructor(@inject("IAirlineService") private airlineService: IAirlineService) {
         super();
     }
 
@@ -83,7 +82,7 @@ export class AirlineController extends Controller {
         try {
 
             // Await the result of the createAirline method from the airlineService
-            await this.airlineService.createAirline(body);
+            await this.airlineService.createAirline(body, undefined);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);
@@ -126,7 +125,7 @@ export class AirlineController extends Controller {
             }
 
             // Await the result of the updateAirline method from the airlineService
-            await this.airlineService.updateAirline(airlineCode, body);
+            await this.airlineService.updateAirline(airlineCode, body, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Updated airline ${airlineCode} successfuly.` };
@@ -164,7 +163,7 @@ export class AirlineController extends Controller {
             }
 
             // Await the result of the getAirline method from the airlineService
-            await this.airlineService.deleteAirline(airlineCode);
+            await this.airlineService.deleteAirline(airlineCode, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted airline ${airlineCode} successfuly.` };

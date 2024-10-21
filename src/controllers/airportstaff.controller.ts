@@ -1,24 +1,23 @@
 import { Controller, Body, Get, Post, Delete, Tags, Route, Path } from "tsoa";
-import { provideSingleton, inject } from "../utils/provideSingleton";
 import RequestResponse from "../utils/request.response";
 import { IPerson } from "../models/person.model";
 import { IAirline } from "../models/airline.model";
-import AirlineService from "../services/airline.service";
-import PersonService from "../services/person.service";
-import AirportStaffService from "../services/airlinestaff.service";
+import IAirlineService from "../services/airline.interface";
+import IPersonService from "../services/person.interface";
+import { inject } from "inversify";
+import IAirlineStaffService from "src/services/airlinestaff.interface";
 
 /**
  * Airline and Staff mapping controller
  */
 @Tags("AirlinesStaff")
 @Route("/airlineStaff")
-@provideSingleton(AirlineStaffController)
 export class AirlineStaffController extends Controller {
 
     constructor(
-        @inject(AirportStaffService) private airportStaffService: AirportStaffService,
-        @inject(AirlineService) private airlineService: AirlineService,
-        @inject(PersonService) private personService: PersonService
+        @inject("IAirlineStaffService") private airlineStaffService: IAirlineStaffService,
+        @inject("IAirlineService") private airlineService: IAirlineService,
+        @inject("IPersonService") private personService: IPersonService
     ) {
         super();
     }
@@ -46,8 +45,8 @@ export class AirlineStaffController extends Controller {
                 return { status: 400, message: `Provided ${airlineCode} airline does not exist` };
             }
 
-            // Await the result of the getArilineStaffs method from the airportStaffService
-            return await this.airportStaffService.getArilineStaffs(airlineCode);
+            // Await the result of the getArilineStaffs method from the airlineStaffService
+            return await this.airlineStaffService.getArilineStaffs(airlineCode);
 
         } catch (ex: any) {
 
@@ -82,8 +81,8 @@ export class AirlineStaffController extends Controller {
                 return { status: 400, message: `Provided ${airlineCode} airline does not exist` };
             }
 
-            // Await the result of the addOrUpadateAirlineStaffs method from the airportStaffService
-            await this.airportStaffService.addOrUpadateAirlineStaffs(airlineCode, body);
+            // Await the result of the addOrUpadateAirlineStaffs method from the airlineStaffService
+            await this.airlineStaffService.addOrUpadateAirlineStaffs(airlineCode, body, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Added trips to airline ${airlineCode} successfuly.` };
@@ -122,8 +121,8 @@ export class AirlineStaffController extends Controller {
                 return { status: 400, message: `Provided ${userName} staff does not exist` };
             }
 
-            // Await the result of the getStaffArilines method from the airportStaffService
-            return await this.airportStaffService.getStaffArilines(userName);
+            // Await the result of the getStaffArilines method from the airlineStaffService
+            return await this.airlineStaffService.getStaffArilines(userName);
 
         } catch (ex: any) {
 
@@ -158,8 +157,8 @@ export class AirlineStaffController extends Controller {
                 return { status: 400, message: `Provided ${userName} staff does not exist` };
             }
 
-            // Await the result of the addOrUpdateStaffAirlines method from the airportStaffService
-            await this.airportStaffService.addOrUpdateStaffAirlines(userName, body);
+            // Await the result of the addOrUpdateStaffAirlines method from the airlineStaffService
+            await this.airlineStaffService.addOrUpdateStaffAirlines(userName, body, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Added airline to a staff ${userName} successfuly.` };
@@ -187,7 +186,7 @@ export class AirlineStaffController extends Controller {
         try {
 
             // Validated the provided staff and airline is mapped in the database or not
-            const isExist = await this.airportStaffService.isAirlineAndStaffExist(airlineCode, userName);
+            const isExist = await this.airlineStaffService.isAirlineAndStaffExist(airlineCode, userName);
 
             if (!isExist) {
                 // If no staff and airline is mapped , set the HTTP status to 400 (Bad Request)
@@ -197,8 +196,8 @@ export class AirlineStaffController extends Controller {
                 return { status: 400, message: `Provided airline ${airlineCode} and staff ${userName} relation does not exist` };
             }
 
-            // Await the result of the deleteStaffStaff method from the airportStaffService
-            await this.airportStaffService.deleteStaffStaff(airlineCode, userName);
+            // Await the result of the deleteStaffStaff method from the airlineStaffService
+            await this.airlineStaffService.deleteStaffStaff(airlineCode, userName, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted a airline ${airlineCode} and staff ${userName} successfuly.` };

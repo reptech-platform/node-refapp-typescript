@@ -15,7 +15,7 @@ export interface IAirline {
     logo?: string;
 
     // The CEO of the airline, represented by an IPerson interface
-    CEO?: IPerson;
+    CEO?: IPerson | undefined | null;
 
     // An array of staff members, each represented by an IPerson interface
     staff?: IPerson[];
@@ -41,7 +41,7 @@ export class Airline implements IAirline {
     logo?: string;
 
     // The CEO of the airline, represented by an IPerson interface
-    CEO?: IPerson;
+    CEO?: IPerson | undefined | null;
 
     // An array of staff members, each represented by an IPerson interface
     staff?: IPerson[];

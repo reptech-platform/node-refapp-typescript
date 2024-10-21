@@ -44,4 +44,6 @@ new Helper().SetToJSON(DocumentSchema);
 /**
  * Export as default schema with assigning interface validation
  */
-export default mongoose.model<IDocumentSchema>("Document", DocumentSchema);
+const schemaModal = mongoose.model<IDocumentSchema>("Document", DocumentSchema);
+
+export default schemaModal;

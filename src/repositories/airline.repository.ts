@@ -1,13 +1,13 @@
-import { Error } from "mongoose";
-import { provideSingleton, inject } from "../utils/provideSingleton";
+import { ClientSession, Error } from "mongoose";
 import Helper from "../utils/helper.utils";;
-import AirlineSchema, { IAirlineSchema } from "../db/models/airline.db.model";
+import AirlineSchema, { IAirlineSchema } from "../db/dao/airline.db.model";
 import { IAirline } from "../models/airline.model";
 import RequestResponse from "../utils/request.response";
 import { FilterBy, Pagination, Search, SearchResults, SortBy } from "../models/search.model";
+import { injectable, inject } from "inversify";
 
 // This decorator ensures that AirlinesRepository is a singleton, meaning only one instance of this service will be created and used throughout the application.
-@provideSingleton(AirlineRepository)
+@injectable()
 export default class AirlineRepository {
 
     // Injecting the Helper and AirportsService service
@@ -234,11 +234,11 @@ export default class AirlineRepository {
     }
 
     // Method to create a new airline
-    public async createAirline(airline: IAirline): Promise<IAirline> {
+    public async createAirline(airline: IAirline, session: ClientSession | undefined): Promise<IAirline> {
 
         // create the airline document with the new data.
-        return await AirlineSchema.create(airline)
-            .then((data: IAirlineSchema) => {
+        return await AirlineSchema.create([airline], { session })
+            .then((data: any) => {
                 // Get the first item from the array or return an empty object
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as IAirline;
@@ -250,10 +250,10 @@ export default class AirlineRepository {
     }
 
     // Updates an airline's information based on the provided airline code.
-    public async updateAirline(airlineCode: string, airline: IAirline): Promise<IAirline | RequestResponse> {
+    public async updateAirline(airlineCode: string, airline: IAirline, session: ClientSession | undefined): Promise<IAirline | RequestResponse> {
 
         // Find and update the airline document with the new data.
-        return await AirlineSchema.findOneAndUpdate({ airlineCode }, airline, { new: true })
+        return await AirlineSchema.findOneAndUpdate({ airlineCode }, airline, { new: true, session })
             .then((data: any) => {
                 // Extract the first item from the data array using a helper function.
                 let results = this.helper.GetItemFromArray(data, 0, {});
@@ -267,10 +267,10 @@ export default class AirlineRepository {
     }
 
     // Deletes an airline based on the provided airline code.
-    public async deleteAirline(airlineCode: string): Promise<boolean> {
+    public async deleteAirline(airlineCode: string, session: ClientSession | undefined): Promise<boolean> {
 
         // Find and delete the airline document.
-        return await AirlineSchema.findOneAndDelete({ airlineCode })
+        return await AirlineSchema.findOneAndDelete({ airlineCode }, { session })
             .then(() => {
                 // Return true if the deletion was successful.
                 return true;
@@ -282,9 +282,9 @@ export default class AirlineRepository {
     }
 
     // Deletes an airline based on the provided airline id.
-    public async deleteAirlineById(_id: string): Promise<boolean> {
+    public async deleteAirlineById(_id: string, session: ClientSession | undefined): Promise<boolean> {
         // Find and delete the airline document.
-        return await AirlineSchema.findOneAndDelete({ _id })
+        return await AirlineSchema.findOneAndDelete({ _id }, { session })
             .then(() => {
                 // Return true if the deletion was successful.
                 return true;

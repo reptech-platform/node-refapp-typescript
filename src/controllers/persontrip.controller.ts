@@ -1,11 +1,11 @@
 import { Controller, Body, Get, Post, Delete, Tags, Route, Path } from "tsoa";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import RequestResponse from "../utils/request.response";
-import PersonTripService from "../services/persontrip.service";
-import TripService from "../services/trip.service";
-import PersonService from "../services/person.service";
 import { IPerson } from "../models/person.model";
 import { ITrip } from "../models/trip.model";
+import IPersonsService from "../services/person.interface";
+import ITripService from "../services/trip.interface";
+import IPersonTripService from "../services/persontrip.interface";
 
 /**
  * Person and Trip mapping controller
@@ -16,9 +16,9 @@ import { ITrip } from "../models/trip.model";
 export class PersonTripController extends Controller {
 
     constructor(
-        @inject(PersonTripService) private personTripService: PersonTripService,
-        @inject(PersonService) private personService: PersonService,
-        @inject(TripService) private tripService: TripService
+        @inject("IPersonTripService") private personTripService: IPersonTripService,
+        @inject("IPersonsService") private personService: IPersonsService,
+        @inject("ITripService") private tripService: ITripService
     ) {
         super();
     }
@@ -83,9 +83,9 @@ export class PersonTripController extends Controller {
                 return { status: 400, message: `Provided ${userName} person does not exist` };
             }
 
-            // Call the addOrUpadatePersonTrips method from personService with the provided userName and list of trips
+            // Call the addPersonTrips method from personTripService with the provided userName and list of trips
             // Await the result and return it
-            await this.personTripService.addOrUpadatePersonTrips(userName, body);
+            await this.personTripService.addPersonTrips(userName, body, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Added trips to person ${userName} successfuly.` };
@@ -161,9 +161,9 @@ export class PersonTripController extends Controller {
                 return { status: 400, message: `Provided ${tripId} trip does not exist` };
             }
 
-            // Call the addOrUpdateTripTravellers method from personService with the provided tripId and list of persons
+            // Call the addTripTravellers method from personTripService with the provided tripId and list of persons
             // Await the result and return it
-            await this.personTripService.addOrUpdateTripTravellers(tripId, body);
+            await this.personTripService.addTripTravellers(tripId, body, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Added travellers to a trip ${tripId} successfuly.` };
@@ -203,7 +203,7 @@ export class PersonTripController extends Controller {
 
             // Call the deletePersonTrip method from personService with the provided tripId
             // Await the result and return it
-            await this.personTripService.deletePersonTrip(userName, tripId);
+            await this.personTripService.deletePersonTrip(userName, tripId, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted a trip for a person ${userName} successfuly.` };

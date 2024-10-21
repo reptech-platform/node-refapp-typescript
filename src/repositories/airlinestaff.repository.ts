@@ -1,12 +1,12 @@
-import { Error } from "mongoose";
-import { provideSingleton, inject } from "../utils/provideSingleton";
-import AirlineStaffSchema from "../db/models/airlinestaff.db.model";
+import { ClientSession, Error } from "mongoose";
+import AirlineStaffSchema from "../db/dao/airlinestaff.db.model";
 import { IPerson } from "../models/person.model";
 import { IAirline } from "../models/airline.model";
 import Helper from "../utils/helper.utils";
+import { injectable, inject } from "inversify";
 
 // This decorator ensures that AirlineStaffsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
-@provideSingleton(AirlineStaffRepository)
+@injectable()
 export default class AirlineStaffRepository {
 
     // Injecting the Helper, PersonsService and TripService services
@@ -81,59 +81,30 @@ export default class AirlineStaffRepository {
     }
 
     // This method adds multiple staff for a airline.
-    public async addOrUpadateAirlineStaffs(mapItems: [] | any[]): Promise<void> {
-
-
-        /* if (persons && persons.length > 0) {
-            // Loop Check if the persons already exists in the database using its userName
-            for (let index = 0; index < persons.length; index++) {
-
-                // Read person based on index loop
-                let currentPerson = persons[index];
-
-                // Check the person is exist in the database
-                let isExist = await this.personsService.isPersonExist(currentPerson.userName);
-
-                if (!isExist) {
-                    // If the person does not exist, create a new person entry in the database
-                    currentPerson = await this.personsService.createPerson(currentPerson);
-                } else {
-                    // If the person exist, update person entry in the database
-                    await this.personsService.updatePerson(currentPerson.userName, currentPerson);
-                }
-
-                // Check airline and person is already mapped
-                isExist = await this.isAirlineAndStaffExist(airlineCode, currentPerson.userName);
-
-                if (!isExist) {
-                    // Add userName to array of id list for person airline mapping
-                    mapItems.push({ airlineCode, userName: currentPerson.userName });
-                }
-            }
-        } */
+    public async addOrUpadateAirlineStaffs(mapItems: [] | any[], session: ClientSession | undefined): Promise<void> {
 
         // Inserts the mapItems into the AirportStaffSchema collection.
-        await AirlineStaffSchema.insertMany(mapItems).catch((error: Error) => {
+        await AirlineStaffSchema.insertMany(mapItems, { session }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
     }
 
     // This method deletes a staff for a ailine.
-    public async deleteStaffStaff(airlineCode: string, userName: string): Promise<void> {
+    public async deleteStaffStaff(airlineCode: string, userName: string, session: ClientSession | undefined): Promise<void> {
 
         // Deletes the userName from the AirportStaffSchema collection.
-        await AirlineStaffSchema.deleteOne({ airlineCode, userName }).catch((error: Error) => {
+        await AirlineStaffSchema.deleteOne({ airlineCode, userName }, { session }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
     }
 
     // This method deletes a all staffs for a airline.
-    public async deleteAllAirlineStaff(airlineCode: string): Promise<void> {
+    public async deleteAllAirlineStaff(airlineCode: string, session: ClientSession | undefined): Promise<void> {
 
         // Deletes the person from the AirportStaffSchema collection.
-        await AirlineStaffSchema.deleteMany({ airlineCode }).catch((error: Error) => {
+        await AirlineStaffSchema.deleteMany({ airlineCode }, { session }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
@@ -191,48 +162,20 @@ export default class AirlineStaffRepository {
     }
 
     // This method adds multiple airlines to a staff.
-    public async addOrUpdateStaffAirlines(mapItems: [] | any[]): Promise<void> {
-
-        /* if (airlines && airlines.length > 0) {
-            // Loop Check if the travellers are already exists in the database using its tripId
-            for (let index = 0; index < airlines.length; index++) {
-
-                // Read traveller based on index loop
-                let currentAirline = airlines[index];
-
-                // Check the traveller is exist in the database
-                let isExist = await this.airlinesService.isAirlineExist(currentAirline.airlineCode);
-
-                if (!isExist) {
-                    // If the traveller does not exist, create a new traveller entry in the database
-                    currentAirline = await this.airlinesService.createAirline(currentAirline);
-                } else {
-                    // If the trip exist, update trip entry in the database
-                    await this.airlinesService.updateAirline(currentAirline.airlineCode, currentAirline);
-                }
-
-                // Check person and trip is already mapped
-                isExist = await this.isAirlineAndStaffExist(currentAirline.airlineCode, userName);
-
-                if (!isExist) {
-                    // Add tripId to array of id list for person trip mapping
-                    mapItems.push({ airlineCode: currentAirline.airlineCode, userName });
-                }
-            }
-        } */
+    public async addOrUpdateStaffAirlines(mapItems: [] | any[], session: ClientSession | undefined): Promise<void> {
 
         // Inserts the mapItems into the PersonTripSchema collection.
-        await AirlineStaffSchema.insertMany(mapItems).catch((error: Error) => {
+        await AirlineStaffSchema.insertMany(mapItems, { session }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
     }
 
     // This method deletes a all airlines for a staff.
-    public async deleteAllStaffAirlines(userName: string): Promise<void> {
+    public async deleteAllStaffAirlines(userName: string, session: ClientSession | undefined): Promise<void> {
 
         // Deletes the trip from the AirportStaffSchema collection.
-        await AirlineStaffSchema.deleteMany({ userName }).catch((error: Error) => {
+        await AirlineStaffSchema.deleteMany({ userName }, { session }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });

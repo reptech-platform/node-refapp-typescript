@@ -1,16 +1,23 @@
-import { Search, SearchResults } from "../models/search.model";
-import { provideSingleton, inject } from "../utils/provideSingleton";
-import { IAirport } from "../models/airport.model";
-import { IAirline } from "../models/airline.model";
-import AirportRepository from "../repositories/airport.repository";
+import { Search, SearchResults } from "../../models/search.model";
+import { IAirport } from "../../models/airport.model";
+import { IAirline } from "../../models/airline.model";
+import Helper from "../../utils/helper.utils";
+import { inject, injectable } from "inversify";
+import IAirportService from "../airport.interface";
+import IAirlineService from "../airline.interface";
+import AirportRepository from "../../repositories/airport.repository";
+import { ClientSession } from "mongoose";
+import DbSession from "../../db/utils/dbsession.db";
 
 // This decorator ensures that AirportsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
-@provideSingleton(AirportService)
-export default class AirportService {
+@injectable()
+export default class AirportService implements IAirportService {
 
     // Injecting the Helper service
     constructor(
         // AirlinesService has a circular dependency
+        @inject(Helper) private helper: Helper,
+        @inject("IAirlineService") private airlineService: IAirlineService,
         @inject(AirportRepository) private airportRepository: AirportRepository
     ) { }
 
@@ -50,36 +57,52 @@ export default class AirportService {
     }
 
     // Method to create a new airport
-    public async createAirport(airport: IAirport): Promise<IAirport> {
+    public async createAirport(airport: IAirport, dbSession: ClientSession | undefined): Promise<IAirport> {
+
+        // Create a new session for transaction if session is null
+        if (this.helper.IsNullValue(dbSession)) {
+            dbSession = await DbSession.Session();
+            DbSession.Start(dbSession);
+        }
 
         // Retrieve the airline information from the airport object, which may be undefined
         const airline: IAirline | undefined = airport.airlines;
 
-        /* if (airline) {
+        if (airline) {
             // Check if the airline already exists in the database using its airline code
-            const isExist = await this.airlinesService.isAirlineExist(airline.airlineCode);
+            const isExist = await this.airlineService.isAirlineExist(airline.airlineCode);
 
             // If the airline does not exist, create a new airline entry in the database
             if (!isExist) {
-                await this.airlinesService.createAirline(airline);
+                await this.airlineService.createAirline(airline, dbSession);
             }
 
             // Retrieve the airline ID using the airline code and assign it to the airport object
-            airport.airlineId = await this.airlinesService.getAirlineId(airline.airlineCode);
-        } */
+            airport.airlineId = await this.airlineService.getAirlineId(airline.airlineCode);
+        }
 
-        return await this.airportRepository.createAirport(airport);
+        const results: IAirport = await this.airportRepository.createAirport(airport, dbSession);
+
+        DbSession.Commit(dbSession);
+
+        return results;
     }
 
     // Updates an airport's information based on the provided ICAO and IATA codes.
-    public async updateAirport(icaoCode: string, iataCode: string, airport: IAirport): Promise<IAirport> {
+    public async updateAirport(icaoCode: string, iataCode: string, airport: IAirport, dbSession: ClientSession | undefined): Promise<IAirport> {
+
+        // Create a new session for transaction if session is null
+        if (this.helper.IsNullValue(dbSession)) {
+            dbSession = await DbSession.Session();
+            DbSession.Start(dbSession);
+        }
 
         // Retrieve the airline information from the airport object, which may be undefined
         const airline: IAirline | undefined = airport.airlines;
 
-        /* if (airline) {
+        if (airline) {
             // Check if the airline already exists in the database using its airline code
-            const isExist = await this.airlinesService.isAirlineExist(airline.airlineCode);
+            const isExist = await this.airlineService.isAirlineExist(airline.airlineCode);
 
             // If the airline does not exist, throw error message
             if (!isExist) {
@@ -87,33 +110,58 @@ export default class AirportService {
             }
 
             // Retrieve the airline ID using the airline code and assign it to the airport object
-            airport.airlineId = await this.airlinesService.getAirlineId(airline.airlineCode);
+            airport.airlineId = await this.airlineService.getAirlineId(airline.airlineCode);
 
             // Update airport object using the icaoCode and  iataCode in the database
-            await this.airlinesService.updateAirline(airline.airlineCode, airline);
-        } */
+            await this.airlineService.updateAirline(airline.airlineCode, airline, dbSession);
+        }
 
-        return await this.airportRepository.updateAirport(icaoCode, iataCode, airport);
+        const results: IAirport = await this.airportRepository.updateAirport(icaoCode, iataCode, airport, dbSession);
+
+        DbSession.Commit(dbSession);
+
+        return results;
     }
 
     // Deletes an airport based on the provided ICAO and IATA codes.
-    public async deleteAirport(icaoCode: string, iataCode: string): Promise<boolean> {
+    public async deleteAirport(icaoCode: string, iataCode: string, dbSession: ClientSession | undefined): Promise<boolean> {
+
+        // Create a new session for transaction if session is null
+        if (this.helper.IsNullValue(dbSession)) {
+            dbSession = await DbSession.Session();
+            DbSession.Start(dbSession);
+        }
 
         // Retrieve the airline id information from the database, which may be undefined
         const airlineId: string = await this.getAirportAirlineId(icaoCode, iataCode);
 
         // Check if the airlineId exists in the database using its airlineId
-        /* if (!this.helper.IsNullValue(airlineId)) {
+        if (!this.helper.IsNullValue(airlineId)) {
             // Delete airline in the database using airline id
-            await this.airlinesService.deleteAirlineById(airlineId);
-        } */
+            await this.airlineService.deleteAirlineById(airlineId, dbSession);
+        }
 
-        return await this.airportRepository.deleteAirport(icaoCode, iataCode);
+        const results: boolean = await this.airportRepository.deleteAirport(icaoCode, iataCode, dbSession);
+
+        DbSession.Commit(dbSession);
+
+        return results;
     }
 
     // Deletes an airport based on the provided airport id.
-    public async deleteAirportById(_id: string): Promise<boolean> {
-        return await this.airportRepository.deleteAirportById(_id);
+    public async deleteAirportById(_id: string, dbSession: ClientSession | undefined): Promise<boolean> {
+
+        // Create a new session for transaction if session is null
+        if (this.helper.IsNullValue(dbSession)) {
+            dbSession = await DbSession.Session();
+            DbSession.Start(dbSession);
+        }
+
+        const results: boolean = await this.airportRepository.deleteAirportById(_id, dbSession);
+
+        DbSession.Commit(dbSession);
+
+        return results;
     }
 
     // Searches for airports based on the provided search criteria.

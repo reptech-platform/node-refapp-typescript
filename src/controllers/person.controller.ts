@@ -1,16 +1,17 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
-import PersonService from "../services/person.service";
 import RequestResponse from "../utils/request.response";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { IPerson } from "../models/person.model";
 import { Search, SearchResults } from "../models/search.model";
+import { IDocument } from "../models/document.model";
+import IPersonService from "../services/person.interface";
 
 @Tags("Persons")
 @Route("persons")
 @provideSingleton(PersonController)
 export class PersonController extends Controller {
     constructor(
-        @inject(PersonService) private personService: PersonService
+        @inject("IPersonService") private personService: IPersonService,
     ) {
         super();
     }
@@ -84,7 +85,7 @@ export class PersonController extends Controller {
         try {
 
             // Await the result of the createPerson method from the personService
-            await this.personService.createPerson(body);
+            await this.personService.createPerson(body, undefined);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);
@@ -127,7 +128,7 @@ export class PersonController extends Controller {
             }
 
             // Await the result of the updatePerson method from the personService
-            await this.personService.updatePerson(userName, body);
+            await this.personService.updatePerson(userName, body, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Updated person ${userName} successfuly.` };
@@ -165,7 +166,7 @@ export class PersonController extends Controller {
             }
 
             // Await the result of the getAirlines method from the airlinesService
-            await this.personService.deletePerson(userName);
+            await this.personService.deletePerson(userName, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted person ${userName} successfuly.` };
@@ -188,12 +189,12 @@ export class PersonController extends Controller {
      * @returns RequestResponse
      */
     @Post("/:userName/document")
-    public async updatePersonDocument(@Path() userName: string, @Body() body: IPerson): Promise<RequestResponse> {
+    public async updatePersonDocument(@Path() userName: string, @Body() body: IDocument[]): Promise<RequestResponse> {
 
         try {
 
             // Await the result of the getAirlines method from the airlinesService
-            await this.personService.updatePersonDocument(userName, body.personAttachments);
+            await this.personService.updatePersonDocument(userName, body, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Updated ${userName} person documents successfuly.` };
@@ -215,13 +216,13 @@ export class PersonController extends Controller {
      * @param body 
      * @returns RequestResponse
      */
-    @Delete("/:userName/document")
-    public async deletePersonDocument(@Path() userName: string, @Body() body: IPerson): Promise<RequestResponse> {
+    @Delete("/:userName/document/:docId")
+    public async deletePersonDocument(@Path() userName: string, @Path() docId: number): Promise<RequestResponse> {
 
         try {
 
             // Await the result of the getAirlines method from the airlinesService
-            await this.personService.deletePersonDocument(userName, body.personAttachments);
+            await this.personService.deletePersonDocument(userName, docId, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted ${userName} person documents successfuly.` };

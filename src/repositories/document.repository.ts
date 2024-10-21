@@ -1,11 +1,11 @@
-import { Error } from "mongoose";
-import Document, { IDocumentSchema } from "../db/models/document.db.model";
+import { ClientSession, Error } from "mongoose";
+import Document, { IDocumentSchema } from "../db/dao/document.db.model";
 import Helper from "../utils/helper.utils";
-import { provideSingleton, inject } from "../utils/provideSingleton";
 import { IDocument } from "../models/document.model";
+import { injectable, inject } from "inversify";
 
 // This decorator ensures that DocumentsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
-@provideSingleton(DocumentRepository)
+@injectable()
 export default class DocumentRepository {
 
     // Injecting the Helper service
@@ -40,9 +40,9 @@ export default class DocumentRepository {
     }
 
     // Creates a new document in the database.
-    public async createDocument(document: IDocumentSchema): Promise<IDocument> {
-        return await Document.create(document)
-            .then((data: IDocumentSchema) => {
+    public async createDocument(document: IDocumentSchema, session: ClientSession | undefined): Promise<IDocument> {
+        return await Document.create([document], { session })
+            .then((data: any) => {
                 // Converts the document to a plain object and removes the _id field.
                 let results = JSON.parse(JSON.stringify(data));
                 delete results['_id'];
@@ -55,8 +55,8 @@ export default class DocumentRepository {
     }
 
     // Updates an existing document by its docId and returns the updated document.
-    public async updateDocument(docId: number, person: any): Promise<IDocument> {
-        return await Document.findOneAndUpdate({ docId }, person, { new: true })
+    public async updateDocument(docId: number, person: any, session: ClientSession | undefined): Promise<IDocument> {
+        return await Document.findOneAndUpdate({ docId }, person, { new: true, session })
             .then((data: any) => {
                 // Uses the helper to process the updated document.
                 let results = this.helper.GetItemFromArray(data, 0, {});
@@ -69,8 +69,8 @@ export default class DocumentRepository {
     }
 
     // Deletes a document by its docId.
-    public async deleteDocument(docId: number): Promise<boolean> {
-        return await Document.findOneAndDelete({ docId })
+    public async deleteDocument(docId: number, session: ClientSession | undefined): Promise<boolean> {
+        return await Document.findOneAndDelete({ docId }, { session })
             .then(() => {
                 // Returns true if the deletion is successful.
                 return true;

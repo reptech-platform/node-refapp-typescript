@@ -1,16 +1,19 @@
-import { Error } from "mongoose";
-import { provideSingleton, inject } from "../utils/provideSingleton";
-import PersonTripSchema from "../db/models/persontrip.db.model";
+import { ClientSession, Error } from "mongoose";
+import PersonTripSchema from "../db/dao/persontrip.db.model";
 import { IPerson } from "../models/person.model";
 import { ITrip } from "../models/trip.model";
 import Helper from "../utils/helper.utils";
+import MapItem from "src/utils/mapitems";
+import { injectable, inject } from "inversify";
 
 // This decorator ensures that PersonTripsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
-@provideSingleton(PersonTripRepository)
+@injectable()
 export default class PersonTripRepository {
 
     // Injecting the Helper, PersonsService and TripService services
-    constructor(@inject(Helper) private helper: Helper) { }
+    constructor(
+        @inject(Helper) private helper: Helper
+    ) { }
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
     public async isPersonAndTripExist(userName: string, tripId: number): Promise<boolean> {
@@ -82,58 +85,29 @@ export default class PersonTripRepository {
     }
 
     // This method adds multiple trips for a person.
-    public async addOrUpadatePersonTrips(mapItems: [] | any[]): Promise<void> {
-
-        /* if (trips && trips.length > 0) {
-            // Loop Check if the trips already exists in the database using its userName
-            for (let index = 0; index < trips.length; index++) {
-
-                // Read trip based on index loop
-                let currentTrip = trips[index];
-
-                // Check the trip is exist in the database
-                let isExist = await this.tripsService.isTripExist(currentTrip.tripId);
-
-                if (!isExist) {
-                    // If the trip does not exist, create a new trip entry in the database
-                    currentTrip = await this.tripsService.createTrip(currentTrip);
-                } else {
-                    // If the trip exist, update trip entry in the database
-                    await this.tripsService.updateTrip(currentTrip.tripId, currentTrip);
-                }
-
-                // Check person and trip is already mapped
-                isExist = await this.isPersonAndTripExist(userName, currentTrip.tripId);
-
-                if (!isExist) {
-                    // Add tripId to array of id list for person trip mapping
-                    mapItems.push({ userName, tripId: currentTrip.tripId });
-                }
-            }
-        } */
-
+    public async mapPersonsAndTrips(mapItems: MapItem[], session: ClientSession | undefined): Promise<void> {
         // Inserts the mapItems into the PersonTripSchema collection.
-        await PersonTripSchema.insertMany(mapItems).catch((error: Error) => {
+        await PersonTripSchema.insertMany(mapItems, { session }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
     }
 
     // This method deletes a trip for a person.
-    public async deletePersonTrip(userName: string, tripId: number): Promise<void> {
+    public async deletePersonTrip(userName: string, tripId: number, session: ClientSession | undefined): Promise<void> {
 
         // Deletes the trip from the PersonTripSchema collection.
-        await PersonTripSchema.deleteOne({ userName, tripId }).catch((error: Error) => {
+        await PersonTripSchema.deleteOne({ userName, tripId }, { session }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
     }
 
     // This method deletes a all trips for a person.
-    public async deleteAllPersonTrips(userName: string): Promise<void> {
+    public async deleteAllPersonTrips(userName: string, session: ClientSession | undefined): Promise<void> {
 
         // Deletes the trip from the PersonTripSchema collection.
-        await PersonTripSchema.deleteMany({ userName }).catch((error: Error) => {
+        await PersonTripSchema.deleteMany({ userName }, { session }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });
@@ -190,49 +164,11 @@ export default class PersonTripRepository {
             });
     }
 
-    // This method adds multiple travellers to a trip.
-    public async addOrUpdateTripTravellers(mapItems: [] | any[]): Promise<void> {
-
-        /* if (travellers && travellers.length > 0) {
-            // Loop Check if the travellers are already exists in the database using its tripId
-            for (let index = 0; index < travellers.length; index++) {
-
-                // Read traveller based on index loop
-                let currentTraveller = travellers[index];
-
-                // Check the traveller is exist in the database
-                let isExist = await this.personsService.isPersonExist(currentTraveller.userName);
-
-                if (!isExist) {
-                    // If the traveller does not exist, create a new traveller entry in the database
-                    currentTraveller = await this.personsService.createPerson(currentTraveller);
-                } else {
-                    // If the trip exist, update trip entry in the database
-                    await this.personsService.updatePerson(currentTraveller.userName, currentTraveller);
-                }
-
-                // Check person and trip is already mapped
-                isExist = await this.isPersonAndTripExist(currentTraveller.userName, tripId);
-
-                if (!isExist) {
-                    // Add tripId to array of id list for person trip mapping
-                    mapItems.push({ userName: currentTraveller.userName, tripId });
-                }
-            }
-        } */
-
-        // Inserts the mapItems into the PersonTripSchema collection.
-        await PersonTripSchema.insertMany(mapItems).catch((error: Error) => {
-            // Throws an error if the operation fails.
-            throw error;
-        });
-    }
-
     // This method deletes a all travellers for a tripe.
-    public async deleteAllTripTravellers(tripId: number): Promise<void> {
+    public async deleteAllTripTravellers(tripId: number, session: ClientSession | undefined): Promise<void> {
 
         // Deletes the trip from the PersonTripSchema collection.
-        await PersonTripSchema.deleteMany({ tripId }).catch((error: Error) => {
+        await PersonTripSchema.deleteMany({ tripId }, { session }).catch((error: Error) => {
             // Throws an error if the operation fails.
             throw error;
         });

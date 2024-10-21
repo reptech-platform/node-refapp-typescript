@@ -97,4 +97,6 @@ helper.SetToJSON(PersonSchema);
 /**
  * Export as default schema with assigning interface validation
  */
-export default mongoose.model<IPersonSchema>("Person", PersonSchema, 'persons');
+const schemaModal = mongoose.model<IPersonSchema>("Person", PersonSchema, 'persons');
+
+export default schemaModal;

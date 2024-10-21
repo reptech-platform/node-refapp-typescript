@@ -1,12 +1,12 @@
-import { Error } from "mongoose";
+import { ClientSession, Error } from "mongoose";
 import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
-import { provideSingleton, inject } from "../utils/provideSingleton";
 import Helper from "../utils/helper.utils";;
-import AirportSchema, { IAirportSchema } from "../db/models/airport.db.model";
+import AirportSchema, { IAirportSchema } from "../db/dao/airport.db.model";
 import { IAirport } from "../models/airport.model";
+import { injectable, inject } from "inversify";
 
 // This decorator ensures that AirportsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
-@provideSingleton(AirportRepository)
+@injectable()
 export default class AirportRepository {
 
     // Injecting the Helper service
@@ -218,11 +218,11 @@ export default class AirportRepository {
     }
 
     // Method to create a new airport
-    public async createAirport(airport: IAirport): Promise<IAirport> {
+    public async createAirport(airport: IAirport, session: ClientSession | undefined): Promise<IAirport> {
 
         // create the airport document with the new data.
-        return await AirportSchema.create(airport)
-            .then((data: IAirportSchema) => {
+        return await AirportSchema.create([airport], { session })
+            .then((data: any) => {
                 // Get the first item from the array or return an empty object
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as IAirport;
@@ -234,10 +234,10 @@ export default class AirportRepository {
     }
 
     // Updates an airport's information based on the provided ICAO and IATA codes.
-    public async updateAirport(icaoCode: string, iataCode: string, airport: IAirport): Promise<IAirport> {
+    public async updateAirport(icaoCode: string, iataCode: string, airport: IAirport, session: ClientSession | undefined): Promise<IAirport> {
 
         // Find and update the airport document with the new data.
-        return await AirportSchema.findOneAndUpdate({ icaoCode, iataCode }, airport, { new: true })
+        return await AirportSchema.findOneAndUpdate({ icaoCode, iataCode }, airport, { new: true, session })
             .then((data: any) => {
                 // Extract the first item from the data array using a helper function.
                 let results = this.helper.GetItemFromArray(data, 0, {});
@@ -251,10 +251,10 @@ export default class AirportRepository {
     }
 
     // Deletes an airport based on the provided ICAO and IATA codes.
-    public async deleteAirport(icaoCode: string, iataCode: string): Promise<boolean> {
+    public async deleteAirport(icaoCode: string, iataCode: string, session: ClientSession | undefined): Promise<boolean> {
 
         // Find and delete the airport document.
-        return await AirportSchema.findOneAndDelete({ icaoCode, iataCode })
+        return await AirportSchema.findOneAndDelete({ icaoCode, iataCode }, { session })
             .then(() => {
                 // Return true if the deletion was successful.
                 return true;
@@ -266,9 +266,9 @@ export default class AirportRepository {
     }
 
     // Deletes an airport based on the provided airport id.
-    public async deleteAirportById(_id: string): Promise<boolean> {
+    public async deleteAirportById(_id: string, session: ClientSession | undefined): Promise<boolean> {
         // Find and delete the airport document.
-        return await AirportSchema.findOneAndDelete({ _id })
+        return await AirportSchema.findOneAndDelete({ _id }, { session })
             .then(() => {
                 // Return true if the deletion was successful.
                 return true;

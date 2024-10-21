@@ -1,17 +1,16 @@
 import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tsoa";
 import RequestResponse from "../utils/request.response";
-import { provideSingleton, inject } from "../utils/provideSingleton";
-import AirportService from "../services/airport.service";
 import { IAirport } from "../models/airport.model";
 import { Search, SearchResults } from "../models/search.model";
+import { inject } from "inversify";
+import IAirportService from "../services/airport.interface";
 
 @Tags("Airports")
 @Route("airports")
-@provideSingleton(AirportController)
 export class AirportController extends Controller {
 
     constructor(
-        @inject(AirportService) private airportService: AirportService) {
+        @inject("IAirportService") private airportService: IAirportService) {
         super();
     }
 
@@ -85,7 +84,7 @@ export class AirportController extends Controller {
         try {
 
             // Await the result of the createAirport method from the airportService
-            await this.airportService.createAirport(body);
+            await this.airportService.createAirport(body, undefined);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);
@@ -129,7 +128,7 @@ export class AirportController extends Controller {
             }
 
             // Await the result of the updateAirport method from the airportService
-            await this.airportService.updateAirport(icaoCode, iataCode, body);
+            await this.airportService.updateAirport(icaoCode, iataCode, body, undefined);
 
             return { status: 200, message: `Updated airport ${icaoCode} and ${iataCode} successfuly` };
 
@@ -167,7 +166,7 @@ export class AirportController extends Controller {
             }
 
             // Await the result of the deleteAirport method from the airportService
-            await this.airportService.deleteAirport(icaoCode, iataCode);
+            await this.airportService.deleteAirport(icaoCode, iataCode, undefined);
 
             return { status: 200, message: `Deleted airport ${icaoCode} and ${iataCode} successfuly` };
 

@@ -5,10 +5,9 @@ import { RegisterRoutes } from "../build/routes";
 import swaggerUi from "swagger-ui-express";
 import { ValidateError } from "tsoa";
 import * as bodyParser from "body-parser";
-import { DbConnection } from "./db/utils/connection.db";
+import DbConnection from "./db/utils/connection.db";
 
 export const app = express();
-
 
 DbConnection.initConnection().then(() => {
     DbConnection.setAutoReconnect();

@@ -1,16 +1,16 @@
 import { Controller, Get, Post, Delete, Tags, Route, Path, UploadedFile, SuccessResponse } from "tsoa";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import RequestResponse from "../utils/request.response";
-import DocumentService from "../services/document.service";
 import { IDocument } from "../models/document.model";
 import fs from "fs";
+import IDocumentService from "../services/document.interface";
 
 @Tags("Documents")
 @Route("documents")
 @provideSingleton(DocumentController)
 export class DocumentController extends Controller {
     constructor(
-        @inject(DocumentService) private documentService: DocumentService) {
+        @inject("IDocumentService") private documentService: IDocumentService) {
         super();
     }
 
@@ -73,7 +73,7 @@ export class DocumentController extends Controller {
                     docLocation: uploadPath
                 };
 
-                const content = await this.documentService.createDocument(input);
+                const content = await this.documentService.createDocument(input, undefined);
 
                 return resolve(content);
 
@@ -93,7 +93,7 @@ export class DocumentController extends Controller {
         try {
 
             // Await the result of the getAirlines method from the airlinesService
-            return await this.documentService.deleteDocument(docId);
+            return await this.documentService.deleteDocument(docId, undefined);
 
         } catch (ex: any) {
 

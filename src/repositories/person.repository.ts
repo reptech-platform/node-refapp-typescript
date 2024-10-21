@@ -1,13 +1,14 @@
-import { Error } from "mongoose";
-import PersonSchema, { IPersonSchema } from "../db/models/person.db.model";
+import { ClientSession, Error } from "mongoose";
+import PersonSchema, { IPersonSchema } from "../db/dao/person.db.model";
 import Helper from "../utils/helper.utils";
 import { IPerson } from "../models/person.model";
 import { Search, SortBy, FilterBy, Pagination, SearchResults } from "../models/search.model";
-import { provideSingleton, inject } from "../utils/provideSingleton";
-import { IPersonAttachmentSchema } from "src/db/models/personattachment.db.model";
+import { IPersonAttachmentSchema } from "src/db/dao/personattachment.db.model";
+import DbSession from "../db/utils/dbsession.db";
+import { injectable, inject } from "inversify";
 
 // This decorator ensures that PersonsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
-@provideSingleton(PersonRepository)
+@injectable()
 export default class PersonRepository {
 
     // Injecting the Helper service
@@ -58,34 +59,30 @@ export default class PersonRepository {
     }
 
     // Creates a new person in the database.
-    public async createPerson(person: IPerson): Promise<IPerson> {
+    public async createPerson(person: IPerson, session: ClientSession | undefined): Promise<IPerson> {
 
         // create new person entry in the database
-        let newPerson = await PersonSchema.create(person)
+        let newPerson = await PersonSchema.create([person], { session })
             .then((data: any) => {
-                return data as IPerson;
+                // Uses the helper to process the person.
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IPerson;
             })
             .catch((error: Error) => {
+                // Abort Client Session
+                DbSession.Abort(session);
                 // Throws an error if the operation fails.
                 throw error;
             });
-
-        /* // Retrieve the trip information from the person object, which may be undefined
-        const trips: ITrip[] | undefined = person.trips;
-
-        if (trips && trips.length > 0) {
-            // Add or update trips and map the person trips
-            await this.personTripsService.addOrUpadatePersonTrips(person.userName, trips);
-        } */
 
         // Returns newly created person object
         return newPerson;
     }
 
     // Updates an existing person by their userName and returns the updated person.
-    public async updatePerson(userName: string, person: any): Promise<IPerson> {
+    public async updatePerson(userName: string, person: any, session: ClientSession | undefined): Promise<IPerson> {
 
-        let updatedPerson = await PersonSchema.findOneAndUpdate({ userName }, person, { new: true })
+        let updatedPerson = await PersonSchema.findOneAndUpdate({ userName }, person, { new: true, session })
             .then((data: any) => {
                 // Uses the helper to process the updated person.
                 let results = this.helper.GetItemFromArray(data, 0, {});
@@ -96,20 +93,12 @@ export default class PersonRepository {
                 throw error;
             });
 
-        /* // Retrieve the trip information from the person object, which may be undefined
-        const trips: ITrip[] | undefined = person.trips;
-
-        if (trips && trips.length > 0) {
-            // Add or update trips and map the person trips
-            await this.personTripsService.addOrUpadatePersonTrips(userName, trips);
-        } */
-
         return updatedPerson;
     }
 
     // Updates or adds documents to a person's attachments.
-    public async updatePersonDocument(userName: string, document: any): Promise<IPerson> {
-        return await PersonSchema.findOne({ userName })
+    public async updatePersonDocument(userName: string, document: any, session: ClientSession | undefined): Promise<IPerson> {
+        return await PersonSchema.findOne({ userName }, { session })
             .then((data: any) => {
                 document.forEach((x: IPersonAttachmentSchema) => {
                     // If docId exists, update the document; otherwise, add it to the array.
@@ -132,14 +121,12 @@ export default class PersonRepository {
     }
 
     // Deletes documents from a person's attachments.
-    public async deletePersonDocument(userName: string, document: any): Promise<IPerson> {
-        return await PersonSchema.findOne({ userName })
+    public async deletePersonDocument(userName: string, docId: number, session: ClientSession | undefined): Promise<IPerson> {
+        return await PersonSchema.findOne({ userName }, { session })
             .then((data: any) => {
                 let existingDocuments: IPersonAttachmentSchema[] = data.personAttachments;
-                document.forEach((x: IPersonAttachmentSchema) => {
-                    existingDocuments = existingDocuments.filter((z: any) => z.docId !== x.docId);
-                });
-                data.personAttachments = existingDocuments;
+                // Remove document by docId
+                data.personAttachments = existingDocuments.filter((z: any) => z.docId !== docId);
                 data.save();
                 // Uses the helper to process the updated person.
                 let results = this.helper.GetItemFromArray(data, 0, {});
@@ -152,9 +139,9 @@ export default class PersonRepository {
     }
 
     // Deletes a person by their userName.
-    public async deletePerson(userName: string): Promise<boolean> {
+    public async deletePerson(userName: string, session: ClientSession | undefined): Promise<boolean> {
 
-        let boolDeleted: boolean = await PersonSchema.findOneAndDelete({ userName })
+        let boolDeleted: boolean = await PersonSchema.findOneAndDelete({ userName }, { session })
             .then(() => {
                 // Returns true if the deletion is successful.
                 return true;
@@ -163,9 +150,6 @@ export default class PersonRepository {
                 // Throws an error if the operation fails.
                 throw error;
             });
-
-        // delete all person trips from the database
-        // await this.personTripsService.deleteAllPersonTrips(userName);
 
         return boolDeleted;
     }
