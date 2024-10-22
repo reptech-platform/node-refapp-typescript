@@ -125,6 +125,10 @@ export default class AirlineService implements IAirlineService {
 
             // If the airport does not exist, throw error message
             if (!isExist) {
+                // Abort the transaction if it was started in this call
+                if (!inCarryTransact) {
+                    await DbSession.Abort(dbSession);
+                }
                 throw { status: 400, message: `Provided ${airport.icaoCode} and ${airport.iataCode} airport does not exist` };
             }
 

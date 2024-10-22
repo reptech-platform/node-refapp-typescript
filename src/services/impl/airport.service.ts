@@ -71,7 +71,7 @@ export default class AirportService implements IAirportService {
         }
 
         // Retrieve the airline information from the airport object, which may be undefined
-        const airline: IAirline | undefined = airport.airlines;
+        let airline: IAirline | undefined = airport.airlines;
 
         if (airline) {
             // Check if the airline already exists in the database using its airline code
@@ -79,11 +79,15 @@ export default class AirportService implements IAirportService {
 
             // If the airline does not exist, create a new airline entry in the database
             if (!isExist) {
-                await this.airlineService().createAirline(airline, dbSession);
-            }
+                // Create the airline and assign it to the airport object
+                airline = await this.airlineService().createAirline(airline, dbSession);
 
-            // Retrieve the airline ID using the airline code and assign it to the airport object
-            airport.airlineId = await this.airlineService().getAirlineId(airline.airlineCode);
+                // map airline id to airport airlineId
+                airport.airlineId = airport['_id'];
+            } else {
+                // Retrieve the airline ID using the airline code and assign it to the airport object
+                airport.airlineId = await this.airlineService().getAirlineId(airline.airlineCode);
+            }
         }
 
         const results: IAirport = await this.airportRepository.createAirport(airport, dbSession);
@@ -111,7 +115,7 @@ export default class AirportService implements IAirportService {
         }
 
         // Retrieve the airline information from the airport object, which may be undefined
-        const airline: IAirline | undefined = airport.airlines;
+        let airline: IAirline | undefined = airport.airlines;
 
         if (airline) {
             // Check if the airline already exists in the database using its airline code
@@ -119,6 +123,10 @@ export default class AirportService implements IAirportService {
 
             // If the airline does not exist, throw error message
             if (!isExist) {
+                // Abort the transaction if it was started in this call
+                if (!inCarryTransact) {
+                    await DbSession.Abort(dbSession);
+                }
                 throw { status: 400, message: `Provided ${airline.airlineCode} airline does not exist` };
             }
 
