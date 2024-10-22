@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import AutoIncrementFactory from "mongoose-sequence";
+import { AirlineSchema, IAirlineSchema } from "./airline.db.model";
 
 const AutoIncrement = AutoIncrementFactory(mongoose);
 
@@ -24,7 +25,7 @@ export interface IPlanItemSchema extends Document {
     /**
      * Referencing the _id from Airline collection
      */
-    airLine: String;
+    airLine: IAirlineSchema;
     /**
      * Referencing the _id from Airport collection
      */
@@ -55,15 +56,15 @@ export const PlanItemSchema: Schema = new Schema({
     /**
      * Referencing the _id from Airline collection
      */
-    airLine: { type: String, default: null },
+    airLine: { type: AirlineSchema, default: null },
     /**
      * Referencing the _id from Airport collection
      */
-    fromAirport: { type: String, default: null },
+    fromAirportId: { type: Schema.Types.ObjectId, default: null },
     /**
      * Referencing the _id from Airport collection
      */
-    toAirport: { type: String, default: null }
+    toAirportId: { type: Schema.Types.ObjectId, default: null }
 }, {
     timestamps: true,
     /**

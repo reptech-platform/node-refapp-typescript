@@ -5,7 +5,7 @@ import { IAirport } from "./airport.model";
 import { IDocument } from "./document.model";
 
 // Interface representing plan items, extending the PublicTransport interface
-export interface IPlanItems extends PublicTransport {
+export interface IPlanItem extends PublicTransport {
     // Optional flight number for the plan item
     flightNumber?: string;
 
@@ -15,8 +15,14 @@ export interface IPlanItems extends PublicTransport {
     // Optional departure airport for the plan item, represented by the IAirport interface
     fromAirport?: IAirport;
 
+    // Optional departure airport for the plan item, represented by the IAirport interface
+    fromAirportId?: String;
+
     // Optional arrival airport for the plan item, represented by the IAirport interface
     toAirport?: IAirport;
+
+    // Optional arrival airport for the plan item, represented by the IAirport interface
+    toAirportId?: string;
 
     // Optional ticket document for the plan item, represented by the IDocument interface
     ticket?: IDocument;
@@ -24,7 +30,7 @@ export interface IPlanItems extends PublicTransport {
 
 // Class implementing the IPlanItems interface and extending the PublicTransport class
 @injectable()
-export class PlanItems extends PublicTransport {
+export class PlanItem extends PublicTransport {
     // Optional flight number for the plan item
     flightNumber?: string;
 
@@ -34,8 +40,14 @@ export class PlanItems extends PublicTransport {
     // Optional departure airport for the plan item, represented by the IAirport interface
     fromAirport?: IAirport;
 
+    // Optional departure airport for the plan item, represented by the IAirport interface
+    fromAirportId?: String;
+
     // Optional arrival airport for the plan item, represented by the IAirport interface
     toAirport?: IAirport;
+
+    // Optional arrival airport for the plan item, represented by the IAirport interface
+    toAirportId?: string;
 
     // Optional ticket document for the plan item, represented by the IDocument interface
     ticket?: IDocument;

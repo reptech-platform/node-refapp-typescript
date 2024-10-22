@@ -15,7 +15,7 @@ export interface IBasePlanItem {
     endsAt?: Date;
 
     // Optional duration of the plan item in minutes
-    duration?: number;
+    duration?: any;
 }
 
 // Abstract class implementing the IBasePlanItem interface
@@ -34,7 +34,7 @@ export abstract class BasePlanItem implements IBasePlanItem {
     endsAt?: Date;
 
     // Optional duration of the plan item in minutes
-    duration?: number;
+    duration?: any;
 
     // Constructor for the BasePlanItem abstract class
     constructor() { }

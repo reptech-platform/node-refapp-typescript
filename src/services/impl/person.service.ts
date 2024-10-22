@@ -17,7 +17,7 @@ export default class PersonService implements IPersonService {
     // Injecting the Helper service
     constructor(
         @inject('IPersonRepository') private personRepository: IPersonRepository,
-        @inject('ITripService') private tripService: ITripService,
+        @inject('ITripRepository') private tripService: ITripService,
         @inject('IPersonTripService') private personTripService: IPersonTripService
     ) { }
 
@@ -66,23 +66,35 @@ export default class PersonService implements IPersonService {
                 // Read trip based on index loop
                 let currentTrip = trips[index];
 
-                // Check the trip is exist in the database
-                let isExist = await this.tripService.isTripExist(currentTrip.tripId);
+                let tripId: number | undefined = currentTrip.tripId;
 
-                if (!isExist) {
+                if (tripId) {
+                    // Check the trip is exist in the database
+                    let isExist = await this.tripService.isTripExist(tripId);
+
+                    if (!isExist) {
+                        // If the trip does not exist, create a new trip entry in the database
+                        currentTrip = await this.tripService.createTrip(currentTrip, dbSession);
+                    } else {
+                        // If the trip exist, update trip entry in the database
+                        await this.tripService.updateTrip(tripId, currentTrip, dbSession);
+                    }
+                } else {
                     // If the trip does not exist, create a new trip entry in the database
                     currentTrip = await this.tripService.createTrip(currentTrip, dbSession);
-                } else {
-                    // If the trip exist, update trip entry in the database
-                    await this.tripService.updateTrip(currentTrip.tripId, currentTrip, dbSession);
+
+                    tripId = currentTrip.tripId;
                 }
 
-                // Check person and trip is already mapped
-                isExist = await this.personTripService.isPersonAndTripExist(person.userName, currentTrip.tripId);
+                if (tripId) {
 
-                if (!isExist) {
-                    // Add tripId to array of id list for person trip mapping
-                    mapItems.push({ userName: person.userName, tripId: currentTrip.tripId });
+                    // Check person and trip is already mapped
+                    let isExist = await this.personTripService.isPersonAndTripExist(person.userName, tripId);
+
+                    if (!isExist) {
+                        // Add tripId to array of id list for person trip mapping
+                        mapItems.push({ userName: person.userName, tripId });
+                    }
                 }
             }
 
@@ -103,7 +115,6 @@ export default class PersonService implements IPersonService {
 
     // Updates an existing person by their userName and returns the updated person.
     public async updatePerson(userName: string, person: any, dbSession: ClientSession | undefined): Promise<IPerson> {
-
         // Flag to indicate if this function created the session
         let inCarryTransact: boolean = false;
 
@@ -115,43 +126,48 @@ export default class PersonService implements IPersonService {
             inCarryTransact = true;
         }
 
+        // Update person details in the database
         let updatedPerson = await this.personRepository.updatePerson(userName, person, dbSession);
 
         // Retrieve the trip information from the person object, which may be undefined
         const trips: ITrip[] | undefined = person.trips;
-
         let mapItems: MapItem[] = [];
 
         if (trips && trips.length > 0) {
-
-            // Loop Check if the trips already exists in the database using its userName
+            // Loop through each trip to check existence and update or create
             for (let index = 0; index < trips.length; index++) {
-
-                // Read trip based on index loop
+                // Get the current trip from the list
                 let currentTrip = trips[index];
+                let tripId: number | undefined = currentTrip.tripId;
 
-                // Check the trip is exist in the database
-                let isExist = await this.tripService.isTripExist(currentTrip.tripId);
-
-                if (!isExist) {
-                    // If the trip does not exist, create a new trip entry in the database
-                    currentTrip = await this.tripService.createTrip(currentTrip, dbSession);
+                if (tripId) {
+                    // Check if the trip exists in the database
+                    let isExist = await this.tripService.isTripExist(tripId);
+                    if (!isExist) {
+                        // If the trip does not exist, create a new trip entry
+                        currentTrip = await this.tripService.createTrip(currentTrip, dbSession);
+                    } else {
+                        // If the trip exists, update the trip entry
+                        await this.tripService.updateTrip(tripId, currentTrip, dbSession);
+                    }
                 } else {
-                    // If the trip exist, update trip entry in the database
-                    await this.tripService.updateTrip(currentTrip.tripId, currentTrip, dbSession);
+                    // If no tripId, create a new trip entry
+                    currentTrip = await this.tripService.createTrip(currentTrip, dbSession);
+                    tripId = currentTrip.tripId;
                 }
 
-                // Check person and trip is already mapped
-                isExist = await this.personTripService.isPersonAndTripExist(person.userName, currentTrip.tripId);
-
-                if (!isExist) {
-                    // Add tripId to array of id list for person trip mapping
-                    mapItems.push({ userName: person.userName, tripId: currentTrip.tripId });
+                if (tripId) {
+                    // Check if the person and trip are already mapped
+                    let isExist = await this.personTripService.isPersonAndTripExist(person.userName, tripId);
+                    if (!isExist) {
+                        // Add tripId to the list for person trip mapping
+                        mapItems.push({ userName: person.userName, tripId });
+                    }
                 }
             }
 
             if (mapItems && mapItems.length > 0) {
-                // Add or update trips and map the person trips
+                // Map the trips to the person
                 await this.personTripService.addPersonTrips(person.userName, mapItems, dbSession);
             }
         }

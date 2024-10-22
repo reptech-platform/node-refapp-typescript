@@ -1,11 +1,11 @@
 import { injectable } from "inversify";
 import { IPerson } from "./person.model";
-import { IPlanItems } from "./planitem.model";
+import { IPlanItem } from "./planitem.model";
 
 // Interface representing a trip
 export interface ITrip {
     // Optional unique identifier for the trip
-    tripId: number;
+    tripId?: number;
 
     // Optional share identifier for the trip
     shareId?: string;
@@ -38,7 +38,7 @@ export interface ITrip {
     cost?: number;
 
     // Optional array of plan items associated with the trip, each represented by the IPlanItems interface
-    planItems?: IPlanItems[];
+    planItems?: IPlanItem[];
 
     // Optional array of travellers on the trip, each represented by the IPerson interface
     travellers?: IPerson[];
@@ -50,7 +50,7 @@ export interface ITrip {
 @injectable()
 export class Trip implements ITrip {
     // Optional unique identifier for the trip
-    tripId: number;
+    tripId?: number;
 
     // Optional share identifier for the trip
     shareId?: string;
@@ -83,7 +83,7 @@ export class Trip implements ITrip {
     cost?: number;
 
     // Optional array of plan items associated with the trip, each represented by the IPlanItems interface
-    planItems?: IPlanItems[];
+    planItems?: IPlanItem[];
 
     // Optional array of travellers on the trip, each represented by the IPerson interface
     travellers?: IPerson[];
