@@ -170,6 +170,50 @@ export default class PersonService implements IPersonService {
             inCarryTransact = true;
         }
 
+        // Check is best friend object is not null
+        if (person.bestFriend) {
+
+            let bestFriendId = person.bestFriend.userName;
+
+            let isExist = await this.personRepository.isPersonExist(bestFriendId);
+
+            if (!isExist) {
+                let bestFriend = await this.personRepository.createPerson(person.bestFriend, dbSession);
+                bestFriendId = bestFriend.userName;
+            } else {
+                await this.personRepository.updatePerson(bestFriendId, person.bestFriend, dbSession);
+            }
+
+            person.bestFriendId = bestFriendId;
+        }
+
+        // Check is friends object is not null
+        if (person.friends && person.friends.length > 0) {
+
+            let friends: String[] = [];
+
+            // Loop Check if the friend is already exists in the database using its userName
+            for (let index = 0; index < person.friends.length; index++) {
+
+                // Read friend based on index loop
+                let friend = person.friends[index];
+                let friendId = friend.userName;
+
+                let isExist = await this.personRepository.isPersonExist(friend.userName);
+
+                if (!isExist) {
+                    let newFriend = await this.personRepository.createPerson(friend, dbSession);
+                    friendId = newFriend.userName;
+                } else {
+                    await this.personRepository.updatePerson(friendId, friend, dbSession);
+                }
+
+                friends.push(friendId);
+            }
+
+            person.friendsList = friends;
+        }
+
         // Update person details in the database
         let updatedPerson = await this.personRepository.updatePerson(userName, person, dbSession);
 

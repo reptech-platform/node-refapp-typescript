@@ -13,7 +13,6 @@ export default class DocumentService implements IDocumentService {
 
     // Injecting the Helper service
     constructor(
-        @inject(Helper) private helper: Helper,
         @inject("IDocumentRepository") private documentRepository: IDocumentRepository) { }
 
     // Fetches all documents from the database
