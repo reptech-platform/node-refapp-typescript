@@ -1,14 +1,13 @@
 import { IPerson } from "../../models/person.model";
 import { ITrip } from "../../models/trip.model";
-import PersonTripRepository from "../../repositories/persontrip.repository";
 import MapItem from "../../utils/mapitems";
-import TripRepository from "../../repositories/trip.repository";
-import PersonRepository from "../../repositories/person.repository";
 import DbSession from "../../db/utils/dbsession.db";
 import { ClientSession } from "mongoose";
 import { inject, injectable } from "inversify";
 import IPersonTripService from "../persontrip.interface";
-import Helper from "../../utils/helper.utils";
+import IPersonTripRepository from "../../repositories/persontrip.repository";
+import IPersonService from "../person.interface";
+import ITripService from "../trip.interface";
 
 // This decorator ensures that PersonTripsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @injectable()
@@ -16,10 +15,9 @@ export default class PersonTripService implements IPersonTripService {
 
     // Injecting the Helper, PersonsService and TripService services
     constructor(
-        @inject(Helper) private helper: Helper,
-        @inject(PersonTripRepository) private personTripRepository: PersonTripRepository,
-        @inject(PersonRepository) private personRepository: PersonRepository,
-        @inject(TripRepository) private tripRepository: TripRepository,
+        @inject("IPersonTripRepository") private personTripRepository: IPersonTripRepository,
+        @inject('ITripService') private tripService: ITripService,
+        @inject('IPersonService') private personService: IPersonService
     ) { }
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
@@ -36,13 +34,19 @@ export default class PersonTripService implements IPersonTripService {
     // This method adds multiple trips for a person.
     public async addPersonTrips(userName: string, trips: ITrip[] | any[], dbSession: ClientSession | undefined): Promise<void> {
 
-        // Create a new session for transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         let mapItems: MapItem[] = [];
+        let tripId: number;
 
         if (trips && trips.length > 0) {
 
@@ -53,14 +57,15 @@ export default class PersonTripService implements IPersonTripService {
                 let currentTrip = trips[index];
 
                 // Check the trip is exist in the database
-                let isExist = await this.tripRepository.isTripExist(currentTrip.tripId);
+                let isExist = await this.tripService.isTripExist(currentTrip.tripId);
 
                 if (!isExist) {
                     // If the trip does not exist, create a new trip entry in the database
-                    currentTrip = await this.tripRepository.createTrip(currentTrip, dbSession);
+                    currentTrip = await this.tripService.createTrip(currentTrip, dbSession);
+
                 } else {
                     // If the trip exist, update trip entry in the database
-                    await this.tripRepository.updateTrip(currentTrip.tripId, currentTrip, dbSession);
+                    await this.tripService.updateTrip(currentTrip.tripId, currentTrip, dbSession);
                 }
 
                 // Check person and trip is already mapped
@@ -78,36 +83,55 @@ export default class PersonTripService implements IPersonTripService {
             await this.personTripRepository.mapPersonsAndTrips(mapItems, dbSession);
         }
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
 
     }
 
     // This method deletes a trip for a person.
     public async deletePersonTrip(userName: string, tripId: number, dbSession: ClientSession | undefined): Promise<void> {
 
-        // Create a new session for transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         await this.personTripRepository.deletePersonTrip(userName, tripId, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
     }
 
     // This method deletes a all trips for a person.
     public async deleteAllPersonTrips(userName: string, dbSession: ClientSession | undefined): Promise<void> {
 
-        // Create a new session for transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         await this.personTripRepository.deleteAllPersonTrips(userName, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
     }
 
     // This method get multiple travellers to a trip.
@@ -118,10 +142,15 @@ export default class PersonTripService implements IPersonTripService {
     // This method adds multiple travellers to a trip.
     public async addTripTravellers(tripId: number, travellers: IPerson[] | any[], dbSession: ClientSession | undefined): Promise<void> {
 
-        // Create a new session for transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         let mapItems: MapItem[] = [];
@@ -134,14 +163,14 @@ export default class PersonTripService implements IPersonTripService {
                 let currentTraveller = travellers[index];
 
                 // Check the traveller is exist in the database
-                let isExist = await this.personRepository.isPersonExist(currentTraveller.userName);
+                let isExist = await this.personService.isPersonExist(currentTraveller.userName);
 
                 if (!isExist) {
                     // If the traveller does not exist, create a new traveller entry in the database
-                    currentTraveller = await this.personRepository.createPerson(currentTraveller, dbSession);
+                    currentTraveller = await this.personService.createPerson(currentTraveller, dbSession);
                 } else {
                     // If the trip exist, update trip entry in the database
-                    await this.personRepository.updatePerson(currentTraveller.userName, currentTraveller, dbSession);
+                    await this.personService.updatePerson(currentTraveller.userName, currentTraveller, dbSession);
                 }
 
                 // Check person and trip is already mapped
@@ -159,22 +188,33 @@ export default class PersonTripService implements IPersonTripService {
             await this.personTripRepository.mapPersonsAndTrips(mapItems, dbSession);
         }
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
 
     }
 
     // This method deletes a all travellers for a tripe.
     public async deleteAllTripTravellers(tripId: number, dbSession: ClientSession | undefined): Promise<void> {
 
-        // Create a new session for transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         await this.personTripRepository.deleteAllTripTravellers(tripId, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
     }
 
 }

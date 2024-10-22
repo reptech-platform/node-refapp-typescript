@@ -1,15 +1,14 @@
 import { IPerson } from "../../models/person.model";
 import { Search, SearchResults } from "../../models/search.model";
-import PersonRepository from "../../repositories/person.repository";
 import { ITrip } from "../../models/trip.model";
 import MapItem from "../../utils/mapitems";
 import DbSession from "../../db/utils/dbsession.db";
 import { ClientSession } from "mongoose";
-import Helper from "../../utils/helper.utils";
 import IPersonService from "../person.interface";
 import ITripService from "../trip.interface";
 import { inject, injectable } from "inversify";
 import IPersonTripService from "../persontrip.interface";
+import IPersonRepository from "../../repositories/person.repository";
 
 // This decorator ensures that PersonsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @injectable()
@@ -17,8 +16,7 @@ export default class PersonService implements IPersonService {
 
     // Injecting the Helper service
     constructor(
-        @inject(Helper) private helper: Helper,
-        @inject('PersonRepository') private personRepository: PersonRepository,
+        @inject('IPersonRepository') private personRepository: IPersonRepository,
         @inject('ITripService') private tripService: ITripService,
         @inject('IPersonTripService') private personTripService: IPersonTripService
     ) { }
@@ -41,10 +39,15 @@ export default class PersonService implements IPersonService {
     // Creates a new person in the database.
     public async createPerson(person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson> {
 
-        // Create a new session for transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         // create new person entry in the database
@@ -89,7 +92,10 @@ export default class PersonService implements IPersonService {
             }
         }
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
 
         // Returns newly created person object
         return newPerson;
@@ -98,10 +104,15 @@ export default class PersonService implements IPersonService {
     // Updates an existing person by their userName and returns the updated person.
     public async updatePerson(userName: string, person: any, dbSession: ClientSession | undefined): Promise<IPerson> {
 
-        // Create a new session for trip transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         let updatedPerson = await this.personRepository.updatePerson(userName, person, dbSession);
@@ -145,21 +156,34 @@ export default class PersonService implements IPersonService {
             }
         }
 
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
+
         return updatedPerson;
     }
 
     // Updates or adds documents to a person's attachments.
     public async updatePersonDocument(userName: string, document: any, dbSession: ClientSession | undefined): Promise<IPerson> {
 
-        // Create a new session for trip transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         const results: IPerson = await this.personRepository.updatePersonDocument(userName, document, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
 
         return results;
     }
@@ -167,16 +191,23 @@ export default class PersonService implements IPersonService {
     // Deletes documents from a person's attachments.
     public async deletePersonDocument(userName: string, docId: number, dbSession: ClientSession | undefined): Promise<IPerson> {
 
-        // Create a new session for trip transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
-
 
         const results: IPerson = await this.personRepository.deletePersonDocument(userName, docId, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
 
         return results;
     }
@@ -184,10 +215,15 @@ export default class PersonService implements IPersonService {
     // Deletes a person by their userName.
     public async deletePerson(userName: string, dbSession: ClientSession | undefined): Promise<boolean> {
 
-        // Create a new session for trip transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         let results: boolean = await this.personRepository.deletePerson(userName, dbSession);
@@ -195,7 +231,10 @@ export default class PersonService implements IPersonService {
         // delete all person trips from the database
         await this.personTripService.deleteAllPersonTrips(userName, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
 
         return results;
     }

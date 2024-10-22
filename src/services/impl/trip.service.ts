@@ -1,17 +1,15 @@
 
 import { ClientSession } from "mongoose";
-
 import { ITrip } from "../../models/trip.model";
 import { Search, SearchResults } from "../../models/search.model";
-import TripRepository from "../../repositories/trip.repository";
 import MapItem from "../../utils/mapitems";
 import { IPerson } from "../../models/person.model";
 import DbSession from "../../db/utils/dbsession.db";
-import Helper from "../../utils/helper.utils";
 import ITripService from "../trip.interface";
 import { inject, injectable } from "inversify";
 import IPersonTripService from "../persontrip.interface";
 import IPersonService from "../person.interface";
+import ITripRepository from "../../repositories/trip.repository";
 
 // This decorator ensures that TripsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @injectable()
@@ -19,8 +17,7 @@ export default class TripService implements ITripService {
 
     // Injecting the Helper service
     constructor(
-        @inject(Helper) private helper: Helper,
-        @inject(TripRepository) private tripRepository: TripRepository,
+        @inject("ITripRepository") private tripRepository: ITripRepository,
         @inject('IPersonTripService') private personTripService: IPersonTripService,
         @inject('IPersonService') private personService: IPersonService
     ) { }
@@ -43,10 +40,15 @@ export default class TripService implements ITripService {
     // Creates a new trip in the database.
     public async createTrip(trip: ITrip, dbSession: ClientSession | undefined): Promise<ITrip> {
 
-        // Create a new session for trip transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         // Create trip by passing session
@@ -92,7 +94,10 @@ export default class TripService implements ITripService {
             await this.personTripService.addTripTravellers(tripId, mapItems, dbSession);
         }
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
 
         // Returns newly created trip object
         return newTrip;
@@ -101,10 +106,15 @@ export default class TripService implements ITripService {
     // Updates an existing trip by its tripId and returns the updated trip.
     public async updateTrip(tripId: number, trip: any, dbSession: ClientSession | undefined): Promise<ITrip> {
 
-        // Create a new session for trip transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         let updatedTrip = await this.tripRepository.updateTrip(tripId, trip, dbSession);
@@ -147,7 +157,10 @@ export default class TripService implements ITripService {
             await this.personTripService.addTripTravellers(tripId, mapItems, dbSession);
         }
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
 
         return updatedTrip;
     }
@@ -155,10 +168,15 @@ export default class TripService implements ITripService {
     // Deletes a trip by its tripId.
     public async deleteTrip(tripId: number, dbSession: ClientSession | undefined): Promise<boolean> {
 
-        // Create a new session for trip transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         let boolDeleted: boolean = await this.tripRepository.deleteTrip(tripId, dbSession);
@@ -166,7 +184,10 @@ export default class TripService implements ITripService {
         // delete all trip travellers from the database
         await this.personTripService.deleteAllTripTravellers(tripId, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
 
         return boolDeleted;
     }

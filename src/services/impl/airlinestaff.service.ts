@@ -1,11 +1,10 @@
 import { IPerson } from "../../models/person.model";
 import { IAirline } from "../../models/airline.model";
-import AirlineStaffRepository from "../../repositories/airlinestaff.repository";
 import { inject, injectable } from "inversify";
 import IAirlineStaffService from "../airlinestaff.interface";
 import { ClientSession } from "mongoose";
-import Helper from "../../utils/helper.utils";
 import DbSession from "../../db/utils/dbsession.db";
+import IAirlineStaffRepository from "../../repositories/airlinestaff.repository";
 
 // This decorator ensures that AirlineStaffsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @injectable()
@@ -13,8 +12,7 @@ export default class AirlineStaffService implements IAirlineStaffService {
 
     // Injecting the Helper, PersonsService and TripService services
     constructor(
-        @inject(Helper) private helper: Helper,
-        @inject(AirlineStaffRepository) private airlineStaffRepository: AirlineStaffRepository
+        @inject("IAirlineStaffRepository") private airlineStaffRepository: IAirlineStaffRepository
     ) { }
 
     // This method checks if a person with the given userName is associated with a airline with the given airlineCode.
@@ -32,10 +30,15 @@ export default class AirlineStaffService implements IAirlineStaffService {
 
         let mapItems: any[] = [];
 
-        // Create a new session for transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         /* if (persons && persons.length > 0) {
@@ -68,36 +71,55 @@ export default class AirlineStaffService implements IAirlineStaffService {
 
         await this.airlineStaffRepository.addOrUpadateAirlineStaffs(mapItems, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
 
     }
 
     // This method deletes a staff for a ailine.
     public async deleteStaffStaff(airlineCode: string, userName: string, dbSession: ClientSession | undefined): Promise<void> {
 
-        // Create a new session for transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         await this.airlineStaffRepository.deleteStaffStaff(airlineCode, userName, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
     }
 
     // This method deletes a all staffs for a airline.
     public async deleteAllAirlineStaff(airlineCode: string, dbSession: ClientSession | undefined): Promise<void> {
 
-        // Create a new session for transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         await this.airlineStaffRepository.deleteAllAirlineStaff(airlineCode, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
     }
 
     // This method get multiple staff to a airline.
@@ -110,10 +132,15 @@ export default class AirlineStaffService implements IAirlineStaffService {
 
         let mapItems: any[] = [];
 
-        // Create a new session for transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         /* if (airlines && airlines.length > 0) {
@@ -146,21 +173,32 @@ export default class AirlineStaffService implements IAirlineStaffService {
 
         await this.airlineStaffRepository.addOrUpdateStaffAirlines(mapItems, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
     }
 
     // This method deletes a all airlines for a staff.
     public async deleteAllStaffAirlines(userName: string, dbSession: ClientSession | undefined): Promise<void> {
 
-        // Create a new session for transaction if session is null
-        if (this.helper.IsNullValue(dbSession)) {
+        // Flag to indicate if this function created the session
+        let inCarryTransact: boolean = false;
+
+        // Check if a session is provided; if not, create a new one
+        if (!dbSession) {
             dbSession = await DbSession.Session();
             DbSession.Start(dbSession);
+        } else {
+            inCarryTransact = true;
         }
 
         await this.airlineStaffRepository.deleteAllStaffAirlines(userName, dbSession);
 
-        DbSession.Commit(dbSession);
+        // Commit the transaction if it was started in this call
+        if (!inCarryTransact) {
+            await DbSession.Commit(dbSession);
+        }
     }
 
 }
