@@ -2,11 +2,12 @@ import { Controller, Body, Get, Post, Put, Delete, Tags, Route, Path } from "tso
 import RequestResponse from "../utils/request.response";
 import { IAirport } from "../models/airport.model";
 import { Search, SearchResults } from "../models/search.model";
-import { inject } from "inversify";
+import { provideSingleton, inject } from "../utils/provideSingleton";
 import IAirportService from "../services/airport.interface";
 
 @Tags("Airports")
 @Route("airports")
+@provideSingleton(AirportController)
 export class AirportController extends Controller {
 
     constructor(

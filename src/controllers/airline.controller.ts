@@ -3,10 +3,11 @@ import RequestResponse from "../utils/request.response";
 import { IAirline } from "../models/airline.model";
 import { Search, SearchResults } from "../models/search.model";
 import IAirlineService from "../services/airline.interface";
-import { inject } from "inversify";
+import { provideSingleton, inject } from "../utils/provideSingleton";
 
 @Tags("Airlines")
 @Route("airlines")
+@provideSingleton(AirlineController)
 export class AirlineController extends Controller {
 
     constructor(@inject("IAirlineService") private airlineService: IAirlineService) {
