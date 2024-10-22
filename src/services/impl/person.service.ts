@@ -7,8 +7,8 @@ import { ClientSession } from "mongoose";
 import IPersonService from "../person.interface";
 import ITripService from "../trip.interface";
 import { inject, injectable } from "inversify";
-import IPersonTripService from "../persontrip.interface";
 import IPersonRepository from "../../repositories/person.repository";
+import IPersonTripRepository from "../../repositories/persontrip.repository";
 
 // This decorator ensures that PersonsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @injectable()
@@ -18,7 +18,7 @@ export default class PersonService implements IPersonService {
     constructor(
         @inject('IPersonRepository') private personRepository: IPersonRepository,
         @inject('ITripRepository') private tripService: ITripService,
-        @inject('IPersonTripService') private personTripService: IPersonTripService
+        @inject('IPersonTripRepository') private personTripRepository: IPersonTripRepository
     ) { }
 
     // Checks if a person with the given userName exists in the database.
@@ -89,7 +89,7 @@ export default class PersonService implements IPersonService {
                 if (tripId) {
 
                     // Check person and trip is already mapped
-                    let isExist = await this.personTripService.isPersonAndTripExist(person.userName, tripId);
+                    let isExist = await this.personTripRepository.isPersonAndTripExist(person.userName, tripId);
 
                     if (!isExist) {
                         // Add tripId to array of id list for person trip mapping
@@ -100,7 +100,7 @@ export default class PersonService implements IPersonService {
 
             if (mapItems && mapItems.length > 0) {
                 // Add or update trips and map the person trips
-                await this.personTripService.addPersonTrips(person.userName, mapItems, dbSession);
+                await this.personTripRepository.mapPersonsAndTrips(mapItems, dbSession);
             }
         }
 
@@ -158,7 +158,7 @@ export default class PersonService implements IPersonService {
 
                 if (tripId) {
                     // Check if the person and trip are already mapped
-                    let isExist = await this.personTripService.isPersonAndTripExist(person.userName, tripId);
+                    let isExist = await this.personTripRepository.isPersonAndTripExist(person.userName, tripId);
                     if (!isExist) {
                         // Add tripId to the list for person trip mapping
                         mapItems.push({ userName: person.userName, tripId });
@@ -168,7 +168,7 @@ export default class PersonService implements IPersonService {
 
             if (mapItems && mapItems.length > 0) {
                 // Map the trips to the person
-                await this.personTripService.addPersonTrips(person.userName, mapItems, dbSession);
+                await this.personTripRepository.mapPersonsAndTrips(mapItems, dbSession);
             }
         }
 
@@ -245,7 +245,7 @@ export default class PersonService implements IPersonService {
         let results: boolean = await this.personRepository.deletePerson(userName, dbSession);
 
         // delete all person trips from the database
-        await this.personTripService.deleteAllPersonTrips(userName, dbSession);
+        await this.personTripRepository.deleteAllPersonTrips(userName, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {
