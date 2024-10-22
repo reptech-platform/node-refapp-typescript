@@ -5,6 +5,8 @@ import IAirlineStaffService from "../airlinestaff.interface";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
 import IAirlineStaffRepository from "../../repositories/airlinestaff.repository";
+import IPersonRepository from "../../repositories/person.repository";
+import IAirlineRepository from "../../repositories/airline.repository";
 
 // This decorator ensures that AirlineStaffsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @injectable()
@@ -12,7 +14,9 @@ export default class AirlineStaffService implements IAirlineStaffService {
 
     // Injecting the Helper, PersonsService and TripService services
     constructor(
-        @inject("IAirlineStaffRepository") private airlineStaffRepository: IAirlineStaffRepository
+        @inject("IAirlineStaffRepository") private airlineStaffRepository: IAirlineStaffRepository,
+        @inject("IPersonRepository") private personRepository: IPersonRepository,
+        @inject("IAirlineRepository") private airlineRepository: IAirlineRepository
     ) { }
 
     // This method checks if a person with the given userName is associated with a airline with the given airlineCode.
@@ -41,7 +45,7 @@ export default class AirlineStaffService implements IAirlineStaffService {
             inCarryTransact = true;
         }
 
-        /* if (persons && persons.length > 0) {
+        if (persons && persons.length > 0) {
             // Loop Check if the persons already exists in the database using its userName
             for (let index = 0; index < persons.length; index++) {
 
@@ -49,14 +53,14 @@ export default class AirlineStaffService implements IAirlineStaffService {
                 let currentPerson = persons[index];
 
                 // Check the person is exist in the database
-                let isExist = await this.personsService.isPersonExist(currentPerson.userName);
+                let isExist = await this.personRepository.isPersonExist(currentPerson.userName);
 
                 if (!isExist) {
                     // If the person does not exist, create a new person entry in the database
-                    currentPerson = await this.personsService.createPerson(currentPerson);
+                    currentPerson = await this.personRepository.createPerson(currentPerson, dbSession);
                 } else {
                     // If the person exist, update person entry in the database
-                    await this.personsService.updatePerson(currentPerson.userName, currentPerson);
+                    await this.personRepository.updatePerson(currentPerson.userName, currentPerson, dbSession);
                 }
 
                 // Check airline and person is already mapped
@@ -67,7 +71,7 @@ export default class AirlineStaffService implements IAirlineStaffService {
                     mapItems.push({ airlineCode, userName: currentPerson.userName });
                 }
             }
-        } */
+        }
 
         await this.airlineStaffRepository.addOrUpadateAirlineStaffs(mapItems, dbSession);
 
@@ -143,7 +147,7 @@ export default class AirlineStaffService implements IAirlineStaffService {
             inCarryTransact = true;
         }
 
-        /* if (airlines && airlines.length > 0) {
+        if (airlines && airlines.length > 0) {
             // Loop Check if the travellers are already exists in the database using its tripId
             for (let index = 0; index < airlines.length; index++) {
 
@@ -151,14 +155,14 @@ export default class AirlineStaffService implements IAirlineStaffService {
                 let currentAirline = airlines[index];
 
                 // Check the traveller is exist in the database
-                let isExist = await this.airlinesService.isAirlineExist(currentAirline.airlineCode);
+                let isExist = await this.airlineRepository.isAirlineExist(currentAirline.airlineCode);
 
                 if (!isExist) {
                     // If the traveller does not exist, create a new traveller entry in the database
-                    currentAirline = await this.airlinesService.createAirline(currentAirline);
+                    currentAirline = await this.airlineRepository.createAirline(currentAirline, dbSession);
                 } else {
                     // If the trip exist, update trip entry in the database
-                    await this.airlinesService.updateAirline(currentAirline.airlineCode, currentAirline);
+                    await this.airlineRepository.updateAirline(currentAirline.airlineCode, currentAirline, dbSession);
                 }
 
                 // Check person and trip is already mapped
@@ -169,7 +173,7 @@ export default class AirlineStaffService implements IAirlineStaffService {
                     mapItems.push({ airlineCode: currentAirline.airlineCode, userName });
                 }
             }
-        } */
+        }
 
         await this.airlineStaffRepository.addOrUpdateStaffAirlines(mapItems, dbSession);
 
