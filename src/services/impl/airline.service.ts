@@ -5,11 +5,10 @@ import RequestResponse from "../../utils/request.response";
 import Helper from "../../utils/helper.utils";
 import { inject, injectable } from "inversify";
 import IAirlineService from "../airline.interface";
-import IAirportService from "../airport.interface";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
 import IAirlineRepository from "../../repositories/airline.repository";
-import { iocContainer } from "../../ioc";
+import IAirportRepository from "../../repositories/airport.repository";
 
 // This decorator ensures that AirlinesService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @injectable()
@@ -18,7 +17,9 @@ export default class AirlineService implements IAirlineService {
     // Injecting the Helper and AirportsService service
     constructor(
         @inject(Helper) private helper: Helper,
-        @inject("IAirlineRepository") private airlineRepository: IAirlineRepository) {
+        @inject("IAirlineRepository") private airlineRepository: IAirlineRepository,
+        @inject('IAirportRepository') private airportRepository: IAirportRepository
+    ) {
     }
 
     // Method to check if an airline exists by its code
@@ -76,18 +77,18 @@ export default class AirlineService implements IAirlineService {
 
         if (airport) {
             // Check if the airport already exists in the database using its icaoCode and  iataCode
-            const isExist = await this.airportService().isAirportExist(airport.icaoCode, airport.iataCode);
+            const isExist = await this.airportRepository.isAirportExist(airport.icaoCode, airport.iataCode);
 
             // If the airport does not exist, create a new airport entry in the database
             if (!isExist) {
                 // Create the airport and assign it to the airline object
-                airport = await this.airportService().createAirport(airport, dbSession);
+                airport = await this.airportRepository.createAirport(airport, dbSession);
 
                 // map airport id to airline airportid
                 airline.airportId = airport['_id'];
             } else {
                 // Retrieve the airport using the icaoCode and iataCode and assign it to the airline object
-                airline.airportId = await this.airportService().getAirportId(airport.icaoCode, airport.iataCode);
+                airline.airportId = await this.airportRepository.getAirportId(airport.icaoCode, airport.iataCode);
             }
         }
 
@@ -121,7 +122,7 @@ export default class AirlineService implements IAirlineService {
 
         if (airport) {
             // Check if the airport already exists in the database using its icaoCode and  iataCode
-            const isExist = await this.airportService().isAirportExist(airport.icaoCode, airport.iataCode);
+            const isExist = await this.airportRepository.isAirportExist(airport.icaoCode, airport.iataCode);
 
             // If the airport does not exist, throw error message
             if (!isExist) {
@@ -133,10 +134,10 @@ export default class AirlineService implements IAirlineService {
             }
 
             // Retrieve the airport ID using the icaoCode and  iataCode and assign it to the airline object
-            airline.airportId = await this.airportService().getAirportId(airport.icaoCode, airport.iataCode);
+            airline.airportId = await this.airportRepository.getAirportId(airport.icaoCode, airport.iataCode);
 
             // Update airport object using the icaoCode and  iataCode in the database
-            await this.airportService().updateAirport(airport.icaoCode, airport.iataCode, airport, dbSession);
+            await this.airportRepository.updateAirport(airport.icaoCode, airport.iataCode, airport, dbSession);
         }
 
         const results: IAirline | RequestResponse = await this.airlineRepository.updateAirline(airlineCode, airline, dbSession);
@@ -170,7 +171,7 @@ export default class AirlineService implements IAirlineService {
         // Check if the airportId exists in the database using its airportId
         if (!this.helper.IsNullValue(airportId)) {
             // Delete airport in the database using airport id
-            await this.airportService().deleteAirportById(airportId, dbSession);
+            await this.airportRepository.deleteAirportById(airportId, dbSession);
         }
 
         const results: boolean = await this.airlineRepository.deleteAirline(airlineCode, dbSession);
@@ -220,9 +221,5 @@ export default class AirlineService implements IAirlineService {
     // Counts the total number of airlines in the collection.
     public async getAirlineCount(): Promise<number> {
         return await this.airlineRepository.getAirlineCount();
-    }
-
-    private airportService(): IAirportService {
-        return iocContainer.get("IAirportService");
     }
 }
