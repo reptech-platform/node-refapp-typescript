@@ -34,11 +34,11 @@ export interface IPersonSchema extends Document {
     /**
      * Referencing the userName from Person collection
      */
-    bestFriend: String;
+    bestFriendId: String;
     /**
      * Referencing the userName from Person collection
      */
-    friends: [String];
+    friendsList: [String];
     /**
      * Embeded collection of array inside the collection
      */
@@ -71,11 +71,11 @@ export const PersonSchema: Schema = new Schema({
     /**
      * Referencing the userName from Person collection
      */
-    bestFriend: { type: String, default: null },
+    bestFriendId: { type: String, default: null },
     /**
      * Referencing the userName from Person collection
      */
-    friends: [String],
+    friendsList: [String],
     /**
      * Embeded collection of array inside the collection
      */
