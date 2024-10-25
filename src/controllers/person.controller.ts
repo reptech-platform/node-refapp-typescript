@@ -3,30 +3,40 @@ import RequestResponse from "../utils/request.response";
 import { provideSingleton, inject } from "../utils/provideSingleton";
 import { IPerson } from "../models/person.model";
 import { Search, SearchResults } from "../models/search.model";
-import { IDocument } from "../models/document.model";
-import IPersonService from "../services/person.interface";
+import IDeletePersonService from "../services/person/delete.person.service";
+import IGetPersonService from "../services/person/get.person.service";
+import IGetPersonsService from "../services/person/get.persons.service";
+import ICreatePersonService from "../services/person/post.person.service";
+import IUpdatePersonService from "../services/person/put.person.service";
+import ISearchPersonService from "../services/person/search.person.service";
 
 @Tags("Persons")
 @Route("persons")
 @provideSingleton(PersonController)
 export class PersonController extends Controller {
     constructor(
-        @inject("IPersonService") private personService: IPersonService,
+        @inject("IGetPersonService") private getPersonService: IGetPersonService,
+        @inject("IGetPersonsService") private getPersonsService: IGetPersonsService,
+        @inject("ICreatePersonService") private createPersonService: ICreatePersonService,
+        @inject("IUpdatePersonService") private updatePersonService: IUpdatePersonService,
+        @inject("IDeletePersonService") private deletePersonService: IDeletePersonService,
+        @inject("ISearchPersonService") private searchPersonService: ISearchPersonService
     ) {
         super();
     }
 
     /**
-     * Define a GET endpoint to get all persons
-     * @returns IPerson[] | RequestResponse
+     * Define a GET endpoint with the path parameter 'userName'
+     * @param userName
+     * @returns IPerson | RequestResponse
      */
-    @Get()
-    public async getPersons(): Promise<IPerson[] | RequestResponse> {
+    @Get("/:userName")
+    public async get(@Path() userName: string): Promise<IPerson | RequestResponse> {
 
         try {
 
-            // Await the result of the getAirlines method from the airlinesService
-            return await this.personService.getPersons();
+            // Await the result of the get method from the getPersonService
+            return await this.getPersonService.get(userName);
 
         } catch (ex: any) {
 
@@ -40,28 +50,16 @@ export class PersonController extends Controller {
     }
 
     /**
-     * Define a GET endpoint with the path parameter 'userName'
-     * @param userName
-     * @returns IPerson | RequestResponse
+     * Define a GET endpoint to get all persons
+     * @returns IPerson[] | RequestResponse
      */
-    @Get("/:userName")
-    public async getPerson(@Path() userName: string): Promise<IPerson | RequestResponse> {
+    @Get()
+    public async gets(): Promise<IPerson[] | RequestResponse> {
 
         try {
 
-            // Validated the provided userName is exist in the database or not
-            const isExist = await this.personService.isPersonExist(userName);
-
-            if (!isExist) {
-                // If no person is exist , set the HTTP status to 400 (Bad Request)
-                this.setStatus(400);
-
-                // Return an error response with the status and error message
-                return { status: 400, message: `Provided ${userName} person does not exist` };
-            }
-
-            // Await the result of the getPerson method from the personService
-            return await this.personService.getPerson(userName);
+            // Await the result of the gets method from the getPersonsService
+            return await this.getPersonsService.gets();
 
         } catch (ex: any) {
 
@@ -80,12 +78,12 @@ export class PersonController extends Controller {
      * @returns 
      */
     @Post()
-    public async createPerson(@Body() body: IPerson): Promise<RequestResponse> {
+    public async create(@Body() body: IPerson): Promise<RequestResponse> {
 
         try {
 
-            // Await the result of the createPerson method from the personService
-            await this.personService.createPerson(body, undefined);
+            // Await the result of the create method from the createPersonService
+            await this.createPersonService.create(body, undefined);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);
@@ -112,23 +110,12 @@ export class PersonController extends Controller {
      * @returns RequestResponse
      */
     @Put("/:userName")
-    public async updatePerson(@Path() userName: string, @Body() body: IPerson): Promise<RequestResponse> {
+    public async update(@Path() userName: string, @Body() body: IPerson): Promise<RequestResponse> {
 
         try {
 
-            // Validated the provided userName is exist in the database or not
-            const isExist = await this.personService.isPersonExist(userName);
-
-            if (!isExist) {
-                // If no person is exist , set the HTTP status to 400 (Bad Request)
-                this.setStatus(400);
-
-                // Return an error response with the status and error message
-                return { status: 400, message: `Provided ${userName} person does not exist` };
-            }
-
-            // Await the result of the updatePerson method from the personService
-            await this.personService.updatePerson(userName, body, undefined);
+            // Await the result of the update method from the updatePersonService
+            await this.updatePersonService.update(userName, body, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Updated person ${userName} successfuly.` };
@@ -150,105 +137,15 @@ export class PersonController extends Controller {
      * @returns RequestResponse
      */
     @Delete("/:userName")
-    public async deletePerson(@Path() userName: string): Promise<RequestResponse> {
+    public async delete(@Path() userName: string): Promise<RequestResponse> {
 
         try {
 
-            // Validated the provided userName is exist in the database or not
-            const isExist = await this.personService.isPersonExist(userName);
-
-            if (!isExist) {
-                // If no person is exist , set the HTTP status to 400 (Bad Request)
-                this.setStatus(400);
-
-                // Return an error response with the status and error message
-                return { status: 400, message: `Provided ${userName} person does not exist` };
-            }
-
-            // Await the result of the getAirlines method from the airlinesService
-            await this.personService.deletePerson(userName, undefined);
+            // Await the result of the delete method from the deletePersonService
+            await this.deletePersonService.delete(userName, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Deleted person ${userName} successfuly.` };
-
-        } catch (ex: any) {
-
-            // If an error occurs, set the HTTP status to 400 (Bad Request)
-            this.setStatus(400);
-
-            // Return an error response with the status and error message
-            return { status: 400, message: ex.message };
-
-        }
-    }
-
-    /**
-     * Define a POST endpoint to add persons's documents
-     * @param userName 
-     * @param body 
-     * @returns RequestResponse
-     */
-    @Post("/:userName/document")
-    public async updatePersonDocument(@Path() userName: string, @Body() body: IDocument[]): Promise<RequestResponse> {
-
-        try {
-
-            // Await the result of the getAirlines method from the airlinesService
-            await this.personService.updatePersonDocument(userName, body, undefined);
-
-            // Return an success response with the status and status message
-            return { status: 200, message: `Updated ${userName} person documents successfuly.` };
-
-        } catch (ex: any) {
-
-            // If an error occurs, set the HTTP status to 400 (Bad Request)
-            this.setStatus(400);
-
-            // Return an error response with the status and error message
-            return { status: 400, message: ex.message };
-
-        }
-    }
-
-    /**
-     * Define a DELETE endpoint to delete persons's documents
-     * @param userName 
-     * @param body 
-     * @returns RequestResponse
-     */
-    @Delete("/:userName/document/:docId")
-    public async deletePersonDocument(@Path() userName: string, @Path() docId: number): Promise<RequestResponse> {
-
-        try {
-
-            // Await the result of the getAirlines method from the airlinesService
-            await this.personService.deletePersonDocument(userName, docId, undefined);
-
-            // Return an success response with the status and status message
-            return { status: 200, message: `Deleted ${userName} person documents successfuly.` };
-
-        } catch (ex: any) {
-
-            // If an error occurs, set the HTTP status to 400 (Bad Request)
-            this.setStatus(400);
-
-            // Return an error response with the status and error message
-            return { status: 400, message: ex.message };
-
-        }
-    }
-
-    /**
-     * Define a GET endpoint to get persons count
-     * @returns number | RequestResponse
-     */
-    @Get("/records/count")
-    public async getPersonCount(): Promise<number | RequestResponse> {
-
-        try {
-
-            // Await the result of the getPersonCount method from the personService
-            return await this.personService.getPersonCount();
 
         } catch (ex: any) {
 
@@ -267,12 +164,12 @@ export class PersonController extends Controller {
      * @returns number | RequestResponse
      */
     @Post("/search/count")
-    public async searchPersonCount(@Body() body: Search): Promise<number | RequestResponse> {
+    public async searchCount(@Body() body: Search): Promise<number | RequestResponse> {
 
         try {
 
-            // Await the result of the searchPersonCount method from the personService
-            return await this.personService.searchPersonCount(body);
+            // Await the result of the searchCount method from the searchPersonService
+            return await this.searchPersonService.searchCount(body);
 
         } catch (ex: any) {
 
@@ -292,12 +189,12 @@ export class PersonController extends Controller {
      * @returns SearchResults | RequestResponse
      */
     @Post("/search")
-    public async searchPerson(@Body() body: Search): Promise<SearchResults | RequestResponse> {
+    public async search(@Body() body: Search): Promise<SearchResults | RequestResponse> {
 
         try {
 
-            // Await the result of the searchPerson method from the personService
-            return await this.personService.searchPerson(body);
+            // Await the result of the search method from the searchPersonService
+            return await this.searchPersonService.search(body);
 
         } catch (ex: any) {
 
