@@ -48,7 +48,7 @@ export interface IPersonSchema extends Document {
 /**
  * Schema defination to store the document
  */
-const PersonSchema: Schema = new Schema({
+export const PersonSchema: Schema = new Schema({
     userName: { type: String },
     firstName: { type: String, default: null },
     middleName: { type: String, default: null },
@@ -83,11 +83,6 @@ const PersonSchema: Schema = new Schema({
 }, {
     timestamps: true,
 });
-
-/**
- * Defining combination key with multiple fields
- */
-PersonSchema.index({ userName: 1 }, { unique: true });
 
 /**
  * Setting function to onvert $numberDecimal to actual decimal values

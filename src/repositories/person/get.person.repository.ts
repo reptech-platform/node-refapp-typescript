@@ -16,7 +16,7 @@ export default interface IGetPersonRepository {
     getFriends(userName: string): Promise<IPerson[]>;
 
     // Checks if a person with the given userName exists in the database.
-    isPersonExist(userName: string): Promise<boolean>;
+    isExist(userName: string): Promise<boolean>;
 }
 
 // This decorator ensures that GetPersonRepository is a singleton,
@@ -27,7 +27,7 @@ export class GetPersonRepository implements IGetPersonRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Checks if a person with the given userName exists in the database.
-    public async isPersonExist(userName: string): Promise<boolean> {
+    public async isExist(userName: string): Promise<boolean> {
         return await PersonSchema.find({ userName }, { _id: 1 })
             .then((data: any[]) => {
                 // Uses the helper to process the array of persons.

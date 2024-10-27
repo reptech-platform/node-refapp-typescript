@@ -20,12 +20,12 @@ export class PersonCreateController extends Controller {
      * @returns 
      */
     @Post()
-    public async create(@Body() body: IPerson): Promise<RequestResponse> {
+    public async createPerson(@Body() body: IPerson): Promise<RequestResponse> {
 
         try {
 
             // Await the result of the create method from the createPersonService
-            await this.createPersonService.create(body, undefined);
+            await this.createPersonService.createPerson(body, undefined);
 
             // set the HTTP status to 201 (Created)
             this.setStatus(201);

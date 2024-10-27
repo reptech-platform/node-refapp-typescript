@@ -7,10 +7,10 @@ import { injectable, inject } from "inversify";
 // Interface for UpdatePersonRepository
 export default interface IUpdatePersonRepository {
     // Updates an existing person by their userName and returns the updated person.
-    update(userName: string, person: any, session: ClientSession | undefined): Promise<IPerson>;
+    updatePerson(userName: string, person: any, session: ClientSession | undefined): Promise<IPerson>;
 
     // Checks if a person with the given userName exists in the database.
-    isPersonExist(userName: string): Promise<boolean>;
+    isExist(userName: string): Promise<boolean>;
 }
 
 // This decorator ensures that UpdatePersonRepository is a singleton,
@@ -21,7 +21,7 @@ export class UpdatePersonRepository implements IUpdatePersonRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Checks if a person with the given userName exists in the database.
-    public async isPersonExist(userName: string): Promise<boolean> {
+    public async isExist(userName: string): Promise<boolean> {
         return await PersonSchema.find({ userName }, { _id: 1 })
             .then((data: any[]) => {
                 // Uses the helper to process the array of persons.
@@ -37,7 +37,7 @@ export class UpdatePersonRepository implements IUpdatePersonRepository {
     }
 
     // Updates an existing person by their userName and returns the updated person.
-    public async update(userName: string, person: any, session: ClientSession | undefined): Promise<IPerson> {
+    public async updatePerson(userName: string, person: any, session: ClientSession | undefined): Promise<IPerson> {
         // Update person details in the database
         let updatedPerson = await PersonSchema.findOneAndUpdate({ userName }, person, { new: true, session })
             .then((data: any) => {

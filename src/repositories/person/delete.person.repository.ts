@@ -6,10 +6,10 @@ import Helper from "../../utils/helper.utils";
 // Interface for DeletePersonRepository
 export default interface IDeletePersonRepository {
     // Deletes a person by their userName.
-    delete(userName: string, session: ClientSession | undefined): Promise<boolean>;
+    deletePerson(userName: string, session: ClientSession | undefined): Promise<boolean>;
 
     // Checks if a person with the given userName exists in the database.
-    isPersonExist(userName: string): Promise<boolean>;
+    isExist(userName: string): Promise<boolean>;
 }
 
 // This decorator ensures that DeletePersonRepository is a singleton,
@@ -21,7 +21,7 @@ export class DeletePersonRepository implements IDeletePersonRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Checks if a person with the given userName exists in the database.
-    public async isPersonExist(userName: string): Promise<boolean> {
+    public async isExist(userName: string): Promise<boolean> {
         return await PersonSchema.find({ userName }, { _id: 1 })
             .then((data: any[]) => {
                 // Uses the helper to process the array of persons.
@@ -37,7 +37,7 @@ export class DeletePersonRepository implements IDeletePersonRepository {
     }
 
     // Deletes a person by their userName.
-    public async delete(userName: string, session: ClientSession | undefined): Promise<boolean> {
+    public async deletePerson(userName: string, session: ClientSession | undefined): Promise<boolean> {
         // Use findOneAndDelete to find and delete the person by userName
         let boolDeleted: boolean = await PersonSchema.findOneAndDelete({ userName }, { session })
             .then(() => {

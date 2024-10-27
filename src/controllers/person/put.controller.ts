@@ -21,12 +21,12 @@ export class PersonUpdateController extends Controller {
      * @returns RequestResponse
      */
     @Put("/:userName")
-    public async update(@Path() userName: string, @Body() body: IPerson): Promise<RequestResponse> {
+    public async updatePerson(@Path() userName: string, @Body() body: IPerson): Promise<RequestResponse> {
 
         try {
 
             // Await the result of the update method from the updatePersonService
-            await this.updatePersonService.update(userName, body, undefined);
+            await this.updatePersonService.updatePerson(userName, body, undefined);
 
             // Return an success response with the status and status message
             return { status: 200, message: `Updated person ${userName} successfuly.` };

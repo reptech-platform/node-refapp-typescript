@@ -8,7 +8,7 @@ import IUpdatePersonRepository from "../../repositories/person/put.person.reposi
 // Interface for UpdatePersonService
 export default interface IUpdatePersonService {
     // Updates an existing person by their userName and returns the updated person.
-    update(userName: string, person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson>;
+    updatePerson(userName: string, person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson>;
 }
 
 // This decorator ensures that UpdatePersonService is a singleton,
@@ -21,16 +21,16 @@ export class UpdatePersonService implements IUpdatePersonService {
     ) { }
 
     // Updates an existing person by their userName and returns the updated person.
-    public async update(userName: string, person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson> {
+    public async updatePerson(userName: string, person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson> {
         // Check if the person exists. If not, throw an error.
-        let isExist = await this.isPersonExist(userName);
+        let isExist = await this.updatePersonRepository.isExist(userName);
         if (!isExist) {
             throw new Error(`Provided '${userName}' person does not exist`);
         }
 
         // Check if best friend object is not null
         if (person.bestFriendId) {
-            isExist = await this.isPersonExist(person.bestFriendId);
+            isExist = await this.updatePersonRepository.isExist(person.bestFriendId);
             if (!isExist) {
                 throw new Error(`Provided '${person.bestFriendId}' best friend does not exist`);
             }
@@ -41,7 +41,7 @@ export class UpdatePersonService implements IUpdatePersonService {
             // Loop to check if each friend already exists in the database using their userName
             for (let index = 0; index < person.friendsList.length; index++) {
                 let friend = person.friendsList[index];
-                isExist = await this.isPersonExist(friend);
+                isExist = await this.updatePersonRepository.isExist(friend);
                 if (!isExist) {
                     throw new Error(`Provided '${person.bestFriendId}' friend does not exist`);
                 }
@@ -60,7 +60,7 @@ export class UpdatePersonService implements IUpdatePersonService {
         }
 
         // Update the person entry in the database
-        let updatedPerson = await this.updatePersonRepository.update(userName, person, dbSession);
+        let updatedPerson = await this.updatePersonRepository.updatePerson(userName, person, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {
@@ -69,10 +69,5 @@ export class UpdatePersonService implements IUpdatePersonService {
 
         // Return the updated person object
         return updatedPerson;
-    }
-
-    // Checks if a person with the given userName exists in the database.
-    private async isPersonExist(userName: string): Promise<boolean> {
-        return await this.updatePersonRepository.isPersonExist(userName);
     }
 }

@@ -5,7 +5,7 @@ import IDeletePersonRepository from "../../repositories/person/delete.person.rep
 
 export default interface IDeletePersonService {
     // Deletes a person by their userName.
-    delete(userName: string, dbSession: ClientSession | undefined): Promise<boolean>;
+    deletePerson(userName: string, dbSession: ClientSession | undefined): Promise<boolean>;
 }
 
 // This decorator ensures that PersonsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
@@ -18,10 +18,10 @@ export class DeletePersonService implements IDeletePersonService {
     ) { }
 
     // Deletes a person by their userName.
-    public async delete(userName: string, dbSession: ClientSession | undefined): Promise<boolean> {
+    public async deletePerson(userName: string, dbSession: ClientSession | undefined): Promise<boolean> {
 
         // Check if the person exists. If not, throw an error.
-        let isExist = await this.deletePersonRepository.isPersonExist(userName);
+        let isExist = await this.deletePersonRepository.isExist(userName);
         if (!isExist) {
             throw new Error(`Provided '${userName}' person does not exist`);
         }
@@ -37,7 +37,7 @@ export class DeletePersonService implements IDeletePersonService {
             inCarryTransact = true;
         }
 
-        let results: boolean = await this.deletePersonRepository.delete(userName, dbSession);
+        let results: boolean = await this.deletePersonRepository.deletePerson(userName, dbSession);
 
         // delete all person trips from the database
         // await this.personTripRepository.deleteAllPersonTrips(userName, dbSession);

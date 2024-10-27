@@ -8,10 +8,10 @@ import DbSession from "../../db/utils/dbsession.db";
 // Interface for CreatePersonRepository
 export default interface ICreatePersonRepository {
     // Creates a new person in the database.
-    create(person: IPerson, session: ClientSession | undefined): Promise<IPerson>;
+    createPerson(person: IPerson, session: ClientSession | undefined): Promise<IPerson>;
 
     // Checks if a person with the given userName exists in the database.
-    isPersonExist(userName: String): Promise<boolean>;
+    isExist(userName: String): Promise<boolean>;
 }
 
 // This decorator ensures that CreatePersonRepository is a singleton,
@@ -22,7 +22,7 @@ export class CreatePersonRepository implements ICreatePersonRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Checks if a person with the given userName exists in the database.
-    public async isPersonExist(userName: String): Promise<boolean> {
+    public async isExist(userName: String): Promise<boolean> {
         return await PersonSchema.find({ userName }, { _id: 1 })
             .then((data: any[]) => {
                 // Uses the helper to process the array of persons.
@@ -38,7 +38,7 @@ export class CreatePersonRepository implements ICreatePersonRepository {
     }
 
     // Creates a new person in the database.
-    public async create(person: IPerson, session: ClientSession | undefined): Promise<IPerson> {
+    public async createPerson(person: IPerson, session: ClientSession | undefined): Promise<IPerson> {
         // Create new person entry in the database
         let newPerson = await PersonSchema.create([person], { session })
             .then((data: any) => {

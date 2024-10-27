@@ -24,7 +24,7 @@ export class GetPersonService implements IGetPersonService {
     // Gets a person by their userName
     public async getPerson(userName: string): Promise<IPerson> {
         // Check if the person exists. If not, throw an error.
-        let isExist = await this.getPersonRepository.isPersonExist(userName);
+        let isExist = await this.getPersonRepository.isExist(userName);
         if (!isExist) {
             throw new Error(`Provided '${userName}' person does not exist`);
         }
@@ -35,7 +35,7 @@ export class GetPersonService implements IGetPersonService {
     // Gets the best friend of a person by their userName
     public async getBestFriend(userName: string): Promise<IPerson> {
         // Check if the person exists. If not, throw an error.
-        let isExist = await this.getPersonRepository.isPersonExist(userName);
+        let isExist = await this.getPersonRepository.isExist(userName);
         if (!isExist) {
             throw new Error(`Provided '${userName}' person does not exist`);
         }
@@ -46,7 +46,7 @@ export class GetPersonService implements IGetPersonService {
     // Gets the friends of a person by their userName
     public async getFriends(userName: string): Promise<IPerson[]> {
         // Check if the person exists. If not, throw an error.
-        let isExist = await this.getPersonRepository.isPersonExist(userName);
+        let isExist = await this.getPersonRepository.isExist(userName);
         if (!isExist) {
             throw new Error(`Provided '${userName}' person does not exist`);
         }
