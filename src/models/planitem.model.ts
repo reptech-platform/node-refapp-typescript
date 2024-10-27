@@ -16,7 +16,7 @@ export interface IPlanItem extends PublicTransport {
     fromAirport?: IAirport;
 
     // Optional departure airport for the plan item, represented by the IAirport interface
-    fromAirportId?: String;
+    fromAirportId?: string;
 
     // Optional arrival airport for the plan item, represented by the IAirport interface
     toAirport?: IAirport;
@@ -41,7 +41,7 @@ export class PlanItem extends PublicTransport {
     fromAirport?: IAirport;
 
     // Optional departure airport for the plan item, represented by the IAirport interface
-    fromAirportId?: String;
+    fromAirportId?: string;
 
     // Optional arrival airport for the plan item, represented by the IAirport interface
     toAirport?: IAirport;

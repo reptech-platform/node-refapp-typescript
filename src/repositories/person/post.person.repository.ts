@@ -11,7 +11,7 @@ export default interface ICreatePersonRepository {
     create(person: IPerson, session: ClientSession | undefined): Promise<IPerson>;
 
     // Checks if a person with the given userName exists in the database.
-    isPersonExist(userName: string): Promise<boolean>;
+    isPersonExist(userName: String): Promise<boolean>;
 }
 
 // This decorator ensures that CreatePersonRepository is a singleton,
@@ -22,7 +22,7 @@ export class CreatePersonRepository implements ICreatePersonRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Checks if a person with the given userName exists in the database.
-    public async isPersonExist(userName: string): Promise<boolean> {
+    public async isPersonExist(userName: String): Promise<boolean> {
         return await PersonSchema.find({ userName }, { _id: 1 })
             .then((data: any[]) => {
                 // Uses the helper to process the array of persons.

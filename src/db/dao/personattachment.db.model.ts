@@ -11,15 +11,15 @@ export interface IPersonAttachmentSchema extends Document {
      * Auto increment docId
      */
     docId: Number,
-    docName: String;
-    docLocation: String;
-    docFileType: String;
+    docName: string;
+    docLocation: string;
+    docFileType: string;
 }
 
 /**
  * Schema defination to store the document
  */
-export const PersonAttachmentSchema: Schema = new Schema({
+const PersonAttachmentSchema: Schema = new Schema({
     /**
      * Auto increment id
      */
@@ -34,7 +34,7 @@ export const PersonAttachmentSchema: Schema = new Schema({
 /**
  * Define auto increment number
  */
-// PersonAttachmentSchema.plugin(AutoIncrement, { inc_field: 'docId' });
+PersonAttachmentSchema.plugin(AutoIncrement, { inc_field: 'docId' });
 
 /**
  * Setting function to onvert $numberDecimal to actual decimal values
@@ -44,4 +44,6 @@ new Helper().SetToJSON(PersonAttachmentSchema);
 /**
  * Export as default schema with assigning interface validation
  */
-// export default mongoose.model<IPersonAttachmentSchema>("PersonAttachment", PersonAttachmentSchema);
+// const schemaModal = mongoose.model<IPersonAttachmentSchema>("PersonAttachment", PersonAttachmentSchema);
+
+export default PersonAttachmentSchema;

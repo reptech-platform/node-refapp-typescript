@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from "mongoose";
 import DateOnlyFactory from "mongoose-dateonly";
-import { LocationSchema, ILocationSchema } from "./location.db.model";
+import LocationSchema, { ILocationSchema } from "./location.db.model";
 import Helper from "../../utils/helper.utils";
-import { PersonAttachmentSchema, IPersonAttachmentSchema } from "./personattachment.db.model";
+import PersonAttachmentSchema, { IPersonAttachmentSchema } from "./personattachment.db.model";
 
 const DateOnly = DateOnlyFactory(mongoose);
 
@@ -12,15 +12,15 @@ const helper = new Helper();
  * Interface to validate schema field construction
  */
 export interface IPersonSchema extends Document {
-    userName: String;
-    firstName: String;
-    middleName: String;
-    lastName: String;
+    userName: string;
+    firstName: string;
+    middleName: string;
+    lastName: string;
     income: Number;
     dateOfBirth: Date;
     gender: Number;
     age: Number,
-    emails: String[];
+    emails: string[];
     /**
      * Embeded collection of array inside the collection
      */
@@ -34,11 +34,11 @@ export interface IPersonSchema extends Document {
     /**
      * Referencing the userName from Person collection
      */
-    bestFriendId: String;
+    bestFriendId: string;
     /**
      * Referencing the userName from Person collection
      */
-    friendsList: [String];
+    friendsList: [string];
     /**
      * Embeded collection of array inside the collection
      */
@@ -48,7 +48,7 @@ export interface IPersonSchema extends Document {
 /**
  * Schema defination to store the document
  */
-export const PersonSchema: Schema = new Schema({
+const PersonSchema: Schema = new Schema({
     userName: { type: String },
     firstName: { type: String, default: null },
     middleName: { type: String, default: null },

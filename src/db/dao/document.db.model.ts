@@ -11,15 +11,15 @@ export interface IDocumentSchema extends Document {
      * Auto increment docId
      */
     docId: Number,
-    docName: String;
-    docLocation: String;
-    docFileType: String;
+    docName: string;
+    docLocation: string;
+    docFileType: string;
 }
 
 /**
  * Schema defination to store the document
  */
-export const DocumentSchema: Schema = new Schema({
+const DocumentSchema: Schema = new Schema({
     /**
      * Auto increment id
      */

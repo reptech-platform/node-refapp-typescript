@@ -38,16 +38,10 @@ export interface IPerson {
     personAttachments?: IDocument[];
 
     // Optional best friend of the person, represented by the IPerson interface
-    bestFriend?: IPerson;
-
-    // Optional best friend of the person, represented by the IPerson interface
-    bestFriendId?: String;
+    bestFriendId?: string;
 
     // Optional array of friends of the person, each represented by the IPerson interface
-    friends?: IPerson[];
-
-    // Optional array of friends of the person, each represented by the IPerson interface
-    friendsList?: String[];
+    friendsList?: string[];
 
     // Optional array of address information, each represented by the ILocation interface
     addressInfo?: ILocation[];
@@ -99,16 +93,10 @@ export class Person implements IPerson {
     personAttachments?: IDocument[];
 
     // Optional best friend of the person, represented by the IPerson interface
-    bestFriend?: IPerson;
-
-    // Optional best friend of the person, represented by the IPerson interface
-    bestFriendId?: String;
+    bestFriendId?: string;
 
     // Optional array of friends of the person, each represented by the IPerson interface
-    friends?: IPerson[];
-
-    // Optional array of friends of the person, each represented by the IPerson interface
-    friendsList?: String[];
+    friendsList?: string[];
 
     // Optional array of address information, each represented by the ILocation interface
     addressInfo?: ILocation[];

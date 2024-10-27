@@ -16,7 +16,7 @@ export interface IGeographicPointSchema extends Document {
 /**
  * Schema defination to store the document
  */
-export const GeographicPointSchema: Schema = new Schema({
+const GeographicPointSchema: Schema = new Schema({
     latitude: { type: Number, default: null },
     longitude: { type: Number, default: null }
 }, {
@@ -31,4 +31,9 @@ export const GeographicPointSchema: Schema = new Schema({
  */
 new Helper().SetToJSON(GeographicPointSchema);
 
-// export default mongoose.model<IGeographicPointSchema>("GeographicPoint", GeographicPointSchema);
+/**
+ * Export as default schema with assigning interface validation
+ */
+// const schemaModal = mongoose.model<IGeographicPointSchema>("GeographicPoint", GeographicPointSchema);
+
+export default GeographicPointSchema;

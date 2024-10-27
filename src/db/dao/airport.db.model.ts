@@ -1,18 +1,18 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import { IAirportLocationSchema, AirportLocationSchema } from "./airportlocation.db.model";
+import AirportLocationSchema, { IAirportLocationSchema } from "./airportlocation.db.model";
 
 /**
  * Interface to validate schema field construction
  */
 export interface IAirportSchema extends Document {
-    name: String;
-    icaoCode: String;
-    iataCode: String;
+    name: string;
+    icaoCode: string;
+    iataCode: string;
     latitude: Number;
     longitude: Number;
     isInsideCity: Boolean;
-    locationJSON: String;
+    locationJSON: string;
     /**
      * Embeded collection inside the collection
      */
@@ -20,13 +20,13 @@ export interface IAirportSchema extends Document {
     /**
      * Referencing the _id from Airline collection
      */
-    airlineId: String;
+    airlineId: string;
 }
 
 /**
  * Schema defination to store the document
  */
-export const AirportSchema: Schema = new Schema({
+const AirportSchema: Schema = new Schema({
     icaoCode: { type: String },
     iataCode: { type: String },
     name: { type: String, default: null },

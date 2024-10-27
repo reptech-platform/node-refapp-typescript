@@ -1,7 +1,7 @@
 import { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import { GeographicPointSchema, IGeographicPointSchema } from "./geographicpoint.db.model";
-import { CitySchema, ICitySchema } from "./city.db.model";
+import GeographicPointSchema, { IGeographicPointSchema } from "./geographicpoint.db.model";
+import CitySchema, { ICitySchema } from "./city.db.model";
 
 /**
  * Complex type collection
@@ -19,7 +19,7 @@ export interface IAirportLocationSchema extends Document {
     /**
      * Extended from complext type of Location model
      */
-    address: String;
+    address: string;
     /**
      * Embeded collection inside the collection extend from location model
      */
@@ -29,7 +29,7 @@ export interface IAirportLocationSchema extends Document {
 /**
  * Schema defination to store the document
  */
-export const AirportLocationSchema: Schema = new Schema({
+const AirportLocationSchema: Schema = new Schema({
     /**
      * Embeded collection inside the collection
      */
@@ -55,4 +55,9 @@ export const AirportLocationSchema: Schema = new Schema({
  */
 new Helper().SetToJSON(AirportLocationSchema);
 
-// export default mongoose.model<IAirportLocationSchema>("AirportLocation", AirportLocationSchema);
+/**
+ * Export as default schema with assigning interface validation
+ */
+// const schemaModal = mongoose.model<IAirportLocationSchema>("AirportLocation", AirportLocationSchema);
+
+export default AirportLocationSchema;

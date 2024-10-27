@@ -11,13 +11,13 @@ export interface IAirlineStaffSchema extends Document {
     /**
      * Referencing the airlineCode from airline collection
      */
-    airlineCode: String;
+    airlineCode: string;
 }
 
 /**
  * Schema defination to store the document
  */
-export const AirlineStaffSchema: Schema = new Schema({
+const AirlineStaffSchema: Schema = new Schema({
     /**
      * Referencing the userName from Person collection
      */
@@ -33,4 +33,6 @@ export const AirlineStaffSchema: Schema = new Schema({
 /**
  * Export as default schema with assigning interface validation
  */
-export default mongoose.model<IAirlineStaffSchema>("AirlineStaff", AirlineStaffSchema);
+const schemaModal = mongoose.model<IAirlineStaffSchema>("AirlineStaff", AirlineStaffSchema);
+
+export default schemaModal;

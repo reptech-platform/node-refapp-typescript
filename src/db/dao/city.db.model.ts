@@ -9,15 +9,15 @@ import Helper from "../../utils/helper.utils";
  * Interface to validate schema field construction
  */
 export interface ICitySchema extends Document {
-    name: String;
-    countryRegion: String;
-    region: String;
+    name: string;
+    countryRegion: string;
+    region: string;
 }
 
 /**
  * Schema defination to store the document
  */
-export const CitySchema: Schema = new Schema({
+const CitySchema: Schema = new Schema({
     name: { type: String, default: null },
     countryRegion: { type: String, default: null },
     region: { type: String, default: null }
@@ -33,4 +33,9 @@ export const CitySchema: Schema = new Schema({
  */
 new Helper().SetToJSON(CitySchema);
 
-// export default mongoose.model<ICitySchema>("City", CitySchema);
+/**
+ * Export as default schema with assigning interface validation
+ */
+// const schemaModal = mongoose.model<ICitySchema>("City", CitySchema);
+
+export default CitySchema;

@@ -17,7 +17,7 @@ export interface IPersonTripSchema extends Document {
 /**
  * Schema defination to store the document
  */
-export const PersonTripSchema: Schema = new Schema({
+const PersonTripSchema: Schema = new Schema({
     /**
      * Referencing the userName from Person collection
      */

@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import AutoIncrementFactory from "mongoose-sequence";
-import { AirlineSchema, IAirlineSchema } from "./airline.db.model";
-import { DocumentSchema, IDocumentSchema } from "./document.db.model";
+import AirlineSchema, { IAirlineSchema } from "./airline.db.model";
+import DocumentSchema, { IDocumentSchema } from "./document.db.model";
 
 const AutoIncrement = AutoIncrementFactory(mongoose);
 
@@ -10,16 +10,16 @@ const AutoIncrement = AutoIncrementFactory(mongoose);
  * Interface to validate schema field construction
  */
 export interface IPlanItemSchema extends Document {
-    flightNumber: String;
+    flightNumber: string;
     /**
      * Extended from complext public transport model
      */
-    seatNumber: String;
+    seatNumber: string;
     /**
      * Extended from complext base plan item model
      */
     planItemId: Number;
-    confirmationCode: String;
+    confirmationCode: string;
     startsAt: Date;
     endsAt: Date;
     duaration: Number;
@@ -30,11 +30,11 @@ export interface IPlanItemSchema extends Document {
     /**
      * Referencing the _id from Airport collection
      */
-    fromAirport: String;
+    fromAirport: string;
     /**
      * Referencing the _id from Airport collection
      */
-    toAirport: String;
+    toAirport: string;
 
     // Optional ticket document for the plan item, represented by the IDocument interface
     ticket?: IDocumentSchema;
@@ -43,7 +43,7 @@ export interface IPlanItemSchema extends Document {
 /**
  * Schema defination to store the document
  */
-export const PlanItemSchema: Schema = new Schema({
+const PlanItemSchema: Schema = new Schema({
     flightNumber: { type: String, default: null },
     /**
      * Extended from complext public transport model
@@ -91,4 +91,6 @@ new Helper().SetToJSON(PlanItemSchema);
  */
 PlanItemSchema.plugin(AutoIncrement, { inc_field: 'planItemId' });
 
-//export default mongoose.model<IPlanItemSchema>("PlanItem", PlanItemSchema);
+// const schemaModal = mongoose.model<IPlanItemSchema>("PlanItem", PlanItemSchema);
+
+export default PlanItemSchema;

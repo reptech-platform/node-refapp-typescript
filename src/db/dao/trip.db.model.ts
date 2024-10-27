@@ -1,17 +1,17 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import { PlanItemSchema, IPlanItemSchema } from "./planitem.db.model";
+import PlanItemSchema, { IPlanItemSchema } from "./planitem.db.model";
 
 /**
  * Interface to validate schema field construction
  */
 export interface ITripSchema extends Document {
     tripId: Number;
-    shareId: String,
-    name: String;
+    shareId: string,
+    name: string;
     budget: Number;
-    description: String;
-    tags: String[];
+    description: string;
+    tags: string[];
     startAt: Date;
     endsAt: Date;
     startTime: Date;
@@ -23,7 +23,7 @@ export interface ITripSchema extends Document {
 /**
  * Schema defination to store the document
  */
-export const TripSchema: Schema = new Schema({
+const TripSchema: Schema = new Schema({
     tripId: { type: Number },
     shareId: { type: mongoose.Types.UUID, default: new mongoose.Types.UUID() },
     name: { type: String, default: null },
@@ -89,8 +89,3 @@ async function getNextSequenceValue() {
 }
 
 export default schemaModal;
-
-/**
- * Export as default schema with assigning interface validation
- */
-//export default mongoose.model<ITripSchema>("Trip", TripSchema);

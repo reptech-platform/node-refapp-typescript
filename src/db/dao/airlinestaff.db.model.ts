@@ -11,13 +11,13 @@ export interface IAirlineStaffSchema extends Document {
     /**
      * Referencing the airline code from Airline collection
      */
-    airlineCode: String;
+    airlineCode: string;
 }
 
 /**
  * Schema defination to store the document
  */
-export const AirlineStaffSchema: Schema = new Schema({
+const AirlineStaffSchema: Schema = new Schema({
     /**
      * Referencing the userName from Person collection
      */

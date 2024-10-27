@@ -1,6 +1,6 @@
 import { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import { CitySchema, ICitySchema } from "./city.db.model";
+import CitySchema, { ICitySchema } from "./city.db.model";
 
 /**
  * Complex type collection
@@ -17,7 +17,7 @@ export interface ILocationSchema extends Document {
     city: ICitySchema;
 }
 
-export const LocationSchema: Schema = new Schema({
+const LocationSchema: Schema = new Schema({
     address: { type: String, default: null },
     /**
      * Embeded collection inside the collection
@@ -32,5 +32,9 @@ export const LocationSchema: Schema = new Schema({
  */
 new Helper().SetToJSON(LocationSchema);
 
+/**
+ * Export as default schema with assigning interface validation
+ */
+// const schemaModal = mongoose.model<ILocationSchema>("Location", LocationSchema);
 
-// export default mongoose.model<ILocationSchema>("Location", LocationSchema);
+export default LocationSchema;
