@@ -10,8 +10,8 @@ export default interface ICreateTripRepository {
     // Creates a new trip in the database.
     createTrip(trip: ITrip, session: ClientSession | undefined): Promise<ITrip>;
 
-    // Checks if a trip with the given tripId exists in the database.
-    isTripExist(tripId: number): Promise<boolean>;
+    // This method checks if a person with the given userName is associated with a trip with the given tripId.
+    isPersonAndTripExist(userName: string, tripId: number): Promise<boolean>;
 }
 
 // This decorator ensures that CreateTripRepository is a singleton,
@@ -21,13 +21,14 @@ export class CreateTripRepository implements ICreateTripRepository {
     // Injecting the Helper service
     constructor(@inject(Helper) private helper: Helper) { }
 
-    // Checks if a trip with the given tripId exists in the database.
-    public async isTripExist(tripId: number): Promise<boolean> {
-        return await TripSchema.find({ tripId }, { _id: 1 })
-            .then((data: ITripSchema[]) => {
-                // Uses the helper to process the array of trips.
+    // This method checks if a person with the given userName is associated with a trip with the given tripId.
+    public async isPersonAndTripExist(userName: string, tripId: number): Promise<boolean> {
+
+        return await PersonTripSchema.find({ userName, tripId }, { _id: 1 })
+            .then((data: any[]) => {
+                // Uses the helper to process the array of results.
                 let results = this.helper.GetItemFromArray(data, 0, { _id: null });
-                // Returns true if the trip exists, otherwise false.
+                // Returns true if the association exists, otherwise false.
                 if (!this.helper.IsNullValue(results._id)) return true;
                 return false;
             })

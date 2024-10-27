@@ -1,54 +1,41 @@
 import { injectable, inject } from "inversify";
 import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import TripSchema, { ITripSchema } from "../../db/dao/trip.db.model";
+import PersonTripSchema from "../../db/dao/persontrip.db.model";
 
-// Interface for DeleteTripRepository
-export default interface IDeleteTripRepository {
-    // Deletes a trip by its tripId.
-    deleteTrip(tripId: number, session: ClientSession | undefined): Promise<boolean>;
+// Interface for DeletePersonTripRepository
+export default interface IDeletePersonTripRepository {
+    // This method deletes a trip for a person.
+    deletePersonTrip(userName: string, tripId: number, session: ClientSession | undefined): Promise<void>;
 
-    // Checks if a trip with the given tripId exists in the database.
-    isTripExist(tripId: number): Promise<boolean>;
+    // This method checks if a person with the given userName is associated with a trip with the given tripId.
+    isPersonAndTripExist(userName: string, tripId: number): Promise<boolean>;
 }
 
-// This decorator ensures that DeleteTripRepository is a singleton,
+// This decorator ensures that DeletePersonTripRepository is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class DeleteTripRepository implements IDeleteTripRepository {
-
+export class DeletePersonTripRepository implements IDeletePersonTripRepository {
     // Injecting the Helper service
     constructor(@inject(Helper) private helper: Helper) { }
 
-    // Checks if a trip with the given tripId exists in the database.
-    public async isTripExist(tripId: number): Promise<boolean> {
-        return await TripSchema.find({ tripId }, { _id: 1 })
-            .then((data: ITripSchema[]) => {
-                // Uses the helper to process the array of trips.
+    // This method checks if a person with the given userName is associated with a trip with the given tripId.
+    public async isPersonAndTripExist(userName: string, tripId: number): Promise<boolean> {
+        return await PersonTripSchema.find({ userName, tripId }, { _id: 1 })
+            .then((data: any[]) => {
                 let results = this.helper.GetItemFromArray(data, 0, { _id: null });
-                // Returns true if the trip exists, otherwise false.
-                if (!this.helper.IsNullValue(results._id)) return true;
-                return false;
+                // Returns true if the association exists, otherwise false.
+                return !this.helper.IsNullValue(results._id);
             })
             .catch((error: Error) => {
-                // Throws an error if the operation fails.
                 throw error;
             });
     }
 
-    // Deletes a trip by its tripId.
-    public async deleteTrip(tripId: number, session: ClientSession | undefined): Promise<boolean> {
-
-        let boolDeleted: boolean = await TripSchema.findOneAndDelete({ tripId }, { session })
-            .then(() => {
-                // Returns true if the deletion is successful.
-                return true;
-            })
-            .catch((error: Error) => {
-                // Throws an error if the operation fails.
-                throw error;
-            });
-
-        return boolDeleted;
+    // This method deletes a trip for a person.
+    public async deletePersonTrip(userName: string, tripId: number, session: ClientSession | undefined): Promise<void> {
+        await PersonTripSchema.deleteOne({ userName, tripId }, { session }).catch((error: Error) => {
+            throw error;
+        });
     }
 }
