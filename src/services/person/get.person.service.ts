@@ -2,30 +2,55 @@ import { IPerson } from "../../models/person.model";
 import { inject, injectable } from "inversify";
 import IGetPersonRepository from "../../repositories/person/get.person.repository";
 
+// Interface for GetPersonService
 export default interface IGetPersonService {
-    // Fetches a single person by their userName, excluding the _id field.
-    get(userName: string): Promise<IPerson>;
+    // Gets a person by their userName
+    getPerson(userName: string): Promise<IPerson>;
+    // Gets the best friend of a person by their userName
+    getBestFriend(userName: string): Promise<IPerson>;
+    // Gets the friends of a person by their userName
+    getFriends(userName: string): Promise<IPerson[]>;
 }
 
-// This decorator ensures that PersonsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
+// This decorator ensures that GetPersonService is a singleton,
+// meaning only one instance of this service will be created and used throughout the application.
 @injectable()
 export class GetPersonService implements IGetPersonService {
-
-    // Injecting the Helper service
+    // Injecting the GetPersonRepository service
     constructor(
         @inject("IGetPersonRepository") private getPersonRepository: IGetPersonRepository
     ) { }
 
-    // Fetches a single person by their userName, excluding the _id field.
-    public async get(userName: string): Promise<IPerson> {
-
-        // Check if the person exists. If they do, throw an error.
+    // Gets a person by their userName
+    public async getPerson(userName: string): Promise<IPerson> {
+        // Check if the person exists. If not, throw an error.
         let isExist = await this.getPersonRepository.isPersonExist(userName);
         if (!isExist) {
             throw new Error(`Provided '${userName}' person does not exist`);
         }
-
-        return await this.getPersonRepository.get(userName);
+        // Retrieve and return the person's information
+        return await this.getPersonRepository.getPerson(userName);
     }
 
+    // Gets the best friend of a person by their userName
+    public async getBestFriend(userName: string): Promise<IPerson> {
+        // Check if the person exists. If not, throw an error.
+        let isExist = await this.getPersonRepository.isPersonExist(userName);
+        if (!isExist) {
+            throw new Error(`Provided '${userName}' person does not exist`);
+        }
+        // Retrieve and return the best friend's information
+        return await this.getPersonRepository.getBestFriend(userName);
+    }
+
+    // Gets the friends of a person by their userName
+    public async getFriends(userName: string): Promise<IPerson[]> {
+        // Check if the person exists. If not, throw an error.
+        let isExist = await this.getPersonRepository.isPersonExist(userName);
+        if (!isExist) {
+            throw new Error(`Provided '${userName}' person does not exist`);
+        }
+        // Retrieve and return the friends' information
+        return await this.getPersonRepository.getFriends(userName);
+    }
 }

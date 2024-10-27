@@ -7,7 +7,13 @@ import { injectable, inject } from "inversify";
 // Interface for GetPersonRepository
 export default interface IGetPersonRepository {
     // Fetches a single person by their userName, excluding the userName field.
-    get(userName: string): Promise<IPerson>;
+    getPerson(userName: string): Promise<IPerson>;
+
+    // Fetches a best friend of a person by their userName, excluding the userName field.
+    getBestFriend(userName: string): Promise<IPerson>;
+
+    // Fetches a single person by their userName, excluding the userName field.
+    getFriends(userName: string): Promise<IPerson[]>;
 
     // Checks if a person with the given userName exists in the database.
     isPersonExist(userName: string): Promise<boolean>;
@@ -37,12 +43,95 @@ export class GetPersonRepository implements IGetPersonRepository {
     }
 
     // Fetches a single person by their userName, excluding the userName field.
-    public async get(userName: string): Promise<IPerson> {
+    public async getPerson(userName: string): Promise<IPerson> {
         return await PersonSchema.find({ userName }, { _id: 0 })
             .then((data: IPersonSchema[]) => {
                 // Uses the helper to process the person.
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 return results as IPerson;
+            })
+            .catch((error: Error) => {
+                // Throws an error if the operation fails.
+                throw error;
+            });
+    }
+
+    // Fetches a best friend of a person by their userName, excluding the userName field.
+    public async getBestFriend(userName: string): Promise<IPerson> {
+
+        let $pipeline = [
+            { $match: { userName } },
+            {
+                $lookup: {
+                    from: "persons", localField: "bestFriendId", foreignField: "userName", as: "bestFriend",
+                    pipeline: [
+                        {
+                            $project: {
+                                __v: 0,
+                                _id: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$bestFriend", preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 0,
+                    "bestFriend": 1
+                }
+            }
+        ];
+
+        return await PersonSchema.aggregate($pipeline)
+            .then((data: IPersonSchema[]) => {
+                // Uses the helper to process the person.
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                if (!this.helper.IsJsonNull(results)) {
+                    results = results['bestFriend'] || {};
+                }
+                return results as IPerson;
+            })
+            .catch((error: Error) => {
+                // Throws an error if the operation fails.
+                throw error;
+            });
+    }
+
+    // Fetches a all friends of a person by their userName, excluding the userName field.
+    public async getFriends(userName: string): Promise<IPerson[]> {
+
+        let $pipeline = [
+            { $match: { userName } },
+            {
+                $lookup: {
+                    from: "persons", localField: "friendsList", foreignField: "userName", as: "friends",
+                    pipeline: [
+                        {
+                            $project: {
+                                __v: 0,
+                                _id: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$bestFriend", preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    "friends": 1
+                }
+            }
+        ];
+
+        return await PersonSchema.aggregate($pipeline)
+            .then((data: IPersonSchema[]) => {
+                // Uses the helper to process the person.
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                if (!this.helper.IsJsonNull(results)) {
+                    results = results['friends'] || [];
+                }
+                return results as IPerson[];
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.
