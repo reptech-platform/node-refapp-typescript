@@ -2,7 +2,6 @@ import { IPerson } from "../../models/person.model";
 import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
-import ICreatePersonRepository from "../../repositories/person/post.person.repository";
 import IUpdatePersonRepository from "../../repositories/person/put.person.repository";
 
 // Interface for UpdatePersonService
