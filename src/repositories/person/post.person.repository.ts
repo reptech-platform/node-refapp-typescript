@@ -1,14 +1,14 @@
-import { IPerson } from "../../models/person.model";
 import { ClientSession, Error } from "mongoose";
-import PersonSchema from "../../db/dao/person.db.model";
+import PersonSchema, { IPersonSchema } from "../../db/dao/person.db.model";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import DbSession from "../../db/utils/dbsession.db";
+import { IPersonRead } from "../../models/person/person.read.model";
 
 // Interface for CreatePersonRepository
 export default interface ICreatePersonRepository {
     // Creates a new person in the database.
-    createPerson(person: IPerson, session: ClientSession | undefined): Promise<IPerson>;
+    createPerson(person: IPersonSchema, session: ClientSession | undefined): Promise<IPersonRead>;
 
     // Checks if a person with the given userName exists in the database.
     isExist(userName: String): Promise<boolean>;
@@ -38,13 +38,13 @@ export class CreatePersonRepository implements ICreatePersonRepository {
     }
 
     // Creates a new person in the database.
-    public async createPerson(person: IPerson, session: ClientSession | undefined): Promise<IPerson> {
+    public async createPerson(person: IPersonSchema, session: ClientSession | undefined): Promise<IPersonRead> {
         // Create new person entry in the database
         let newPerson = await PersonSchema.create([person], { session })
             .then((data: any) => {
                 // Uses the helper to process the person
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IPerson;
+                return results as IPersonRead;
             })
             .catch((error: Error) => {
                 // Abort Client Session if there's an error

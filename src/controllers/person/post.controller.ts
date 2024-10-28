@@ -1,8 +1,8 @@
 import { Controller, Body, Post, Tags, Route } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
-import { IPerson } from "../../models/person.model";
 import ICreatePersonService from "../../services/person/post.person.service";
+import { IPersonRead } from "../../models/person/person.read.model";
 
 @Tags("Persons")
 @Route("persons")
@@ -15,12 +15,12 @@ export class PersonCreateController extends Controller {
     }
 
     /**
-     * Define a POST endpoint with the body parameter 'IPerson'
+     * Define a POST endpoint with the body parameter 'IPersonRead'
      * @param body 
      * @returns 
      */
     @Post()
-    public async createPerson(@Body() body: IPerson): Promise<RequestResponse> {
+    public async createPerson(@Body() body: IPersonRead): Promise<RequestResponse> {
 
         try {
 

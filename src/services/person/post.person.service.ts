@@ -1,13 +1,15 @@
-import { IPerson } from "../../models/person.model";
 import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
 import ICreatePersonRepository from "../../repositories/person/post.person.repository";
+import { IPersonAdd } from "../../models/person/person.add.model";
+import { IPersonRead } from "../../models/person/person.read.model";
+import PersonSchema, { IPersonSchema } from "../../db/dao/person.db.model";
 
 // Interface for CreatePersonService
 export default interface ICreatePersonService {
     // Creates a new person in the database.
-    createPerson(person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson>;
+    createPerson(person: IPersonAdd, dbSession: ClientSession | undefined): Promise<IPersonRead>;
 }
 
 // This decorator ensures that CreatePersonService is a singleton,
@@ -20,7 +22,9 @@ export class CreatePersonService implements ICreatePersonService {
     ) { }
 
     // Creates a new person in the database.
-    public async createPerson(person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson> {
+    public async createPerson(person: IPersonAdd, dbSession: ClientSession | undefined): Promise<IPersonRead> {
+
+        let newPerson: IPersonSchema = new PersonSchema();
 
         // Check if the person exists. If they do, throw an error.
         let isExist = await this.createPersonRepository.isExist(person.userName);
@@ -48,6 +52,14 @@ export class CreatePersonService implements ICreatePersonService {
             }
         }
 
+        const keys = Object.keys(person);
+
+        for (let i = 0; i < keys.length; i++) {
+            if (person[keys[i]]) {
+                newPerson[keys[i]] = person[keys[i]];
+            }
+        }
+
         // Flag to indicate if this function created the session
         let inCarryTransact: boolean = false;
 
@@ -60,7 +72,7 @@ export class CreatePersonService implements ICreatePersonService {
         }
 
         // Create new person entry in the database
-        let newPerson = await this.createPersonRepository.createPerson(person, dbSession);
+        let results = await this.createPersonRepository.createPerson(newPerson, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {
@@ -68,6 +80,6 @@ export class CreatePersonService implements ICreatePersonService {
         }
 
         // Return newly created person object
-        return newPerson;
+        return results;
     }
 }

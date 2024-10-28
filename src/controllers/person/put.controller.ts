@@ -1,8 +1,8 @@
 import { Controller, Body, Put, Tags, Route, Path } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
-import { IPerson } from "../../models/person.model";
 import IUpdatePersonService from "../../services/person/put.person.service";
+import { IPersonRead } from "../../models/person/person.read.model";
 
 @Tags("Persons")
 @Route("persons")
@@ -15,13 +15,13 @@ export class PersonUpdateController extends Controller {
     }
 
     /**
-     * Define a PUT endpoint with the parameter 'userName' and body parameter 'IPerson'
+     * Define a PUT endpoint with the parameter 'userName' and body parameter 'IPersonRead'
      * @param userName 
      * @param body 
      * @returns RequestResponse
      */
     @Put("/:userName")
-    public async updatePerson(@Path() userName: string, @Body() body: IPerson): Promise<RequestResponse> {
+    public async updatePerson(@Path() userName: string, @Body() body: IPersonRead): Promise<RequestResponse> {
 
         try {
 

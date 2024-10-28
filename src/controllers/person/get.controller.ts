@@ -1,8 +1,8 @@
 import { Controller, Get, Tags, Route, Path } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
-import { IPerson } from "../../models/person.model";
 import IGetPersonService from "../../services/person/get.person.service";
+import { IPersonRead } from "../../models/person/person.read.model";
 
 // Tags and route for the controller
 @Tags("Persons")
@@ -21,10 +21,10 @@ export class PersonGetController extends Controller {
     /**
      * Gets a person by their userName
      * @param userName 
-     * @returns IPerson | RequestResponse
+     * @returns IPersonRead | RequestResponse
      */
     @Get("/:userName")
-    public async getPerson(@Path() userName: string): Promise<IPerson | RequestResponse> {
+    public async getPerson(@Path() userName: string): Promise<IPersonRead | RequestResponse> {
         try {
             // Await the result of the get method from the getPersonService
             return await this.getPersonService.getPerson(userName);
@@ -39,10 +39,10 @@ export class PersonGetController extends Controller {
     /**
      * Gets the best friend of a person by their userName
      * @param userName 
-     * @returns IPerson | RequestResponse
+     * @returns IPersonRead | RequestResponse
      */
     @Get("/:userName/bestfriend")
-    public async getBestFriend(@Path() userName: string): Promise<IPerson | RequestResponse> {
+    public async getBestFriend(@Path() userName: string): Promise<IPersonRead | RequestResponse> {
         try {
             // Await the result of the get best friend method by their username from the getPersonService
             return await this.getPersonService.getBestFriend(userName);
@@ -57,10 +57,10 @@ export class PersonGetController extends Controller {
     /**
      * Gets the friends of a person by their userName
      * @param userName 
-     * @returns IPerson[] | RequestResponse
+     * @returns IPersonRead[] | RequestResponse
      */
     @Get("/:userName/friends")
-    public async getFriends(@Path() userName: string): Promise<IPerson[] | RequestResponse> {
+    public async getFriends(@Path() userName: string): Promise<IPersonRead[] | RequestResponse> {
         try {
             // Await the result of the get friends method by their username from the getPersonService
             return await this.getPersonService.getFriends(userName);

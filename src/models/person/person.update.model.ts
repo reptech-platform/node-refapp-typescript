@@ -1,12 +1,10 @@
 import { injectable } from "inversify";
-import { ILocation } from "./location.model";
-import { ITrip } from "./trip.model";
-import { Feature, PersonGender } from "../enums";
-import { IDocument } from "./document.model";
-
+import { ILocation } from "../location.model";
+import { Feature, PersonGender } from "../../enums";
+import { IDocument } from "../document.model";
 
 // Interface representing a person
-export interface IPerson {
+export interface IPersonUpdate {
     // Optional username of the person
     userName: string;
 
@@ -56,12 +54,12 @@ export interface IPerson {
     features?: Feature[];
 
     // Optional array of trips of the person, each represented by the ITrip interface
-    trips?: ITrip[];
+    // trips?: ITrip[];
 }
 
 // Class implementing the IPerson interface
 @injectable()
-export class Person implements IPerson {
+export class PersonUpdate implements IPersonUpdate {
     // Optional unique identifier username of the person
     userName: string;
 
@@ -111,7 +109,7 @@ export class Person implements IPerson {
     features?: Feature[];
 
     // Optional array of trips of the person, each represented by the ITrip interface
-    trips?: ITrip[];
+    // trips?: ITrip[];
 
     // Constructor for the Person class
     constructor() { }

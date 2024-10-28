@@ -1,8 +1,8 @@
 import { Controller, Get, Tags, Route } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
-import { IPerson } from "../../models/person.model";
 import IGetPersonsService from "../../services/person/get.persons.service";
+import { IPersonRead } from "../../models/person/person.read.model";
 
 @Tags("Persons")
 @Route("persons/all")
@@ -16,10 +16,10 @@ export class PersonGetAllController extends Controller {
 
     /**
      * Define a GET endpoint to get all persons
-     * @returns IPerson[] | RequestResponse
+     * @returns IPersonRead[] | RequestResponse
      */
     @Get()
-    public async getPersons(): Promise<IPerson[] | RequestResponse> {
+    public async getPersons(): Promise<IPersonRead[] | RequestResponse> {
 
         try {
 

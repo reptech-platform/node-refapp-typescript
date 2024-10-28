@@ -1,13 +1,14 @@
-import { IPerson } from "../../models/person.model";
 import { ClientSession, Error } from "mongoose";
-import PersonSchema from "../../db/dao/person.db.model";
+import PersonSchema, { IPersonSchema } from "../../db/dao/person.db.model";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
+import DbSession from "../../db/utils/dbsession.db";
+import { IPersonRead } from "../../models/person/person.read.model";
 
 // Interface for UpdatePersonRepository
 export default interface IUpdatePersonRepository {
     // Updates an existing person by their userName and returns the updated person.
-    updatePerson(userName: string, person: any, session: ClientSession | undefined): Promise<IPerson>;
+    updatePerson(userName: string, person: IPersonSchema, session: ClientSession | undefined): Promise<IPersonRead>;
 
     // Checks if a person with the given userName exists in the database.
     isExist(userName: string): Promise<boolean>;
@@ -37,15 +38,17 @@ export class UpdatePersonRepository implements IUpdatePersonRepository {
     }
 
     // Updates an existing person by their userName and returns the updated person.
-    public async updatePerson(userName: string, person: any, session: ClientSession | undefined): Promise<IPerson> {
+    public async updatePerson(userName: string, person: IPersonSchema, session: ClientSession | undefined): Promise<IPersonRead> {
         // Update person details in the database
         let updatedPerson = await PersonSchema.findOneAndUpdate({ userName }, person, { new: true, session })
             .then((data: any) => {
                 // Uses the helper to process the updated person
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IPerson;
+                return results as IPersonRead;
             })
             .catch((error: Error) => {
+                // Abort Client Session if there's an error
+                DbSession.Abort(session);
                 // Throws an error if the operation fails
                 throw error;
             });

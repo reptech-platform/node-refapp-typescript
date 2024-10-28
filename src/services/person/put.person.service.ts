@@ -1,13 +1,15 @@
-import { IPerson } from "../../models/person.model";
 import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
 import IUpdatePersonRepository from "../../repositories/person/put.person.repository";
+import PersonSchema, { IPersonSchema } from "../../db/dao/person.db.model";
+import { IPersonUpdate } from "../../models/person/person.update.model";
+import { IPersonRead } from "../../models/person/person.read.model";
 
 // Interface for UpdatePersonService
 export default interface IUpdatePersonService {
     // Updates an existing person by their userName and returns the updated person.
-    updatePerson(userName: string, person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson>;
+    updatePerson(userName: string, person: IPersonUpdate, dbSession: ClientSession | undefined): Promise<IPersonRead>;
 }
 
 // This decorator ensures that UpdatePersonService is a singleton,
@@ -20,18 +22,20 @@ export class UpdatePersonService implements IUpdatePersonService {
     ) { }
 
     // Updates an existing person by their userName and returns the updated person.
-    public async updatePerson(userName: string, person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson> {
-        // Check if the person exists. If not, throw an error.
+    public async updatePerson(userName: string, person: IPersonUpdate, dbSession: ClientSession | undefined): Promise<IPersonRead> {
+        let newPerson: IPersonSchema = new PersonSchema();
+
+        // Check if the person exists. If they do, throw an error.
         let isExist = await this.updatePersonRepository.isExist(userName);
         if (!isExist) {
-            throw new Error(`Provided '${userName}' person does not exist`);
+            throw new Error(`Provided person '${person.userName}' does not exists`);
         }
 
         // Check if best friend object is not null
         if (person.bestFriendId) {
-            isExist = await this.updatePersonRepository.isExist(person.bestFriendId);
+            let isExist = await this.updatePersonRepository.isExist(person.bestFriendId);
             if (!isExist) {
-                throw new Error(`Provided '${person.bestFriendId}' best friend does not exist`);
+                throw new Error(`Provided best friend '${person.bestFriendId}' does not exist`);
             }
         }
 
@@ -40,10 +44,18 @@ export class UpdatePersonService implements IUpdatePersonService {
             // Loop to check if each friend already exists in the database using their userName
             for (let index = 0; index < person.friendsList.length; index++) {
                 let friend = person.friendsList[index];
-                isExist = await this.updatePersonRepository.isExist(friend);
+                let isExist = await this.updatePersonRepository.isExist(friend);
                 if (!isExist) {
-                    throw new Error(`Provided '${person.bestFriendId}' friend does not exist`);
+                    throw new Error(`Provided friend '${friend}' does not exist`);
                 }
+            }
+        }
+
+        const keys = Object.keys(person);
+
+        for (let i = 0; i < keys.length; i++) {
+            if (person[keys[i]]) {
+                newPerson[keys[i]] = person[keys[i]];
             }
         }
 
@@ -58,15 +70,15 @@ export class UpdatePersonService implements IUpdatePersonService {
             inCarryTransact = true;
         }
 
-        // Update the person entry in the database
-        let updatedPerson = await this.updatePersonRepository.updatePerson(userName, person, dbSession);
+        // Create new person entry in the database
+        let results = await this.updatePersonRepository.updatePerson(userName, newPerson, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {
             await DbSession.Commit(dbSession);
         }
 
-        // Return the updated person object
-        return updatedPerson;
+        // Return newly created person object
+        return results;
     }
 }
