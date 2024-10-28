@@ -7,10 +7,10 @@ import { injectable, inject } from "inversify";
 // Interface for SearchAirlineRepository
 export default interface ISearchAirlineRepository {
     // Searches for Airlines based on the provided search criteria.
-    searchAirline(search: Search): Promise<SearchResults>;
+    search(search: Search): Promise<SearchResults>;
 
     // Gets the total count of Airlines matching the search criteria.
-    searchAirlineCount(search: Search): Promise<number>;
+    searchCount(search: Search): Promise<number>;
 }
 
 // This decorator ensures that SearchAirlineRepository is a singleton,
@@ -21,7 +21,7 @@ export class SearchAirlineRepository implements ISearchAirlineRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Searches for Airlines based on the provided search criteria.
-    public async searchAirline(search: Search): Promise<SearchResults> {
+    public async search(search: Search): Promise<SearchResults> {
 
         let $sort: any = undefined, $match: any = undefined, $limit: any = undefined, $skip: any = undefined;
 
@@ -49,7 +49,7 @@ export class SearchAirlineRepository implements ISearchAirlineRepository {
         }
 
         // Gets the total count of records matching the search criteria.
-        let recordCount = await this.searchAirlineCount(search);
+        let recordCount = await this.searchCount(search);
 
         let $pipeline: any = [];
 
@@ -74,7 +74,7 @@ export class SearchAirlineRepository implements ISearchAirlineRepository {
     }
 
     // Gets the total count of Airlines matching the search criteria.
-    public async searchAirlineCount(search: Search): Promise<number> {
+    public async searchCount(search: Search): Promise<number> {
 
         let $match = {};
 

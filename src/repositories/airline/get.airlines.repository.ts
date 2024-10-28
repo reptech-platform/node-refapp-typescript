@@ -2,12 +2,12 @@ import { Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
-import { IAirline } from "../../models/airline.model";
+import { IAirlineRead } from "../../models/airline/airline.read.model";
 
 // Interface for GetAirlinesRepository
 export default interface IGetAirlinesRepository {
     // Method to get all airlines
-    getAirlines(): Promise<IAirline[]>;
+    getAirlines(): Promise<IAirlineRead[]>;
 }
 
 // This decorator ensures that GetAirlinesRepository is a singleton,
@@ -18,13 +18,38 @@ export class GetAirlinesRepository implements IGetAirlinesRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Fetches a single Airline by its airlineCode, excluding the _id field.
-    public async getAirlines(): Promise<IAirline[]> {
+    public async getAirlines(): Promise<IAirlineRead[]> {
 
-        return await AirlineSchema.find({}, { _id: 0 })
+        let $pipeline = [
+            {
+                $lookup: {
+                    from: "airports", localField: "airportId", foreignField: "_id", as: "airports",
+                    pipeline: [
+                        {
+                            $project: {
+                                __v: 0,
+                                _id: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$airports", preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 0,
+                    airportId: 0,
+                    __v: 0,
+                    "CEO._id": 0
+                }
+            }
+        ];
+
+        return await AirlineSchema.aggregate($pipeline)
             .then((data: IAirlineSchema[]) => {
                 // Uses the helper to process the Airline.
                 let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as IAirline[];
+                return results as IAirlineRead[];
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.

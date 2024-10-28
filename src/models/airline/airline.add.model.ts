@@ -1,56 +1,48 @@
 import { injectable } from "inversify";
-import { IPerson } from "./person.model";
-import { IAirport } from "./airport.model";
 
 // Interface representing an airline
-export interface IAirline {
+export interface IAirlineAdd {
 
     // The unique code for the airline
     airlineCode: string;
 
     // The name of the airline
-    name?: string;
+    name?: string | undefined;
 
     // URL or path to the airline's logo image
-    logo?: string;
+    logo?: string | undefined;
 
     // The CEO of the airline, represented by an IPerson interface
-    CEO?: IPerson | undefined | null;
+    CEO?: string | undefined;
 
     // An array of staff members, each represented by an IPerson interface
-    staff?: IPerson[];
-
-    // The airports associated with the airline, represented by an IAirport interface
-    airports?: IAirport;
+    //staff?: string[];
 
     // Store airport reference id
-    airportId?: string;
+    airport?: { icaoCode: string, iataCode: string };
 
 }
 
 // The Airline class implements the IAirline interface
 @injectable()
-export class Airline implements IAirline {
+export class AirlineAdd implements IAirlineAdd {
     // The unique code for the airline
     airlineCode: string;
 
     // The name of the airline
-    name?: string;
+    name?: string | undefined;
 
     // URL or path to the airline's logo image
-    logo?: string;
+    logo?: string | undefined;
 
     // The CEO of the airline, represented by an IPerson interface
-    CEO?: IPerson | undefined | null;
+    CEO?: string | undefined;
 
     // An array of staff members, each represented by an IPerson interface
-    staff?: IPerson[];
-
-    // The airports associated with the airline, represented by an IAirport interface
-    airports?: IAirport;
+    //staff?: string[];
 
     // Store airport reference id
-    airportId?: string;
+    airport?: { icaoCode: string, iataCode: string };
 
     // Constructor for the Airline class
     constructor() { }

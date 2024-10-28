@@ -1,16 +1,16 @@
 import { ClientSession, Error } from "mongoose";
 import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
-import { IAirline } from "../../models/airline.model";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
+import { IAirlineRead } from "../../models/airline/airline.read.model";
 
 // Interface for UpdateAirlineRepository
 export default interface IUpdateAirlineRepository {
     // Updates an airline's information based on the provided airline code.
-    updateAirline(airlineCode: string, airline: IAirline, session: ClientSession | undefined): Promise<IAirline>;
+    updateAirline(airlineCode: string, airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirlineRead>;
 
     // Method to check if an airline exists by its code
-    isAirlineExist(airlineCode: string): Promise<boolean>;
+    isExist(airlineCode: string): Promise<boolean>;
 }
 
 // This decorator ensures that UpdateAirlineRepository is a singleton,
@@ -21,7 +21,7 @@ export class UpdateAirlineRepository implements IUpdateAirlineRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Method to check if an airline exists by its code
-    public async isAirlineExist(airlineCode: string): Promise<boolean> {
+    public async isExist(airlineCode: string): Promise<boolean> {
         return await AirlineSchema.find({ airlineCode }, { _id: 1 })
             .then((data: IAirlineSchema[]) => {
                 // Get the first item from the array or return an object with _id: null
@@ -37,7 +37,7 @@ export class UpdateAirlineRepository implements IUpdateAirlineRepository {
     }
 
     // Updates an airline's information based on the provided airline code.
-    public async updateAirline(airlineCode: string, airline: IAirline, session: ClientSession | undefined): Promise<IAirline> {
+    public async updateAirline(airlineCode: string, airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirlineRead> {
 
         // Find and update the airline document with the new data.
         return await AirlineSchema.findOneAndUpdate({ airlineCode }, airline, { new: true, session })
@@ -45,7 +45,7 @@ export class UpdateAirlineRepository implements IUpdateAirlineRepository {
                 // Extract the first item from the data array using a helper function.
                 let results = this.helper.GetItemFromArray(data, 0, {});
                 // Return the results cast as an IAirline object.
-                return results as IAirline;
+                return results as IAirlineRead;
             })
             .catch((error: Error) => {
                 // Throw an error if the update operation fails.

@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
-import PersonSchema, { IPersonSchema } from './person.db.model';
+import { PersonSchema, IPersonSchema } from './person.db.model';
 
 /**
  * Interface to validate schema field construction
@@ -38,11 +38,6 @@ const AirlineSchema: Schema = new Schema({
 }, {
     timestamps: true
 });
-
-/**
- * Defining combination key with multiple fields
- */
-AirlineSchema.index({ airlineCode: 1 }, { unique: true });
 
 /**
  * Setting function to onvert $numberDecimal to actual decimal values

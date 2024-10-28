@@ -2,15 +2,15 @@ import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
-import { IAirline } from "../../models/airline.model";
+import { IAirlineRead } from "../../models/airline/airline.read.model";
 
 // Interface for CreateAirlineRepository
 export default interface ICreateAirlineRepository {
     // Method to create a new airline
-    createAirline(airline: IAirline, session: ClientSession | undefined): Promise<IAirline>;
+    createAirline(airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirlineRead>;
 
     // Method to check if an airline exists by its code
-    isAirlineExist(airlineCode: string): Promise<boolean>;
+    isExist(airlineCode: string): Promise<boolean>;
 }
 
 // This decorator ensures that CreateAirlineRepository is a singleton,
@@ -21,7 +21,7 @@ export class CreateAirlineRepository implements ICreateAirlineRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Method to check if an airline exists by its code
-    public async isAirlineExist(airlineCode: string): Promise<boolean> {
+    public async isExist(airlineCode: string): Promise<boolean> {
         return await AirlineSchema.find({ airlineCode }, { _id: 1 })
             .then((data: IAirlineSchema[]) => {
                 // Get the first item from the array or return an object with _id: null
@@ -37,14 +37,14 @@ export class CreateAirlineRepository implements ICreateAirlineRepository {
     }
 
     // Method to create a new airline
-    public async createAirline(airline: IAirline, session: ClientSession | undefined): Promise<IAirline> {
+    public async createAirline(airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirlineRead> {
 
         // create the airline document with the new data.
         return await AirlineSchema.create([airline], { session })
             .then((data: any) => {
                 // Get the first item from the array or return an empty object
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IAirline;
+                return results as IAirlineRead;
             })
             .catch((error: Error) => {
                 // Handle any errors that occur during the creation

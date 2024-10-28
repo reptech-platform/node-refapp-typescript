@@ -9,7 +9,7 @@ export default interface IDeleteAirlineRepository {
     deleteAirline(airlineCode: string, session: ClientSession | undefined): Promise<boolean>;
 
     // Checks if an airline with the given code exists.
-    isAirlineExist(airlineCode: string): Promise<boolean>;
+    isExist(airlineCode: string): Promise<boolean>;
 }
 
 // This decorator ensures that DeleteAirlineRepository is a singleton,
@@ -20,7 +20,7 @@ export class DeleteAirlineRepository implements IDeleteAirlineRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Checks if an airline with the given code exists.
-    public async isAirlineExist(airlineCode: string): Promise<boolean> {
+    public async isExist(airlineCode: string): Promise<boolean> {
         return await AirlineSchema.find({ airlineCode }, { _id: 1 })
             .then((data: IAirlineSchema[]) => {
                 let results = this.helper.GetItemFromArray(data, 0, { _id: null });

@@ -2,15 +2,15 @@ import { Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
-import { IAirline } from "../../models/airline.model";
+import { IAirlineRead } from "../../models/airline/airline.read.model";
 
 // Interface for GetAirlineRepository
 export default interface IGetAirlineRepository {
     // Method to get a specific airline by its code
-    getAirline(airlineCode: string): Promise<IAirline>;
+    getAirline(airlineCode: string): Promise<IAirlineRead>;
 
     // Method to check if an airline exists by its code
-    isAirlineExist(airlineCode: string): Promise<boolean>;
+    isExist(airlineCode: string): Promise<boolean>;
 }
 
 // This decorator ensures that GetAirlineRepository is a singleton,
@@ -21,7 +21,7 @@ export class GetAirlineRepository implements IGetAirlineRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Method to check if an airline exists by its code
-    public async isAirlineExist(airlineCode: string): Promise<boolean> {
+    public async isExist(airlineCode: string): Promise<boolean> {
         return await AirlineSchema.find({ airlineCode }, { _id: 1 })
             .then((data: IAirlineSchema[]) => {
                 // Get the first item from the array or return an object with _id: null
@@ -37,13 +37,39 @@ export class GetAirlineRepository implements IGetAirlineRepository {
     }
 
     // Fetches a single Airline by its airlineCode, excluding the _id field.
-    public async getAirline(airlineCode: string): Promise<IAirline> {
+    public async getAirline(airlineCode: string): Promise<IAirlineRead> {
 
-        return await AirlineSchema.find({ airlineCode }, { _id: 0 })
+        let $pipeline = [
+            { $match: { airlineCode } },
+            {
+                $lookup: {
+                    from: "airports", localField: "airportId", foreignField: "_id", as: "airports",
+                    pipeline: [
+                        {
+                            $project: {
+                                __v: 0,
+                                _id: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$airports", preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 0,
+                    airportId: 0,
+                    __v: 0,
+                    "CEO._id": 0
+                }
+            }
+        ];
+
+        return await AirlineSchema.aggregate($pipeline)
             .then((data: IAirlineSchema[]) => {
                 // Uses the helper to process the Airline.
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IAirline;
+                return results as IAirlineRead;
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.
