@@ -1,17 +1,16 @@
 import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
-import DbSession from "../../db/utils/dbsession.db";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
-import { IAirport } from "../../models/airport.model";
+import { IAirportRead } from "../../models/airport/airport.read.model";
 
 // Interface for CreateAirportRepository
 export default interface ICreateAirportRepository {
     // Creates a new Airport in the database.
-    createAirport(airport: IAirport, session: ClientSession | undefined): Promise<IAirport>;
+    createAirport(airport: IAirportSchema, session: ClientSession | undefined): Promise<IAirportRead>;
 
     // Method to check if an airport exists by its ICAO and IATA codes
-    isAirportExist(icaoCode: string, iataCode: string): Promise<boolean>;
+    isExist(icaoCode: string, iataCode: string): Promise<boolean>;
 }
 
 // This decorator ensures that CreateAirportRepository is a singleton,
@@ -22,7 +21,7 @@ export class CreateAirportRepository implements ICreateAirportRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Method to check if an airport exists by its ICAO and IATA codes
-    public async isAirportExist(icaoCode: string, iataCode: string): Promise<boolean> {
+    public async isExist(icaoCode: string, iataCode: string): Promise<boolean> {
         return await AirportSchema.find({ icaoCode, iataCode }, { _id: 1 })
             .then((data: IAirportSchema[]) => {
                 // Get the first item from the array or return an object with _id: null
@@ -38,14 +37,14 @@ export class CreateAirportRepository implements ICreateAirportRepository {
     }
 
     // Method to create a new airport
-    public async createAirport(airport: IAirport, session: ClientSession | undefined): Promise<IAirport> {
+    public async createAirport(airport: IAirportSchema, session: ClientSession | undefined): Promise<IAirportRead> {
 
         // create the airport document with the new data.
         return await AirportSchema.create([airport], { session })
             .then((data: any) => {
                 // Get the first item from the array or return an empty object
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IAirport;
+                return results as IAirportRead;
             })
             .catch((error: Error) => {
                 // Handle any errors that occur during the creation

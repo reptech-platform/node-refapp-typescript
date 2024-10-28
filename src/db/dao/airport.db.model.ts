@@ -17,16 +17,13 @@ export interface IAirportSchema extends Document {
      * Embeded collection inside the collection
      */
     location: IAirportLocationSchema;
-    /**
-     * Referencing the _id from Airline collection
-     */
-    airlineId: string;
+    airline: string;
 }
 
 /**
  * Schema defination to store the document
  */
-const AirportSchema: Schema = new Schema({
+export const AirportSchema: Schema = new Schema({
     icaoCode: { type: String },
     iataCode: { type: String },
     name: { type: String, default: null },
@@ -41,15 +38,10 @@ const AirportSchema: Schema = new Schema({
     /**
      * Referencing the _id from Airline collection
      */
-    airlineId: { type: Schema.Types.ObjectId, default: null }
+    airline: { type: String, default: null }
 }, {
     timestamps: true
 });
-
-/**
- * Defining combination key with multiple fields
- */
-AirportSchema.index({ icaoCode: 1, iataCode: 1 }, { unique: true });
 
 /**
  * Setting function to onvert $numberDecimal to actual decimal values

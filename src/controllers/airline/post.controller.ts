@@ -15,7 +15,7 @@ export class AirlineCreateController extends Controller {
     }
 
     /**
-     * Define a POST endpoint with the body parameter 'IAirline'
+     * Define a POST endpoint with the body parameter 'IAirlineAdd'
      * @param body 
      * @returns 
      */

@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 
-// Interface representing an airline
+// Interface representing an IAirlineUpdate
 export interface IAirlineUpdate {
 
     // The name of the airline
@@ -20,7 +20,7 @@ export interface IAirlineUpdate {
 
 }
 
-// The Airline class implements the IAirline interface
+// The Airline class implements the IAirlineUpdate interface
 @injectable()
 export class AirlineAdd implements IAirlineUpdate {
 

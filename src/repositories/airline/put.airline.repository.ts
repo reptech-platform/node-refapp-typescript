@@ -44,7 +44,7 @@ export class UpdateAirlineRepository implements IUpdateAirlineRepository {
             .then((data: any) => {
                 // Extract the first item from the data array using a helper function.
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                // Return the results cast as an IAirline object.
+                // Return the results cast as an IAirlineRead object.
                 return results as IAirlineRead;
             })
             .catch((error: Error) => {

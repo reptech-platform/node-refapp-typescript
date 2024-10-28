@@ -57,12 +57,12 @@ import ISearchAirlineService, { SearchAirlineService } from "../services/airline
 /**
  * Airport Services
  */
-/* import IDeleteAirportService, { DeleteAirportService } from "../services/airport/delete.airport.service";
+import IDeleteAirportService, { DeleteAirportService } from "../services/airport/delete.airport.service";
 import IGetAirportService, { GetAirportService } from "../services/airport/get.airport.service";
 import IGetAirportsService, { GetAirportsService } from "../services/airport/get.airports.service";
 import ICreateAirportService, { CreateAirportService } from "../services/airport/post.airport.service";
 import IUpdateAirportService, { UpdateAirportService } from "../services/airport/put.airport.service";
-import ISearchAirportService, { SearchAirportService } from "../services/airport/search.airport.service"; */
+import ISearchAirportService, { SearchAirportService } from "../services/airport/search.airport.service";
 
 export default class ContainerConfigLoader {
     public static Load(iocContainer: Container) {
@@ -107,6 +107,13 @@ export default class ContainerConfigLoader {
         iocContainer.bind<IUpdateAirportRepository>('IUpdateAirportRepository').to(UpdateAirportRepository);
         iocContainer.bind<ISearchAirportRepository>('ISearchAirportRepository').to(SearchAirportRepository);
 
+        // Airport Services
+        iocContainer.bind<IDeleteAirportService>('IDeleteAirportService').to(DeleteAirportService);
+        iocContainer.bind<IGetAirportService>('IGetAirportService').to(GetAirportService);
+        iocContainer.bind<IGetAirportsService>('IGetAirportsService').to(GetAirportsService);
+        iocContainer.bind<ICreateAirportService>('ICreateAirportService').to(CreateAirportService);
+        iocContainer.bind<IUpdateAirportService>('IUpdateAirportService').to(UpdateAirportService);
+        iocContainer.bind<ISearchAirportService>('ISearchAirportService').to(SearchAirportService);
 
     }
 }

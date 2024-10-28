@@ -9,7 +9,7 @@ export default interface IDeleteAirportRepository {
     deleteAirport(icaoCode: string, iataCode: string, session: ClientSession | undefined): Promise<boolean>;
 
     // Method to check if an airport exists by its ICAO and IATA codes
-    isAirportExist(icaoCode: string, iataCode: string): Promise<boolean>;
+    isExist(icaoCode: string, iataCode: string): Promise<boolean>;
 }
 
 // This decorator ensures that DeleteAirportRepository is a singleton,
@@ -21,7 +21,7 @@ export class DeleteAirportRepository implements IDeleteAirportRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Method to check if an airport exists by its ICAO and IATA codes
-    public async isAirportExist(icaoCode: string, iataCode: string): Promise<boolean> {
+    public async isExist(icaoCode: string, iataCode: string): Promise<boolean> {
         return await AirportSchema.find({ icaoCode, iataCode }, { _id: 1 })
             .then((data: IAirportSchema[]) => {
                 // Get the first item from the array or return an object with _id: null

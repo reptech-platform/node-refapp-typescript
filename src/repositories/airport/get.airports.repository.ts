@@ -2,12 +2,12 @@ import { Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
-import { IAirport } from "../../models/airport.model";
+import { IAirportRead } from "../../models/airport/airport.read.model";
 
 // Interface for GetAirportRepository
 export default interface IGetAirportsRepository {
     // Method to get all airports
-    getAirports(): Promise<IAirport[]>;
+    getAirports(): Promise<IAirportRead[]>;
 }
 
 // This decorator ensures that GetAirportRepository is a singleton,
@@ -18,13 +18,37 @@ export class GetAirportsRepository implements IGetAirportsRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Method to get all airports
-    public async getAirports(): Promise<IAirport[]> {
+    public async getAirports(): Promise<IAirportRead[]> {
 
-        return await AirportSchema.find({}, { _id: 0 })
+        let $pipeline = [
+            {
+                $lookup: {
+                    from: "airlines", localField: "airlineId", foreignField: "_id", as: "airlines",
+                    pipeline: [
+                        {
+                            $project: {
+                                __v: 0,
+                                _id: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$airlines", preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 0,
+                    airportId: 0,
+                    __v: 0
+                }
+            }
+        ];
+
+        return await AirportSchema.aggregate($pipeline)
             .then((data: IAirportSchema[]) => {
                 // Uses the helper to process the Airport.
-                let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as IAirport[];
+                let results = this.helper.GetItemFromArray(data, 0, {});
+                return results as IAirportRead[];
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.

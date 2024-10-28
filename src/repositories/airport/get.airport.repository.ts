@@ -2,15 +2,18 @@ import { Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
-import { IAirport } from "../../models/airport.model";
+import { IAirportRead } from "../../models/airport/airport.read.model";
 
 // Interface for GetAirportRepository
 export default interface IGetAirportRepository {
     // Method to get a specific airport by its ICAO and IATA codes
-    getAirport(icaoCode: string, iataCode: string): Promise<IAirport>;
+    getAirport(icaoCode: string, iataCode: string): Promise<IAirportRead>;
+
+    // Method to get a specific airport id by its ICAO and IATA codes
+    getAirportId(icaoCode: string, iataCode: string): Promise<string>
 
     // Method to check if an airport exists by its ICAO and IATA codes
-    isAirportExist(icaoCode: string, iataCode: string): Promise<boolean>;
+    isExist(icaoCode: string, iataCode: string): Promise<boolean>;
 }
 
 // This decorator ensures that GetAirportRepository is a singleton,
@@ -21,7 +24,7 @@ export class GetAirportRepository implements IGetAirportRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Method to check if an airport exists by its ICAO and IATA codes
-    public async isAirportExist(icaoCode: string, iataCode: string): Promise<boolean> {
+    public async isExist(icaoCode: string, iataCode: string): Promise<boolean> {
         return await AirportSchema.find({ icaoCode, iataCode }, { _id: 1 })
             .then((data: IAirportSchema[]) => {
                 // Get the first item from the array or return an object with _id: null
@@ -37,13 +40,53 @@ export class GetAirportRepository implements IGetAirportRepository {
     }
 
     // Method to get a specific airport by its ICAO and IATA codes
-    public async getAirport(icaoCode: string, iataCode: string): Promise<IAirport> {
+    public async getAirport(icaoCode: string, iataCode: string): Promise<IAirportRead> {
 
-        return await AirportSchema.find({ icaoCode, iataCode }, { _id: 0 })
+        let $pipeline = [
+            { $match: { icaoCode, iataCode } },
+            {
+                $lookup: {
+                    from: "airlines", localField: "airlineId", foreignField: "_id", as: "airlines",
+                    pipeline: [
+                        {
+                            $project: {
+                                __v: 0,
+                                _id: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$airlines", preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 0,
+                    airportId: 0,
+                    __v: 0
+                }
+            }
+        ];
+
+        return await AirportSchema.aggregate($pipeline)
             .then((data: IAirportSchema[]) => {
                 // Uses the helper to process the Airport.
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IAirport;
+                return results as IAirportRead;
+            })
+            .catch((error: Error) => {
+                // Throws an error if the operation fails.
+                throw error;
+            });
+    }
+
+    // Method to get a specific airport id by its ICAO and IATA codes
+    public async getAirportId(icaoCode: string, iataCode: string): Promise<string> {
+
+        return await AirportSchema.find({ icaoCode, iataCode }, { _id: 1 })
+            .then((data: IAirportSchema[]) => {
+                // Uses the helper to process the Airport.
+                let results = this.helper.GetItemFromArray(data, 0, { _id: null });
+                return results._id;
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.

@@ -1,8 +1,8 @@
 import { injectable } from "inversify";
 import { IPerson } from "../person.model";
-import { IAirport } from "../airport.model";
+import { IAirportRead } from "../airport/airport.read.model";
 
-// Interface representing an airline
+// Interface representing an IAirlineRead
 export interface IAirlineRead {
 
     // The unique code for the airline
@@ -21,11 +21,11 @@ export interface IAirlineRead {
     staff?: IPerson[] | undefined | null;
 
     // The airports associated with the airline, represented by an IAirport interface
-    airports?: IAirport;
+    airports?: IAirportRead;
 
 }
 
-// The Airline class implements the IAirline interface
+// The Airline class implements the IAirlineRead interface
 @injectable()
 export class AirlineRead implements IAirlineRead {
     // The unique code for the airline
@@ -44,7 +44,7 @@ export class AirlineRead implements IAirlineRead {
     staff?: IPerson[] | undefined | null;
 
     // Store airport reference id
-    airports?: IAirport;
+    airports?: IAirportRead;
 
     // The airports associated with the airline, represented by an IAirport interface
     constructor() { }

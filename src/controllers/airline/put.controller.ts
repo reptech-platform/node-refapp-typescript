@@ -15,7 +15,7 @@ export class AirlineUpdateController extends Controller {
     }
 
     /**
-     * Define a PUT endpoint with the parameter 'airlineCode' and body parameter 'IAirline'
+     * Define a PUT endpoint with the parameter 'airlineCode' and body parameter 'IAirlineUpdate'
      * @param airlineCode 
      * @param body 
      * @returns RequestResponse

@@ -5,7 +5,6 @@ import IUpdateAirlineRepository from "../../repositories/airline/put.airline.rep
 import IGetPersonRepository from "../../repositories/person/get.person.repository";
 import IGetAirportRepository from "../../repositories/airport/get.airport.repository";
 import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
-import { IPerson } from "../../models/person.model";
 
 import { IAirlineUpdate } from "../../models/airline/airline.update.model";
 import { IAirlineRead } from "../../models/airline/airline.read.model";
