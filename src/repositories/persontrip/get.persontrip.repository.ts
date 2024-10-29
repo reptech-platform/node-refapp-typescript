@@ -14,7 +14,7 @@ export default interface IGetPersonTripRepository {
     getTripTravellers(tripId: number): Promise<IPerson[]>;
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
-    isExist(userName: string, tripId: number): Promise<boolean>;
+    isExist(userName: string | undefined | null, tripId: number | undefined | null): Promise<boolean>;
 }
 
 // This decorator ensures that GetTripRepository is a singleton,
@@ -25,7 +25,43 @@ export class GetPersonTripRepository implements IGetPersonTripRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
-    public async isExist(userName: string, tripId: number): Promise<boolean> {
+    public async isExist(userName: string | undefined | null, tripId: number | undefined | null): Promise<boolean> {
+
+        // Validate the inputs 
+        if (!tripId && !userName) {
+            throw new Error("At least one of tripId or userName must be provided")
+        }
+
+        if (tripId && !userName) {
+            return await PersonTripSchema.find({ tripId }, { _id: 1 })
+                .then((data: any[]) => {
+                    // Uses the helper to process the array of results.
+                    let results = this.helper.GetItemFromArray(data, 0, { _id: null });
+                    // Returns true if the association exists, otherwise false.
+                    if (!this.helper.IsNullValue(results._id)) return true;
+                    return false;
+                })
+                .catch((error: Error) => {
+                    // Throws an error if the operation fails.
+                    throw error;
+                });
+        }
+
+        if (!tripId && userName) {
+            return await PersonTripSchema.find({ tripId }, { _id: 1 })
+                .then((data: any[]) => {
+                    // Uses the helper to process the array of results.
+                    let results = this.helper.GetItemFromArray(data, 0, { _id: null });
+                    // Returns true if the association exists, otherwise false.
+                    if (!this.helper.IsNullValue(results._id)) return true;
+                    return false;
+                })
+                .catch((error: Error) => {
+                    // Throws an error if the operation fails.
+                    throw error;
+                });
+        }
+
         return await PersonTripSchema.find({ userName, tripId }, { _id: 1 })
             .then((data: any[]) => {
                 let results = this.helper.GetItemFromArray(data, 0, { _id: null });

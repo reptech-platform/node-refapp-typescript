@@ -45,7 +45,7 @@ import ISearchPersonRepository, { SearchPersonRepository } from "../repositories
 /**
  * PersonTrip Repositories
  */
-import IDeletePersonTripRepository, { DeletePersonTripRepository } from "../repositories/persontrip/delete.personstrip.repository"
+import IDeletePersonTripRepository, { DeletePersonTripRepository } from "../repositories/persontrip/delete.persontrip.repository"
 import IGetPersonTripRepository, { GetPersonTripRepository } from "../repositories/persontrip/get.persontrip.repository";
 import IGetPersonTripsRepository, { GetPersonTripsRepository } from "../repositories/persontrip/get.persontrips.repository";
 import ICreatePersonTripRepository, { CreatePersonTripRepository } from "../repositories/persontrip/post.persontrip.repository";

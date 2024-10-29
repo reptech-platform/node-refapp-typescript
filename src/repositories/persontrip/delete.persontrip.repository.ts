@@ -7,10 +7,10 @@ import DbSession from "../../db/utils/dbsession.db";
 // Interface for DeletePersonTripRepository
 export default interface IDeletePersonTripRepository {
     // This method deletes a trip for a person.
-    deletePersonTrip(userName: string, tripId: number, session: ClientSession | undefined): Promise<void>;
+    deletePersonTrip(userName: string, tripId: number, session: ClientSession | undefined): Promise<boolean>;
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
-    isPersonAndTripExist(userName: string, tripId: number): Promise<boolean>;
+    isExist(userName: string, tripId: number): Promise<boolean>;
 }
 
 // This decorator ensures that DeletePersonTripRepository is a singleton,
@@ -21,7 +21,7 @@ export class DeletePersonTripRepository implements IDeletePersonTripRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
-    public async isPersonAndTripExist(userName: string, tripId: number): Promise<boolean> {
+    public async isExist(userName: string, tripId: number): Promise<boolean> {
         return await PersonTripSchema.find({ userName, tripId }, { _id: 1 })
             .then((data: any[]) => {
                 let results = this.helper.GetItemFromArray(data, 0, { _id: null });
@@ -34,12 +34,16 @@ export class DeletePersonTripRepository implements IDeletePersonTripRepository {
     }
 
     // This method deletes a trip for a person.
-    public async deletePersonTrip(userName: string, tripId: number, session: ClientSession | undefined): Promise<void> {
-        await PersonTripSchema.deleteOne({ userName, tripId }, { session }).catch((error: Error) => {
-            // Abort Client Session if there's an error
-            DbSession.Abort(session);
-            // Throws an error if the operation fails.
-            throw error;
-        });
+    public async deletePersonTrip(userName: string, tripId: number, session: ClientSession | undefined): Promise<boolean> {
+        return await PersonTripSchema.deleteOne({ userName, tripId }, { session })
+            .then(() => {
+                return true;
+            })
+            .catch((error: Error) => {
+                // Abort Client Session if there's an error
+                DbSession.Abort(session);
+                // Throws an error if the operation fails.
+                throw error;
+            });
     }
 }

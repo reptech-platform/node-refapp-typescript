@@ -8,10 +8,10 @@ import { ITrip } from "../../models/trip.model";
 // Interface for GetPersonTripsRepository
 export default interface IGetPersonTripsRepository {
     // Fetches all Trips from the database
-    getAllTrips(): Promise<ITrip[]>;
+    getAllPersonTrips(): Promise<ITrip[]>;
 
     // Fetches all Persons from the database
-    getAllPersons(): Promise<IPerson[]>;
+    getAllTripTravellers(): Promise<IPerson[]>;
 }
 
 // This decorator ensures that GetPersonTripsRepository is a singleton,
@@ -22,7 +22,7 @@ export class GetPersonTripsRepository implements IGetPersonTripsRepository {
     constructor() { }
 
     // Fetches all Trips from the database
-    public async getAllTrips(): Promise<ITrip[]> {
+    public async getAllPersonTrips(): Promise<ITrip[]> {
         // Define the aggregation pipeline
         let $pipeline = [
             {
@@ -70,7 +70,7 @@ export class GetPersonTripsRepository implements IGetPersonTripsRepository {
     }
 
     // Fetches all Persons from the database
-    public async getAllPersons(): Promise<IPerson[]> {
+    public async getAllTripTravellers(): Promise<IPerson[]> {
         // Define the aggregation pipeline
         let $pipeline = [
             {
