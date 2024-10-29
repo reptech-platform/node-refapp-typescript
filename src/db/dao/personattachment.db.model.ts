@@ -1,7 +1,5 @@
-import mongoose, { Document, Schema } from "mongoose";
-import AutoIncrementFactory from "mongoose-sequence";
-import Helper from "../../utils/helper.utils";;
-const AutoIncrement = AutoIncrementFactory(mongoose);
+import { Document, Schema } from "mongoose";
+import Helper from "../../utils/helper.utils";
 
 /**
  * Interface to validate schema field construction

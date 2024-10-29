@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import AutoIncrementFactory from "mongoose-sequence";
-import AirlineSchema, { IAirlineSchema } from "./airline.db.model";
-import DocumentSchema, { IDocumentSchema } from "./document.db.model";
+import { AirlineSchema, IAirlineSchema } from "./airline.db.model";
+import { DocumentSchema, IDocumentSchema } from "./document.db.model";
 
 const AutoIncrement = AutoIncrementFactory(mongoose);
 

@@ -2,20 +2,20 @@ import { Controller, Body, Post, Tags, Route, Path } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
 import { Search, SearchResults } from "../../models/search.model";
-import ISearchAirlineStaffService from "../../services/airlinestaff/search.airlinestaff.service";
+import ISearchTripService from "../../services/trip/search.trip.service";
 
-@Tags("AirlineStaff")
-@Route("airlinestaff")
-@provideSingleton(AirlineStaffSearchController)
-export class AirlineStaffSearchController extends Controller {
+@Tags("Trips")
+@Route("trips")
+@provideSingleton(TripSearchController)
+export class TripSearchController extends Controller {
     constructor(
-        @inject("ISearchAirlineStaffService") private searchAirlineStaffService: ISearchAirlineStaffService
+        @inject("ISearchTripService") private searchTripService: ISearchTripService
     ) {
         super();
     }
 
     /**
-     * Define a POST endpoint to search AirlineStaffs count
+     * Define a POST endpoint to search Trips count
      * @param body 
      * @returns number | RequestResponse
      */
@@ -24,8 +24,8 @@ export class AirlineStaffSearchController extends Controller {
 
         try {
 
-            // Await the result of the searchCount method from the searchAirlineStaffService
-            return await this.searchAirlineStaffService.searchCount(body);
+            // Await the result of the searchCount method from the searchTripService
+            return await this.searchTripService.searchCount(body);
 
         } catch (ex: any) {
 
@@ -40,7 +40,7 @@ export class AirlineStaffSearchController extends Controller {
     }
 
     /**
-     * Define a POST endpoint to search AirlineStaffs
+     * Define a POST endpoint to search Trips
      * @param body 
      * @returns SearchResults | RequestResponse
      */
@@ -49,8 +49,8 @@ export class AirlineStaffSearchController extends Controller {
 
         try {
 
-            // Await the result of the search method from the searchAirlineStaffService
-            return await this.searchAirlineStaffService.search(body);
+            // Await the result of the search method from the searchTripService
+            return await this.searchTripService.search(body);
 
         } catch (ex: any) {
 

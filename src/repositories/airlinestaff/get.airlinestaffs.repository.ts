@@ -1,7 +1,6 @@
 import { Error } from "mongoose";
 import { injectable } from "inversify";
 import AirlineStaffSchema from "../../db/dao/airlinestaff.db.model";
-import { IPerson } from "../../models/person.model";
 import { IAirlineStaff } from "../../models/airlinestaff.model";
 
 // Interface for GetAirlineStaffRepository

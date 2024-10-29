@@ -4,12 +4,11 @@ import { injectable, inject } from "inversify";
 import AirlineStaffSchema from "../../db/dao/airlinestaff.db.model";
 import { IAirlineSchema } from "../../db/dao/airline.db.model";
 import { IAirline } from "../../models/airline.model";
-import { IAirlineStaff } from "../../models/airlinestaff.model";
 
 // Interface for GetAirlinesRepository
 export default interface IGetAirlinesRepository {
     // Method to get all airlines
-    getAirlinesAndStaffs(): Promise<IAirlineStaff[]>;
+    getAirlinesAndStaffs(): Promise<IAirline[]>;
 }
 
 // This decorator ensures that GetAirlinesRepository is a singleton,
@@ -20,7 +19,7 @@ export class GetAirlinesRepository implements IGetAirlinesRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Fetches a single Airline by its airlineCode, excluding the _id field.
-    public async getAirlinesAndStaffs(): Promise<IAirlineStaff[]> {
+    public async getAirlinesAndStaffs(): Promise<IAirline[]> {
 
         let $pipeline = [
             {
@@ -63,7 +62,7 @@ export class GetAirlinesRepository implements IGetAirlinesRepository {
             .then((data: IAirlineSchema[]) => {
                 // Uses the helper to process the Airline.
                 let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as IAirlineStaff[];
+                return results as IAirline[];
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.

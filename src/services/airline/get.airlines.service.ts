@@ -18,7 +18,7 @@ export class GetAirlinesService implements IGetAirlinesService {
 
     // Fetches all Airlines from the database.
     public async getAirlines(): Promise<IAirline[]> {
-        return await this.getAirlinesRepository.getAirlines();
+        return await this.getAirlinesRepository.getAirlinesAndStaffs();
     }
 
 }

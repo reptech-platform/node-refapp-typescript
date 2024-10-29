@@ -23,7 +23,7 @@ export interface IAirlineSchema extends Document {
 /**
  * Schema defination to store the document
  */
-const AirlineSchema: Schema = new Schema({
+export const AirlineSchema: Schema = new Schema({
     airlineCode: { type: String },
     name: { type: String, default: null },
     logo: { type: String, default: null },

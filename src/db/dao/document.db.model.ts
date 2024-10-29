@@ -19,7 +19,7 @@ export interface IDocumentSchema extends Document {
 /**
  * Schema defination to store the document
  */
-const DocumentSchema: Schema = new Schema({
+export const DocumentSchema: Schema = new Schema({
     /**
      * Auto increment id
      */
