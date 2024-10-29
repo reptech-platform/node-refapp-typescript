@@ -10,7 +10,7 @@ export default interface IUpdatePersonTripRepository {
     updateTripAndPersonMapping(mapItems: [] | any[], session: ClientSession | undefined): Promise<void>;
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
-    isExist(userName: string, tripId: number): Promise<boolean>;
+    getKeyId(userName: string, tripId: number): Promise<string>;
 }
 
 // This decorator ensures that UpdatePersonTripRepository is a singleton,
@@ -21,7 +21,7 @@ export class UpdatePersonTripRepository implements IUpdatePersonTripRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
-    public async isExist(userName: string, tripId: number): Promise<boolean> {
+    public async getKeyId(userName: string, tripId: number): Promise<string> {
 
         return await PersonTripSchema.find({ userName, tripId }, { _id: 1 })
             .then((data: any[]) => {
@@ -29,7 +29,7 @@ export class UpdatePersonTripRepository implements IUpdatePersonTripRepository {
                 let results = this.helper.GetItemFromArray(data, 0, { _id: null });
                 // Returns true if the association exists, otherwise false.
                 if (!this.helper.IsNullValue(results._id)) return true;
-                return false;
+                return results._id;
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.

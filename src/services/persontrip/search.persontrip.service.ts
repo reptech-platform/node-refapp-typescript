@@ -1,32 +1,32 @@
 import { inject, injectable } from "inversify";
 import { Search, SearchResults } from "../../models/search.model";
-import ISearchAirlineRepository from "../../repositories/airline/search.airline.repository";
+import ISearchPersonTripRepository from "../../repositories/persontrip/search.persontrip.repository";
 
-// Interface for SearchAirlineStaffService
-export default interface ISearchAirlineStaffService {
-    // Searches for AirlineStaffs based on the provided search criteria.
+// Interface for SearchPersonTripService
+export default interface ISearchPersonTripService {
+    // Searches for PersonTrips based on the provided search criteria.
     search(search: Search): Promise<SearchResults>;
 
-    // Counts the number of AirlineStaffs based on the provided search criteria.
+    // Counts the number of PersonTrips based on the provided search criteria.
     searchCount(search: Search): Promise<number>;
 }
 
-// This decorator ensures that SearchAirlineService is a singleton,
+// This decorator ensures that SearchPersonTripService is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class SearchAirlineStaffService implements ISearchAirlineStaffService {
+export class SearchPersonTripService implements ISearchPersonTripService {
     // Injecting the AirlineRepository service
     constructor(
-        @inject('ISearchAirlineRepository') private searchAirlineRepository: ISearchAirlineRepository
+        @inject('ISearchPersonTripRepository') private searchPersonTripRepository: ISearchPersonTripRepository
     ) { }
 
-    // Searches for AirlineStaffs based on the provided search criteria.
+    // Searches for PersonTrips based on the provided search criteria.
     public async search(search: Search): Promise<SearchResults> {
-        return await this.searchAirlineRepository.search(search);
+        return await this.searchPersonTripRepository.search(search);
     }
 
-    // Counts the number of AirlineStaffs based on the provided search criteria.
+    // Counts the number of PersonTrips based on the provided search criteria.
     public async searchCount(search: Search): Promise<number> {
-        return await this.searchAirlineRepository.searchCount(search);
+        return await this.searchPersonTripRepository.searchCount(search);
     }
 }

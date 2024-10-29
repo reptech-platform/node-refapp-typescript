@@ -28,7 +28,7 @@ export class CreateAirlineStaffService implements ICreateAirlineStaffService {
     public async createAirlineStaffs(airlineStaffs: IAirlineStaff[], dbSession: ClientSession | undefined): Promise<void> {
 
         // Create new AirlineStaff schema object
-        let newItems: IAirlineStaffSchema[] = [];
+        let newItems: any[] = [];
 
         // Check if airlineStaffs object is not null
         if (airlineStaffs && airlineStaffs.length > 0) {
@@ -49,11 +49,8 @@ export class CreateAirlineStaffService implements ICreateAirlineStaffService {
                 if (!isExist) {
                     throw new Error(`Provided airline '${airlineCode}' does not exist`);
                 }
-                let item = new AirlineStaffSchema();
-                item.userName = userName;
-                item.airlineCode = airlineCode;
 
-                newItems.push(item);
+                newItems.push({ userName, airlineCode });
             }
         } else {
             throw new Error(`Provided airline staffs are required`);

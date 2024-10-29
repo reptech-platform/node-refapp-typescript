@@ -1,59 +1,55 @@
 import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
+import { IPersonTrip } from "../../models/persontrip.model";
+import ICreatePersonTripRepository from "../../repositories/persontrip/post.persontrip.repository";
 import IGetPersonRepository from "../../repositories/person/get.person.repository";
-import IGetAirlineRepository from "../../repositories/airline/get.airline.repository";
-import ICreateAirlineStaffRepository from "../../repositories/airlinestaff/post.airlinestaff.repository";
-import AirlineStaffSchema, { IAirlineStaffSchema } from "../../db/dao/airlinestaff.db.model";
-import { IAirlineStaff } from "../../models/airlinestaff.model";
+import IGetTripRepository from "../../repositories/trip/get.trip.repository";
 
-// Interface for CreateAirlineStaffService
-export default interface ICreateAirlineStaffService {
-    // Method to create a new airline
-    createAirlineStaffs(airlineStaffs: IAirlineStaff[], dbSession: ClientSession | undefined): Promise<void>;
+// Interface for CreatePersonTripService
+export default interface IUpdatePersonTripService {
+    // Method to create a new person and trip mapping
+    createPersonTrips(personTrips: IPersonTrip[], dbSession: ClientSession | undefined): Promise<void>;
 }
 
-// This decorator ensures that CreateAirlineStaffService is a singleton,
+// This decorator ensures that CreatePersonTripService is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class CreateAirlineStaffService implements ICreateAirlineStaffService {
+export class UpdatePersonTripService implements IUpdatePersonTripService {
     // Injecting the AirlineRepository service
     constructor(
-        @inject('ICreateAirlineStaffRepository') private createAirlineStaffRepository: ICreateAirlineStaffRepository,
-        @inject('IGetAirlineRepository') private getAirlineRepository: IGetAirlineRepository,
+        @inject('ICreatePersonTripRepository') private createPersonTripRepository: ICreatePersonTripRepository,
+        @inject('IGetTripRepository') private getTripRepository: IGetTripRepository,
         @inject('IGetPersonRepository') private getPersonRepository: IGetPersonRepository
     ) { }
 
     // Method to create a new airline
-    public async createAirlineStaffs(airlineStaffs: IAirlineStaff[], dbSession: ClientSession | undefined): Promise<void> {
+    public async createPersonTrips(personTrips: IPersonTrip[], dbSession: ClientSession | undefined): Promise<void> {
 
-        // Create new AirlineStaff schema object
-        let newItems: IAirlineStaffSchema[] = [];
+        // Create new PersonTrip schema object
+        let newItems: any[] = [];
 
-        // Check if airlineStaffs object is not null
-        if (airlineStaffs && airlineStaffs.length > 0) {
+        // Check if personTrips object is not null
+        if (personTrips && personTrips.length > 0) {
             // Loop to check if each friend already exists in the database using their userName
-            for (let index = 0; index < airlineStaffs.length; index++) {
-                let { airlineCode, userName } = airlineStaffs[index];
-                // Check if the AirlineStaff exists. If not, throw an error.
-                let isExist = await this.createAirlineStaffRepository.isExist(airlineCode, userName);
+            for (let index = 0; index < personTrips.length; index++) {
+                let { tripId, userName } = personTrips[index];
+                // Check if the PersonTrip exists. If not, throw an error.
+                let isExist = await this.createPersonTripRepository.isExist(userName, tripId);
                 if (!isExist) {
-                    throw new Error(`Provided airline staff '${airlineCode}' and '${userName}' is already exist`);
+                    throw new Error(`Provided person trip '${tripId}' and '${userName}' is already exist`);
                 }
                 isExist = await this.getPersonRepository.isExist(userName);
                 if (!isExist) {
-                    throw new Error(`Provided staff '${userName}' does not exist`);
+                    throw new Error(`Provided person '${userName}' does not exist`);
                 }
 
-                isExist = await this.getAirlineRepository.isExist(airlineCode);
+                isExist = await this.getTripRepository.isExist(tripId);
                 if (!isExist) {
-                    throw new Error(`Provided airline '${airlineCode}' does not exist`);
+                    throw new Error(`Provided trip '${tripId}' does not exist`);
                 }
-                let item = new AirlineStaffSchema();
-                item.userName = userName;
-                item.airlineCode = airlineCode;
 
-                newItems.push(item);
+                newItems.push({ userName, tripId });
             }
         } else {
             throw new Error(`Provided airline staffs are required`);
@@ -71,7 +67,7 @@ export class CreateAirlineStaffService implements ICreateAirlineStaffService {
         }
 
         // Create airlinestaff document
-        await this.createAirlineStaffRepository.addStaffAirlines(newItems, dbSession);
+        await this.createPersonTripRepository.createTripAndPersonMapping(newItems, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {
