@@ -5,6 +5,7 @@ import IUpdateAirportRepository from "../../repositories/airport/put.airport.rep
 import { IAirport } from "../../models/airport.model";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
 import IGetAirlineRepository from "../../repositories/airline/get.airline.repository";
+import Helper from "../../utils/helper.utils";
 
 // Interface for UpdateAirportService
 export default interface IUpdateAirportService {
@@ -18,6 +19,7 @@ export default interface IUpdateAirportService {
 export class UpdateAirportService implements IUpdateAirportService {
     // Injecting the AirportRepository service
     constructor(
+        @inject('Helper') private helper: Helper,
         @inject('IUpdateAirportRepository') private updateAirportRepository: IUpdateAirportRepository,
         @inject('IGetAirlineRepository') private getAirlineRepository: IGetAirlineRepository
     ) { }
@@ -26,27 +28,45 @@ export class UpdateAirportService implements IUpdateAirportService {
     public async updateAirport(icaoCode: string, iataCode: string, airport: IAirport, dbSession: ClientSession | undefined): Promise<IAirport> {
 
         // Create new Airport schema object
-        let newAirport: IAirportSchema = new AirportSchema();
+        let newItem: IAirportSchema = new AirportSchema();
 
-        let isExist = await this.updateAirportRepository.isExist(icaoCode, iataCode);
-        if (isExist) {
-            throw new Error(`Provided airport '${icaoCode}' and '${iataCode}' is already exist`);
-        }
-
-        // Check if airline is not null
-        if (airport.airlineId) {
-            let isExist = await this.getAirlineRepository.isExist(airport.airlineId);
-            if (!isExist) {
-                throw new Error(`Provided Airport '${airport.airlineId}' does not exist`);
-            }
-        }
-
+        // Map airline model into schema object
         const keys = Object.keys(airport);
-
         for (let i = 0; i < keys.length; i++) {
             if (airport[keys[i]]) {
-                newAirport[keys[i]] = airport[keys[i]];
+                newItem[keys[i]] = airport[keys[i]];
             }
+        }
+
+        if (icaoCode && iataCode) {
+            let isExist = await this.updateAirportRepository.isExist(icaoCode, iataCode);
+            if (isExist) {
+                throw new Error(`Provided airport '${icaoCode}' and '${iataCode}' is already exist`);
+            }
+        } else {
+            throw new Error(`Provided airport '${icaoCode}' and '${iataCode}' is invalid`);
+        }
+
+        // Check airline and airlineId both are passed
+        if (!this.helper.IsJsonNull(airport.airline) && !this.helper.IsNullValue(airport.airlineId)) {
+            throw new Error(`Provide only airline or airlineId`);
+        }
+
+        // Check if airline  is not null
+        if (airport.airlineId && !this.helper.IsNullValue(airport.airlineId)) {
+            let isExist = await this.getAirlineRepository.isExist(airport.airlineId);
+            if (!isExist) {
+                throw new Error(`Provided Airline '${airport.airlineId}' does not exist`);
+            }
+            newItem.airline = airport.airlineId;
+        }
+
+        if (airport.airline && !this.helper.IsJsonNull(airport.airline)) {
+            let isExist = await this.getAirlineRepository.isExist(airport.airline.airlineCode);
+            if (!isExist) {
+                throw new Error(`Provided Airline '${airport.airline.airlineCode}' does not exist`);
+            }
+            newItem.airline = airport.airline.airlineCode;
         }
 
         // Flag to indicate if this function created the session
@@ -61,7 +81,7 @@ export class UpdateAirportService implements IUpdateAirportService {
         }
 
         // Create Airport document
-        const results = await this.updateAirportRepository.updateAirport(icaoCode, iataCode, newAirport, dbSession);
+        const results = await this.updateAirportRepository.updateAirport(icaoCode, iataCode, newItem, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {

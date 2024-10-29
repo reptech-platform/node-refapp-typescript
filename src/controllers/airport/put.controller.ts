@@ -28,7 +28,8 @@ export class AirportUpdateController extends Controller {
             // Await the result of the updateAirport method from the updateAirportService
             await this.updateAirportService.updateAirport(icaoCode, iataCode, body, undefined);
 
-            return { status: 200, message: `Updated airport ${icaoCode} and ${iataCode} successfuly` };
+            // Return an success response with the status and status message
+            return { status: 201, message: `Airport ${icaoCode} and ${iataCode} updated successfuly.` };
 
         } catch (ex: any) {
 

@@ -23,12 +23,14 @@ export class GetAirportsRepository implements IGetAirportsRepository {
         let $pipeline = [
             {
                 $lookup: {
-                    from: "airlines", localField: "airlineId", foreignField: "_id", as: "airlines",
+                    from: "airlines", localField: "airline", foreignField: "airlineCode", as: "airlines",
                     pipeline: [
                         {
                             $project: {
                                 __v: 0,
-                                _id: 0
+                                _id: 0,
+                                airportId: 0,
+                                "CEO._id": 0
                             }
                         }
                     ]
@@ -38,7 +40,7 @@ export class GetAirportsRepository implements IGetAirportsRepository {
             {
                 $project: {
                     _id: 0,
-                    airportId: 0,
+                    airline: 0,
                     __v: 0
                 }
             }
@@ -47,7 +49,7 @@ export class GetAirportsRepository implements IGetAirportsRepository {
         return await AirportSchema.aggregate($pipeline)
             .then((data: IAirportSchema[]) => {
                 // Uses the helper to process the Airport.
-                let results = this.helper.GetItemFromArray(data, 0, {});
+                let results = this.helper.GetItemFromArray(data, -1, []);
                 return results as IAirport[];
             })
             .catch((error: Error) => {

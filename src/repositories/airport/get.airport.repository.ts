@@ -10,7 +10,7 @@ export default interface IGetAirportRepository {
     getAirport(icaoCode: string, iataCode: string): Promise<IAirport>;
 
     // Method to get a specific airport id by its ICAO and IATA codes
-    getAirportId(icaoCode: string, iataCode: string): Promise<string>
+    getAirportId(icaoCode: string, iataCode: string): Promise<string>;
 
     // Method to check if an airport exists by its ICAO and IATA codes
     isExist(icaoCode: string, iataCode: string): Promise<boolean>;
@@ -46,12 +46,14 @@ export class GetAirportRepository implements IGetAirportRepository {
             { $match: { icaoCode, iataCode } },
             {
                 $lookup: {
-                    from: "airlines", localField: "airlineId", foreignField: "_id", as: "airlines",
+                    from: "airlines", localField: "airline", foreignField: "airlineCode", as: "airlines",
                     pipeline: [
                         {
                             $project: {
                                 __v: 0,
-                                _id: 0
+                                _id: 0,
+                                airportId: 0,
+                                "CEO._id": 0
                             }
                         }
                     ]
@@ -61,7 +63,7 @@ export class GetAirportRepository implements IGetAirportRepository {
             {
                 $project: {
                     _id: 0,
-                    airportId: 0,
+                    airline: 0,
                     __v: 0
                 }
             }

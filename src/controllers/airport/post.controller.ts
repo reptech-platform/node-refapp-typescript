@@ -31,7 +31,7 @@ export class AirportCreateController extends Controller {
             this.setStatus(201);
 
             // Return an success response with the status and status message
-            return { status: 201, message: `Added airport ${body.icaoCode} and ${body.iataCode} successfuly.` };
+            return { status: 201, message: `Airport ${body.icaoCode} and ${body.iataCode} created successfuly.` };
 
         } catch (ex: any) {
 

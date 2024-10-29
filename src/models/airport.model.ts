@@ -14,16 +14,16 @@ export interface IAirport {
     iataCode: string;
 
     // The latitude coordinate of the airport
-    latitude: number;
+    latitude?: number;
 
     // The longitude coordinate of the airport
-    longitude: number;
+    longitude?: number;
 
     // Indicates whether the airport is located inside a city
-    isInsideCity: boolean;
+    isInsideCity?: boolean;
 
     // JSON string representing the location details of the airport
-    locationJSON: string;
+    locationJSON?: string;
 
     // Optional property representing the embeded location details of the airport
     location?: IAirportLocation;
@@ -52,16 +52,16 @@ export class Airport implements IAirport {
     iataCode: string;
 
     // The latitude coordinate of the airport
-    latitude: number;
+    latitude?: number;
 
     // The longitude coordinate of the airport
-    longitude: number;
+    longitude?: number;
 
     // Indicates whether the airport is located inside a city
-    isInsideCity: boolean;
+    isInsideCity?: boolean;
 
     // JSON string representing the location details of the airport
-    locationJSON: string;
+    locationJSON?: string;
 
     // Optional property representing the embeded location details of the airport
     location?: IAirportLocation;

@@ -2,7 +2,6 @@ import { Controller, Delete, Tags, Route, Path } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
 import IDeleteAirportService from "../../services/airport/delete.airport.service";
-import { IAirport } from "../../models/airport.model";
 
 // Tags and route for the controller
 @Tags("Airports")
@@ -35,7 +34,7 @@ export class AirportDeleteController extends Controller {
             this.setStatus(201);
 
             // Return an success response with the status and status message
-            return { status: 201, message: `Record deleted successfuly.` };
+            return { status: 201, message: `Airport ${icaoCode} and ${iataCode} deleted successfuly.` };
 
         } catch (ex: any) {
 
