@@ -4,8 +4,8 @@ import { injectable, inject } from "inversify";
 import DbSession from "../../db/utils/dbsession.db";
 import PersonTripSchema from "../../db/dao/persontrip.db.model";
 
-// Interface for CreateTripRepository
-export default interface ICreateTripRepository {
+// Interface for CreatePersonTripRepository
+export default interface ICreatePersonTripRepository {
     // This method create the trip and person mapping in the database.
     createTripAndPersonMapping(mapItems: [] | any[], session: ClientSession | undefined): Promise<void>;
 
@@ -13,10 +13,10 @@ export default interface ICreateTripRepository {
     isExist(userName: string, tripId: number): Promise<boolean>;
 }
 
-// This decorator ensures that CreateTripRepository is a singleton,
+// This decorator ensures that CreatePersonTripRepository is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class CreateTripRepository implements ICreateTripRepository {
+export class CreatePersonTripRepository implements ICreatePersonTripRepository {
     // Injecting the Helper service
     constructor(@inject(Helper) private helper: Helper) { }
 

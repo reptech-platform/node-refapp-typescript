@@ -1,50 +1,33 @@
-import { IPerson } from "../../models/person.model";
+import { ITrip } from "../../models/trip.model";
 import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
-import ICreatePersonRepository from "../../repositories/person/post.person.repository";
+import ICreateTripRepository from "../../repositories/trip/post.trip.repository";
+import TripSchema, { ITripSchema } from "../../db/dao/trip.db.model";
 
-// Interface for CreatePersonService
-export default interface ICreatePersonService {
-    // Creates a new person in the database.
-    create(person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson>;
+// Interface for CreateTripService
+export default interface ICreateTripService {
+    // Creates a new trip in the database.
+    createTrip(trip: ITrip, dbSession: ClientSession | undefined): Promise<ITrip>;
 }
 
-// This decorator ensures that CreatePersonService is a singleton,
+// This decorator ensures that CreateTripService is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class CreatePersonService implements ICreatePersonService {
-    // Injecting the PersonRepository service
+export class CreateTripService implements ICreateTripService {
+    // Injecting the TripRepository service
     constructor(
-        @inject('ICreatePersonRepository') private createPersonRepository: ICreatePersonRepository
+        @inject('ICreateTripRepository') private createTripRepository: ICreateTripRepository
     ) { }
 
-    // Creates a new person in the database.
-    public async create(person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson> {
+    // Creates a new trip in the database.
+    public async createTrip(trip: ITrip, dbSession: ClientSession | undefined): Promise<ITrip> {
 
-        // Check if the person exists. If they do, throw an error.
-        let isExist = await this.isPersonExist(person.userName);
-        if (isExist) {
-            throw new Error(`Provided person '${person.userName}' already exists`);
-        }
-
-        // Check if best friend object is not null
-        if (person.bestFriendId) {
-            isExist = await this.isPersonExist(person.bestFriendId);
-            if (!isExist) {
-                throw new Error(`Provided best friend '${person.bestFriendId}' does not exist`);
-            }
-        }
-
-        // Check if friends object is not null
-        if (person.friendsList && person.friendsList.length > 0) {
-            // Loop to check if each friend already exists in the database using their userName
-            for (let index = 0; index < person.friendsList.length; index++) {
-                let friend = person.friendsList[index];
-                isExist = await this.isPersonExist(friend);
-                if (!isExist) {
-                    throw new Error(`Provided friend '${friend}' does not exist`);
-                }
+        if (trip.tripId) {
+            // Check if the trip exists. If they do, throw an error.
+            let isExist = await this.createTripRepository.isExist(trip.tripId);
+            if (isExist) {
+                throw new Error(`Provided trip '${trip.tripId}' already exists`);
             }
         }
 
@@ -59,20 +42,25 @@ export class CreatePersonService implements ICreatePersonService {
             inCarryTransact = true;
         }
 
-        // Create new person entry in the database
-        let newPerson = await this.createPersonRepository.create(person, dbSession);
+        let newItem: ITripSchema = new TripSchema();
+
+        const keys = Object.keys(trip);
+
+        for (let i = 0; i < keys.length; i++) {
+            if (trip[keys[i]]) {
+                newItem[keys[i]] = trip[keys[i]];
+            }
+        }
+
+        // Create new trip entry in the database
+        let results = await this.createTripRepository.createTrip(newItem, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {
             await DbSession.Commit(dbSession);
         }
 
-        // Return newly created person object
-        return newPerson;
-    }
-
-    // Checks if a person with the given userName exists in the database.
-    private async isPersonExist(userName: string): Promise<boolean> {
-        return await this.createPersonRepository.isPersonExist(userName);
+        // Return newly created trip object
+        return results;
     }
 }

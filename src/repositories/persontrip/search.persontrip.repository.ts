@@ -4,8 +4,8 @@ import TripSchema, { ITripSchema } from "../../db/dao/trip.db.model";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 
-// Interface for SearchTripRepository
-export default interface ISearchTripRepository {
+// Interface for SearchPersonTripRepository
+export default interface ISearchPersonTripRepository {
     // Searches for trips based on the provided search criteria.
     searchTrip(search: Search): Promise<SearchResults>;
 
@@ -13,10 +13,10 @@ export default interface ISearchTripRepository {
     searchTripCount(search: Search): Promise<number>;
 }
 
-// This decorator ensures that SearchTripRepository is a singleton,
+// This decorator ensures that SearchPersonTripRepository is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class SearchTripRepository implements ISearchTripRepository {
+export class SearchPersonTripRepository implements ISearchPersonTripRepository {
     // Injecting the Helper service
     constructor(@inject(Helper) private helper: Helper) { }
 

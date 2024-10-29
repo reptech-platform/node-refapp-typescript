@@ -4,8 +4,8 @@ import { injectable, inject } from "inversify";
 import PersonTripSchema from "../../db/dao/persontrip.db.model";
 import DbSession from "../../db/utils/dbsession.db";
 
-// Interface for UpdateTripRepository
-export default interface IUpdateTripRepository {
+// Interface for UpdatePersonTripRepository
+export default interface IUpdatePersonTripRepository {
     // This method updates the trip and person mapping in the database.
     updateTripAndPersonMapping(mapItems: [] | any[], session: ClientSession | undefined): Promise<void>;
 
@@ -13,10 +13,10 @@ export default interface IUpdateTripRepository {
     isExist(userName: string, tripId: number): Promise<boolean>;
 }
 
-// This decorator ensures that UpdateTripRepository is a singleton,
+// This decorator ensures that UpdatePersonTripRepository is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class UpdateTripRepository implements IUpdateTripRepository {
+export class UpdatePersonTripRepository implements IUpdatePersonTripRepository {
     // Injecting the Helper service
     constructor(@inject(Helper) private helper: Helper) { }
 
@@ -41,7 +41,7 @@ export class UpdateTripRepository implements IUpdateTripRepository {
     public async updateTripAndPersonMapping(mapItems: [] | any[], session: ClientSession | undefined): Promise<void> {
 
         // Inserts the mapItems into the PersonTripSchema collection.
-        await PersonTripSchema.insertMany(mapItems, { session }).catch((error: Error) => {
+        await PersonTripSchema.updateMany(mapItems, { session }).catch((error: Error) => {
             // Abort Client Session if there's an error
             DbSession.Abort(session);
             // Throws an error if the operation fails.

@@ -2,15 +2,14 @@ import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
 import ICreateAirportRepository from "../../repositories/airport/post.airport.repository";
-import { IAirportAdd } from "../../models/airport.model";
-import { IAirportRead } from "../../models/airport/airport.read.model";
+import { IAirport } from "../../models/airport.model";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
 import IGetAirlineRepository from "../../repositories/airline/get.airline.repository";
 
 // Interface for CreateAirportService
 export default interface ICreateAirportService {
     // Method to create a new Airport
-    createAirport(airport: IAirportAdd, dbSession: ClientSession | undefined): Promise<IAirportRead>;
+    createAirport(airport: IAirport, dbSession: ClientSession | undefined): Promise<IAirport>;
 }
 
 // This decorator ensures that CreateAirportService is a singleton,
@@ -24,7 +23,7 @@ export class CreateAirportService implements ICreateAirportService {
     ) { }
 
     // Method to create a new Airport
-    public async createAirport(airport: IAirportAdd, dbSession: ClientSession | undefined): Promise<IAirportRead> {
+    public async createAirport(airport: IAirport, dbSession: ClientSession | undefined): Promise<IAirport> {
 
         // Create new Airport schema object
         let newAirport: IAirportSchema = new AirportSchema();
@@ -40,10 +39,10 @@ export class CreateAirportService implements ICreateAirportService {
         }
 
         // Check if airline  is not null
-        if (airport.airline) {
-            let isExist = await this.getAirlineRepository.isExist(airport.airline);
+        if (airport.airlineId) {
+            let isExist = await this.getAirlineRepository.isExist(airport.airlineId);
             if (!isExist) {
-                throw new Error(`Provided Airline '${airport.airline}' does not exist`);
+                throw new Error(`Provided Airline '${airport.airlineId}' does not exist`);
             }
         }
 
@@ -67,7 +66,7 @@ export class CreateAirportService implements ICreateAirportService {
         }
 
         // Create Airport document
-        const results: IAirportRead = await this.createAirportRepository.createAirport(newAirport, dbSession);
+        const results = await this.createAirportRepository.createAirport(newAirport, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {

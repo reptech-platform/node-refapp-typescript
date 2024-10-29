@@ -2,14 +2,13 @@ import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
 import ICreatePersonRepository from "../../repositories/person/post.person.repository";
-import { IPersonAdd } from "../../models/person.model";
-import { IPersonRead } from "../../models/person/person.read.model";
+import { IPerson } from "../../models/person.model";
 import PersonSchema, { IPersonSchema } from "../../db/dao/person.db.model";
 
 // Interface for CreatePersonService
 export default interface ICreatePersonService {
     // Creates a new person in the database.
-    createPerson(person: IPersonAdd, dbSession: ClientSession | undefined): Promise<IPersonRead>;
+    createPerson(person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson>;
 }
 
 // This decorator ensures that CreatePersonService is a singleton,
@@ -22,14 +21,18 @@ export class CreatePersonService implements ICreatePersonService {
     ) { }
 
     // Creates a new person in the database.
-    public async createPerson(person: IPersonAdd, dbSession: ClientSession | undefined): Promise<IPersonRead> {
+    public async createPerson(person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson> {
 
         let newPerson: IPersonSchema = new PersonSchema();
 
-        // Check if the person exists. If they do, throw an error.
-        let isExist = await this.createPersonRepository.isExist(person.userName);
-        if (isExist) {
-            throw new Error(`Provided person '${person.userName}' already exists`);
+        if (person.userName) {
+            // Check if the person exists. If they do, throw an error.
+            let isExist = await this.createPersonRepository.isExist(person.userName);
+            if (isExist) {
+                throw new Error(`Provided person '${person.userName}' already exists`);
+            }
+        } else {
+            throw new Error(`Provided person userName is required`);
         }
 
         // Check if best friend object is not null

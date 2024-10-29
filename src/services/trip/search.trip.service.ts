@@ -1,32 +1,32 @@
 import { inject, injectable } from "inversify";
 import { Search, SearchResults } from "../../models/search.model";
-import ISearchPersonRepository from "../../repositories/person/search.person.repository";
+import ISearchTripRepository from "../../repositories/trip/search.trip.repository";
 
-// Interface for SearchPersonService
-export default interface ISearchPersonService {
-    // Searches for persons based on the provided search criteria.
+// Interface for SearchTripService
+export default interface ISearchTripService {
+    // Searches for trips based on the provided search criteria.
     search(search: Search): Promise<SearchResults>;
 
-    // Counts the number of persons based on the provided search criteria.
+    // Counts the number of trips based on the provided search criteria.
     searchCount(search: Search): Promise<number>;
 }
 
-// This decorator ensures that SearchPersonService is a singleton,
+// This decorator ensures that SearchTripService is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class SearchPersonService implements ISearchPersonService {
-    // Injecting the PersonRepository service
+export class SearchTripService implements ISearchTripService {
+    // Injecting the TripRepository service
     constructor(
-        @inject('ISearchPersonRepository') private searchPersonRepository: ISearchPersonRepository
+        @inject('ISearchTripRepository') private searchTripRepository: ISearchTripRepository
     ) { }
 
-    // Searches for persons based on the provided search criteria.
+    // Searches for trips based on the provided search criteria.
     public async search(search: Search): Promise<SearchResults> {
-        return await this.searchPersonRepository.search(search);
+        return await this.searchTripRepository.search(search);
     }
 
-    // Counts the number of persons based on the provided search criteria.
+    // Counts the number of trips based on the provided search criteria.
     public async searchCount(search: Search): Promise<number> {
-        return await this.searchPersonRepository.searchCount(search);
+        return await this.searchTripRepository.searchCount(search);
     }
 }

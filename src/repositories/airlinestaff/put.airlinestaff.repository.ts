@@ -41,7 +41,7 @@ export class UpdateAirlineStaffRepository implements IUpdateAirlineStaffReposito
     public async addOrUpdateStaffAirlines(mapItems: [] | any[], session: ClientSession | undefined): Promise<void> {
 
         // Inserts the mapItems into the PersonTripSchema collection.
-        await AirlineStaffSchema.insertMany(mapItems, { session }).catch((error: Error) => {
+        await AirlineStaffSchema.updateMany(mapItems, { session }).catch((error: Error) => {
             // Abort Client Session if there's an error
             DbSession.Abort(session);
             // Throws an error if the operation fails.

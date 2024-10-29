@@ -5,8 +5,8 @@ import PersonTripSchema from "../../db/dao/persontrip.db.model";
 import { IPerson } from "../../models/person.model";
 import { ITrip } from "../../models/trip.model";
 
-// Interface for GetTripsRepository
-export default interface IGetTripsRepository {
+// Interface for GetPersonTripsRepository
+export default interface IGetPersonTripsRepository {
     // Fetches all Trips from the database
     getAllTrips(): Promise<ITrip[]>;
 
@@ -14,10 +14,10 @@ export default interface IGetTripsRepository {
     getAllPersons(): Promise<IPerson[]>;
 }
 
-// This decorator ensures that GetTripsRepository is a singleton,
+// This decorator ensures that GetPersonTripsRepository is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class GetTripsRepository implements IGetTripsRepository {
+export class GetPersonTripsRepository implements IGetPersonTripsRepository {
     // Injecting the Helper service
     constructor() { }
 

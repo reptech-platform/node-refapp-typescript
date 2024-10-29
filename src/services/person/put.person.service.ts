@@ -3,13 +3,12 @@ import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
 import IUpdatePersonRepository from "../../repositories/person/put.person.repository";
 import PersonSchema, { IPersonSchema } from "../../db/dao/person.db.model";
-import { IPersonUpdate } from "../../models/person/person.update.model";
-import { IPersonRead } from "../../models/person/person.read.model";
+import { IPerson } from "../../models/person.model";
 
 // Interface for UpdatePersonService
 export default interface IUpdatePersonService {
     // Updates an existing person by their userName and returns the updated person.
-    updatePerson(userName: string, person: IPersonUpdate, dbSession: ClientSession | undefined): Promise<IPersonRead>;
+    updatePerson(userName: string, person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson>;
 }
 
 // This decorator ensures that UpdatePersonService is a singleton,
@@ -22,13 +21,13 @@ export class UpdatePersonService implements IUpdatePersonService {
     ) { }
 
     // Updates an existing person by their userName and returns the updated person.
-    public async updatePerson(userName: string, person: IPersonUpdate, dbSession: ClientSession | undefined): Promise<IPersonRead> {
+    public async updatePerson(userName: string, person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson> {
         let newPerson: IPersonSchema = new PersonSchema();
 
         // Check if the person exists. If they do, throw an error.
         let isExist = await this.updatePersonRepository.isExist(userName);
         if (!isExist) {
-            throw new Error(`Provided person '${person.userName}' does not exists`);
+            throw new Error(`Provided person '${userName}' does not exists`);
         }
 
         // Check if best friend object is not null

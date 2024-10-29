@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
 import IGetPersonsRepository from "../../repositories/person/get.persons.repository";
-import { IPersonRead } from "../../models/person/person.read.model";
+import { IPerson } from "../../models/person.model";
 
 export default interface IGetPersonsService {
     // Fetches all persons from the database.
-    getPersons(): Promise<IPersonRead[]>;
+    getPersons(): Promise<IPerson[]>;
 }
 
 // This decorator ensures that PersonsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
@@ -17,7 +17,7 @@ export class GetPersonsService implements IGetPersonsService {
     ) { }
 
     // Fetches all persons from the database.
-    public async getPersons(): Promise<IPersonRead[]> {
+    public async getPersons(): Promise<IPerson[]> {
         return await this.getPersonsRepository.getPersons();
     }
 

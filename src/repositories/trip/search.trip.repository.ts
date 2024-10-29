@@ -7,10 +7,10 @@ import { injectable, inject } from "inversify";
 // Interface for SearchTripRepository
 export default interface ISearchTripRepository {
     // Searches for trips based on the provided search criteria.
-    searchTrip(search: Search): Promise<SearchResults>;
+    search(search: Search): Promise<SearchResults>;
 
     // Gets the total count of trips matching the search criteria.
-    searchTripCount(search: Search): Promise<number>;
+    searchCount(search: Search): Promise<number>;
 }
 
 // This decorator ensures that SearchTripRepository is a singleton,
@@ -21,7 +21,7 @@ export class SearchTripRepository implements ISearchTripRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Searches for trips based on the provided search criteria.
-    public async searchTrip(search: Search): Promise<SearchResults> {
+    public async search(search: Search): Promise<SearchResults> {
 
         let $sort: any = undefined, $match: any = undefined, $limit: any = undefined, $skip: any = undefined;
 
@@ -49,7 +49,7 @@ export class SearchTripRepository implements ISearchTripRepository {
         }
 
         // Gets the total count of records matching the search criteria.
-        let recordCount = await this.searchTripCount(search);
+        let recordCount = await this.searchCount(search);
 
         let $pipeline: any = [];
 
@@ -74,7 +74,7 @@ export class SearchTripRepository implements ISearchTripRepository {
     }
 
     // Gets the total count of trips matching the search criteria.
-    public async searchTripCount(search: Search): Promise<number> {
+    public async searchCount(search: Search): Promise<number> {
 
         let $match = {};
 

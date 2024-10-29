@@ -7,10 +7,10 @@ import DbSession from "../../db/utils/dbsession.db";
 // Interface for DeleteAirlineStaffRepository
 export default interface IDeleteAirlineStaffRepository {
     // This method deletes a staff for a ailine.
-    deleteStaffStaff(airlineCode: string, userName: string, session: ClientSession | undefined): Promise<void>;
+    deleteAirlineStaff(airlineCode: string, userName: string, session: ClientSession | undefined): Promise<boolean>;
 
     // This method checks if a person with the given userName is associated with a airline with the given airlineCode.
-    isAirlineAndStaffExist(airlineCode: string, userName: string): Promise<boolean>;
+    isExist(airlineCode: string, userName: string): Promise<boolean>;
 }
 
 // This decorator ensures that DeleteAirlineStaffRepository is a singleton,
@@ -22,7 +22,7 @@ export class DeleteAirlineStaffRepository implements IDeleteAirlineStaffReposito
     constructor(@inject(Helper) private helper: Helper) { }
 
     // This method checks if a person with the given userName is associated with a airline with the given airlineCode.
-    public async isAirlineAndStaffExist(airlineCode: string, userName: string): Promise<boolean> {
+    public async isExist(airlineCode: string, userName: string): Promise<boolean> {
 
         return await AirlineStaffSchema.find({ airlineCode, userName }, { _id: 1 })
             .then((data: any[]) => {
@@ -39,14 +39,18 @@ export class DeleteAirlineStaffRepository implements IDeleteAirlineStaffReposito
     }
 
     // This method deletes a staff for a ailine.
-    public async deleteStaffStaff(airlineCode: string, userName: string, session: ClientSession | undefined): Promise<void> {
+    public async deleteAirlineStaff(airlineCode: string, userName: string, session: ClientSession | undefined): Promise<boolean> {
 
-        // Deletes the userName from the AirportStaffSchema collection.
-        await AirlineStaffSchema.deleteOne({ airlineCode, userName }, { session }).catch((error: Error) => {
-            // Abort Client Session if there's an error
-            DbSession.Abort(session);
-            // Throws an error if the operation fails.
-            throw error;
-        });
+        // Deletes the airline and userName from the AirportStaffSchema collection.
+        return await AirlineStaffSchema.findOneAndDelete({ airlineCode, userName }, { session })
+            .then(() => {
+                return true;
+            })
+            .catch((error: Error) => {
+                // Abort Client Session if there's an error
+                DbSession.Abort(session);
+                // Throws an error if the operation fails.
+                throw error;
+            });
     }
 }

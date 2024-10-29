@@ -1,13 +1,15 @@
 import { Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
-import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
+import AirlineStaffSchema from "../../db/dao/airlinestaff.db.model";
+import { IAirlineSchema } from "../../db/dao/airline.db.model";
 import { IAirline } from "../../models/airline.model";
+import { IAirlineStaff } from "../../models/airlinestaff.model";
 
 // Interface for GetAirlinesRepository
 export default interface IGetAirlinesRepository {
     // Method to get all airlines
-    getAirlines(): Promise<IAirline[]>;
+    getAirlinesAndStaffs(): Promise<IAirlineStaff[]>;
 }
 
 // This decorator ensures that GetAirlinesRepository is a singleton,
@@ -18,12 +20,12 @@ export class GetAirlinesRepository implements IGetAirlinesRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Fetches a single Airline by its airlineCode, excluding the _id field.
-    public async getAirlines(): Promise<IAirline[]> {
+    public async getAirlinesAndStaffs(): Promise<IAirlineStaff[]> {
 
         let $pipeline = [
             {
                 $lookup: {
-                    from: "airports", localField: "airportId", foreignField: "_id", as: "airports",
+                    from: "airlines", localField: "airlineCode", foreignField: "airlineCode", as: "airlines",
                     pipeline: [
                         {
                             $project: {
@@ -34,22 +36,34 @@ export class GetAirlinesRepository implements IGetAirlinesRepository {
                     ]
                 }
             },
-            { $unwind: { path: "$airports", preserveNullAndEmptyArrays: true } },
+            { $unwind: { path: "$airlines", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: "persons", localField: "userName", foreignField: "userName", as: "staffs",
+                    pipeline: [
+                        {
+                            $project: {
+                                __v: 0,
+                                _id: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            { $unwind: { path: "$staffs", preserveNullAndEmptyArrays: true } },
             {
                 $project: {
-                    _id: 0,
-                    airportId: 0,
-                    __v: 0,
-                    "CEO._id": 0
+                    "$airlines": 1,
+                    "$staffs": 1
                 }
             }
         ];
 
-        return await AirlineSchema.aggregate($pipeline)
+        return await AirlineStaffSchema.aggregate($pipeline)
             .then((data: IAirlineSchema[]) => {
                 // Uses the helper to process the Airline.
                 let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as IAirline[];
+                return results as IAirlineStaff[];
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.

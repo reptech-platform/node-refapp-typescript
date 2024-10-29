@@ -1,16 +1,20 @@
 import { Error } from "mongoose";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import AirlineStaffSchema from "../../db/dao/airlinestaff.db.model";
 import { IPerson } from "../../models/person.model";
 import { IAirline } from "../../models/airline.model";
+import Helper from "../../utils/helper.utils";
 
 // Interface for GetAirlineStaffRepository
 export default interface IGetAirlineStaffRepository {
     // This method get multiple staff to a airline.
-    getArilineStaffs(airlineCode: string): Promise<IPerson[]>;
+    getAirlineStaffs(airlineCode: string): Promise<IPerson[]>;
 
     // This method get multiple staff to a airline.
-    getStaffArilines(userName: string): Promise<IAirline[]>;
+    getStaffAirlines(userName: string): Promise<IAirline[]>;
+
+    // This method checks if the given airlineCode or userName is associated with a airline and staff.
+    isExist(airlineCode: string | undefined | null, userName: string | undefined | null): Promise<boolean>;
 }
 
 // This decorator ensures that GetAirlineStaffRepository is a singleton,
@@ -18,10 +22,62 @@ export default interface IGetAirlineStaffRepository {
 @injectable()
 export class GetAirlineStaffRepository implements IGetAirlineStaffRepository {
     // Injecting the Helper service
-    constructor() { }
+    constructor(@inject(Helper) private helper: Helper) { }
+
+    // This method checks if the given airlineCode or userName is associated with a airline and staff.
+    public async isExist(airlineCode: string | undefined | null, userName: string | undefined | null): Promise<boolean> {
+
+        // Validate the inputs 
+        if (!airlineCode && !userName) {
+            throw new Error("At least one of airlineCode or userName must be provided")
+        }
+
+        if (airlineCode && !userName) {
+            return await AirlineStaffSchema.find({ airlineCode }, { _id: 1 })
+                .then((data: any[]) => {
+                    // Uses the helper to process the array of results.
+                    let results = this.helper.GetItemFromArray(data, 0, { _id: null });
+                    // Returns true if the association exists, otherwise false.
+                    if (!this.helper.IsNullValue(results._id)) return true;
+                    return false;
+                })
+                .catch((error: Error) => {
+                    // Throws an error if the operation fails.
+                    throw error;
+                });
+        }
+
+        if (!airlineCode && userName) {
+            return await AirlineStaffSchema.find({ userName }, { _id: 1 })
+                .then((data: any[]) => {
+                    // Uses the helper to process the array of results.
+                    let results = this.helper.GetItemFromArray(data, 0, { _id: null });
+                    // Returns true if the association exists, otherwise false.
+                    if (!this.helper.IsNullValue(results._id)) return true;
+                    return false;
+                })
+                .catch((error: Error) => {
+                    // Throws an error if the operation fails.
+                    throw error;
+                });
+        }
+
+        return await AirlineStaffSchema.find({ airlineCode, userName }, { _id: 1 })
+            .then((data: any[]) => {
+                // Uses the helper to process the array of results.
+                let results = this.helper.GetItemFromArray(data, 0, { _id: null });
+                // Returns true if the association exists, otherwise false.
+                if (!this.helper.IsNullValue(results._id)) return true;
+                return false;
+            })
+            .catch((error: Error) => {
+                // Throws an error if the operation fails.
+                throw error;
+            });
+    }
 
     // This method get multiple staff to a airline.
-    public async getArilineStaffs(airlineCode: string): Promise<IPerson[]> {
+    public async getAirlineStaffs(airlineCode: string): Promise<IPerson[]> {
 
         // Define the aggregation pipeline
         let $pipeline = [
@@ -72,7 +128,7 @@ export class GetAirlineStaffRepository implements IGetAirlineStaffRepository {
     }
 
     // This method get multiple staff to a airline.
-    public async getStaffArilines(userName: string): Promise<IAirline[]> {
+    public async getStaffAirlines(userName: string): Promise<IAirline[]> {
 
         // Define the aggregation pipeline
         let $pipeline = [

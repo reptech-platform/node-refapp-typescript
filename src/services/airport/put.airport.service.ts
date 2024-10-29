@@ -2,15 +2,14 @@ import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
 import IUpdateAirportRepository from "../../repositories/airport/put.airport.repository";
-import { IAirportUpdate } from "../../models/airport/airport.update.model";
-import { IAirportRead } from "../../models/airport/airport.read.model";
+import { IAirport } from "../../models/airport.model";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
 import IGetAirlineRepository from "../../repositories/airline/get.airline.repository";
 
 // Interface for UpdateAirportService
 export default interface IUpdateAirportService {
     // Updates an existing Airport by their userName and returns the updated Airport.
-    updateAirport(icaoCode: string, iataCode: string, Airport: IAirportUpdate, dbSession: ClientSession | undefined): Promise<IAirportRead>;
+    updateAirport(icaoCode: string, iataCode: string, Airport: IAirport, dbSession: ClientSession | undefined): Promise<IAirport>;
 }
 
 // This decorator ensures that UpdateAirportService is a singleton,
@@ -24,7 +23,7 @@ export class UpdateAirportService implements IUpdateAirportService {
     ) { }
 
     // Updates an existing Airport by their userName and returns the updated Airport.
-    public async updateAirport(icaoCode: string, iataCode: string, airport: IAirportUpdate, dbSession: ClientSession | undefined): Promise<IAirportRead> {
+    public async updateAirport(icaoCode: string, iataCode: string, airport: IAirport, dbSession: ClientSession | undefined): Promise<IAirport> {
 
         // Create new Airport schema object
         let newAirport: IAirportSchema = new AirportSchema();
@@ -35,10 +34,10 @@ export class UpdateAirportService implements IUpdateAirportService {
         }
 
         // Check if airline is not null
-        if (airport.airline) {
-            let isExist = await this.getAirlineRepository.isExist(airport.airline);
+        if (airport.airlineId) {
+            let isExist = await this.getAirlineRepository.isExist(airport.airlineId);
             if (!isExist) {
-                throw new Error(`Provided Airport '${airport.airline}' does not exist`);
+                throw new Error(`Provided Airport '${airport.airlineId}' does not exist`);
             }
         }
 
@@ -62,7 +61,7 @@ export class UpdateAirportService implements IUpdateAirportService {
         }
 
         // Create Airport document
-        const results: IAirportRead = await this.updateAirportRepository.updateAirport(icaoCode, iataCode, newAirport, dbSession);
+        const results = await this.updateAirportRepository.updateAirport(icaoCode, iataCode, newAirport, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {

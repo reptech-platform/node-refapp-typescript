@@ -1,29 +1,29 @@
 import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
-import IDeletePersonRepository from "../../repositories/person/delete.person.repository";
+import IDeleteTripRepository from "../../repositories/trip/delete.trip.repository";
 
-export default interface IDeletePersonService {
-    // Deletes a person by their userName.
-    delete(userName: string, dbSession: ClientSession | undefined): Promise<boolean>;
+export default interface IDeleteTripService {
+    // Deletes a trip by their tripId.
+    deleteTrip(tripId: number, dbSession: ClientSession | undefined): Promise<boolean>;
 }
 
-// This decorator ensures that PersonsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
+// This decorator ensures that TripsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class DeletePersonService implements IDeletePersonService {
+export class DeleteTripService implements IDeleteTripService {
 
     // Injecting the Helper service
     constructor(
-        @inject('IDeletePersonRepository') private deletePersonRepository: IDeletePersonRepository
+        @inject('IDeleteTripRepository') private deleteTripRepository: IDeleteTripRepository
     ) { }
 
-    // Deletes a person by their userName.
-    public async delete(userName: string, dbSession: ClientSession | undefined): Promise<boolean> {
+    // Deletes a trip by their tripId.
+    public async deleteTrip(tripId: number, dbSession: ClientSession | undefined): Promise<boolean> {
 
-        // Check if the person exists. If not, throw an error.
-        let isExist = await this.deletePersonRepository.isPersonExist(userName);
+        // Check if the trip exists. If not, throw an error.
+        let isExist = await this.deleteTripRepository.isExist(tripId);
         if (!isExist) {
-            throw new Error(`Provided '${userName}' person does not exist`);
+            throw new Error(`Provided trip '${tripId}' does not exist`);
         }
 
         // Flag to indicate if this function created the session
@@ -37,10 +37,10 @@ export class DeletePersonService implements IDeletePersonService {
             inCarryTransact = true;
         }
 
-        let results: boolean = await this.deletePersonRepository.delete(userName, dbSession);
+        let results: boolean = await this.deleteTripRepository.deleteTrip(tripId, dbSession);
 
         // delete all person trips from the database
-        // await this.personTripRepository.deleteAllPersonTrips(userName, dbSession);
+        // await this.personTripRepository.deleteAllTripTrips(userName, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {

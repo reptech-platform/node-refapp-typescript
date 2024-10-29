@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
 import IGetAirportsRepository from "../../repositories/airport/get.airports.repository";
-import { IAirportRead } from "../../models/airport/airport.read.model";
+import { IAirport } from "../../models/airport.model";
 
 export default interface IGetAirportsService {
     // Fetches all Airports from the database.
-    getAirports(): Promise<IAirportRead[]>;
+    getAirports(): Promise<IAirport[]>;
 }
 
 // This decorator ensures that AirportsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
@@ -17,7 +17,7 @@ export class GetAirportsService implements IGetAirportsService {
     ) { }
 
     // Fetches all Airports from the database.
-    public async getAirports(): Promise<IAirportRead[]> {
+    public async getAirports(): Promise<IAirport[]> {
         return await this.getAirportsRepository.getAirports();
     }
 

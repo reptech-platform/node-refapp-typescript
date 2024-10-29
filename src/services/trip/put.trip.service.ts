@@ -1,51 +1,32 @@
-import { IPerson } from "../../models/person.model";
+import { ITrip } from "../../models/trip.model";
 import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
-import ICreatePersonRepository from "../../repositories/person/post.person.repository";
-import IUpdatePersonRepository from "../../repositories/person/put.person.repository";
+import IUpdateTripRepository from "../../repositories/trip/put.trip.repository";
+import TripSchema, { ITripSchema } from "../../db/dao/trip.db.model";
 
-// Interface for UpdatePersonService
-export default interface IUpdatePersonService {
-    // Updates an existing person by their userName and returns the updated person.
-    update(userName: string, person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson>;
+// Interface for UpdateTripService
+export default interface IUpdateTripService {
+    // Updates an existing trip by their tripId and returns the updated trip.
+    updateTrip(tripId: number, trip: ITrip, dbSession: ClientSession | undefined): Promise<ITrip>;
 }
 
-// This decorator ensures that UpdatePersonService is a singleton,
+// This decorator ensures that UpdateTripService is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class UpdatePersonService implements IUpdatePersonService {
-    // Injecting the PersonRepository service
+export class UpdateTripService implements IUpdateTripService {
+    // Injecting the TripRepository service
     constructor(
-        @inject('IUpdatePersonRepository') private updatePersonRepository: IUpdatePersonRepository
+        @inject('IUpdateTripRepository') private updateTripRepository: IUpdateTripRepository
     ) { }
 
-    // Updates an existing person by their userName and returns the updated person.
-    public async update(userName: string, person: IPerson, dbSession: ClientSession | undefined): Promise<IPerson> {
-        // Check if the person exists. If not, throw an error.
-        let isExist = await this.isPersonExist(userName);
+    // Updates an existing trip by their tripId and returns the updated trip.
+    public async updateTrip(tripId: number, trip: ITrip, dbSession: ClientSession | undefined): Promise<ITrip> {
+
+        // Check if the trip exists. If not, throw an error.
+        let isExist = await this.updateTripRepository.isExist(tripId);
         if (!isExist) {
-            throw new Error(`Provided '${userName}' person does not exist`);
-        }
-
-        // Check if best friend object is not null
-        if (person.bestFriendId) {
-            isExist = await this.isPersonExist(person.bestFriendId);
-            if (!isExist) {
-                throw new Error(`Provided '${person.bestFriendId}' best friend does not exist`);
-            }
-        }
-
-        // Check if friends object is not null
-        if (person.friendsList && person.friendsList.length > 0) {
-            // Loop to check if each friend already exists in the database using their userName
-            for (let index = 0; index < person.friendsList.length; index++) {
-                let friend = person.friendsList[index];
-                isExist = await this.isPersonExist(friend);
-                if (!isExist) {
-                    throw new Error(`Provided '${person.bestFriendId}' friend does not exist`);
-                }
-            }
+            throw new Error(`Provided trip '${tripId}' does not exist`);
         }
 
         // Flag to indicate if this function created the session
@@ -59,20 +40,25 @@ export class UpdatePersonService implements IUpdatePersonService {
             inCarryTransact = true;
         }
 
-        // Update the person entry in the database
-        let updatedPerson = await this.updatePersonRepository.update(userName, person, dbSession);
+        let newItem: ITripSchema = new TripSchema();
+
+        const keys = Object.keys(trip);
+
+        for (let i = 0; i < keys.length; i++) {
+            if (trip[keys[i]]) {
+                newItem[keys[i]] = trip[keys[i]];
+            }
+        }
+
+        // Update the trip entry in the database
+        let results = await this.updateTripRepository.updateTrip(tripId, newItem, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {
             await DbSession.Commit(dbSession);
         }
 
-        // Return the updated person object
-        return updatedPerson;
-    }
-
-    // Checks if a person with the given userName exists in the database.
-    private async isPersonExist(userName: string): Promise<boolean> {
-        return await this.updatePersonRepository.isPersonExist(userName);
+        // Return the updated trip object
+        return results;
     }
 }

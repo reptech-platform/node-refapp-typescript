@@ -1,15 +1,15 @@
 import { inject, injectable } from "inversify";
 import IGetPersonRepository from "../../repositories/person/get.person.repository";
-import { IPersonRead } from "../../models/person/person.read.model";
+import { IPerson } from "../../models/person.model";
 
 // Interface for GetPersonService
 export default interface IGetPersonService {
     // Gets a person by their userName
-    getPerson(userName: string): Promise<IPersonRead>;
+    getPerson(userName: string): Promise<IPerson>;
     // Gets the best friend of a person by their userName
-    getBestFriend(userName: string): Promise<IPersonRead>;
+    getBestFriend(userName: string): Promise<IPerson>;
     // Gets the friends of a person by their userName
-    getFriends(userName: string): Promise<IPersonRead[]>;
+    getFriends(userName: string): Promise<IPerson[]>;
 }
 
 // This decorator ensures that GetPersonService is a singleton,
@@ -22,7 +22,7 @@ export class GetPersonService implements IGetPersonService {
     ) { }
 
     // Gets a person by their userName
-    public async getPerson(userName: string): Promise<IPersonRead> {
+    public async getPerson(userName: string): Promise<IPerson> {
         // Check if the person exists. If not, throw an error.
         let isExist = await this.getPersonRepository.isExist(userName);
         if (!isExist) {
@@ -33,7 +33,7 @@ export class GetPersonService implements IGetPersonService {
     }
 
     // Gets the best friend of a person by their userName
-    public async getBestFriend(userName: string): Promise<IPersonRead> {
+    public async getBestFriend(userName: string): Promise<IPerson> {
         // Check if the person exists. If not, throw an error.
         let isExist = await this.getPersonRepository.isExist(userName);
         if (!isExist) {
@@ -44,7 +44,7 @@ export class GetPersonService implements IGetPersonService {
     }
 
     // Gets the friends of a person by their userName
-    public async getFriends(userName: string): Promise<IPersonRead[]> {
+    public async getFriends(userName: string): Promise<IPerson[]> {
         // Check if the person exists. If not, throw an error.
         let isExist = await this.getPersonRepository.isExist(userName);
         if (!isExist) {
