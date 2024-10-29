@@ -2,6 +2,7 @@ import { injectable, inject } from "inversify";
 import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
+import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for DeleteAirportRepository
 export default interface IDeleteAirportRepository {
@@ -46,7 +47,9 @@ export class DeleteAirportRepository implements IDeleteAirportRepository {
                 return true;
             })
             .catch((error: Error) => {
-                // Throw an error if the deletion operation fails.
+                // Abort Client Session if there's an error
+                DbSession.Abort(session);
+                // Handle any errors that occur during the creation
                 throw error;
             });
     }

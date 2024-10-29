@@ -5,7 +5,7 @@ import { Search, SearchResults } from "../../models/search.model";
 import ISearchAirlineService from "../../services/airline/search.airline.service";
 
 @Tags("Airlines")
-@Route("Airlines")
+@Route("airlines")
 @provideSingleton(AirlineSearchController)
 export class AirlineSearchController extends Controller {
     constructor(

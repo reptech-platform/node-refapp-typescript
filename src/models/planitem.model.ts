@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import { PublicTransport } from "./publictransport.model";
-import { IAirline } from "./airline.model";
+// import { IAirline } from "./airline.model";
 import { IAirport } from "./airport.model";
 import { IDocument } from "./document.model";
 
@@ -10,7 +10,7 @@ export interface IPlanItem extends PublicTransport {
     flightNumber?: string;
 
     // Optional airline associated with the plan item, represented by the IAirline interface
-    airLine?: IAirline;
+    // airLine?: IAirline;
 
     // Optional departure airport for the plan item, represented by the IAirport interface
     fromAirport?: IAirport;
@@ -35,7 +35,7 @@ export class PlanItem extends PublicTransport {
     flightNumber?: string;
 
     // Optional airline associated with the plan item, represented by the IAirline interface
-    airLine?: IAirline;
+    // airLine?: IAirline;
 
     // Optional departure airport for the plan item, represented by the IAirport interface
     fromAirport?: IAirport;

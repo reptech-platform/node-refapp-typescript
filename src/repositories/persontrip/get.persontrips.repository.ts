@@ -1,13 +1,17 @@
-import { ITrip } from "../../models/trip.model";
+
 import { Error } from "mongoose";
-import TripSchema, { ITripSchema } from "../../db/dao/trip.db.model";
-import Helper from "../../utils/helper.utils";
-import { injectable, inject } from "inversify";
+import { injectable } from "inversify";
+import PersonTripSchema from "../../db/dao/persontrip.db.model";
+import { IPerson } from "../../models/person.model";
+import { ITrip } from "../../models/trip.model";
 
 // Interface for GetTripsRepository
 export default interface IGetTripsRepository {
     // Fetches all Trips from the database
-    gets(): Promise<ITrip[]>;
+    getAllTrips(): Promise<ITrip[]>;
+
+    // Fetches all Persons from the database
+    getAllPersons(): Promise<IPerson[]>;
 }
 
 // This decorator ensures that GetTripsRepository is a singleton,
@@ -15,18 +19,100 @@ export default interface IGetTripsRepository {
 @injectable()
 export class GetTripsRepository implements IGetTripsRepository {
     // Injecting the Helper service
-    constructor(@inject(Helper) private helper: Helper) { }
+    constructor() { }
 
     // Fetches all Trips from the database
-    public async gets(): Promise<ITrip[]> {
-        return await TripSchema.find({}, { _id: 0 })
-            .then((data: ITripSchema[]) => {
-                // Uses the helper to process the array of Trips.
-                let results = this.helper.GetItemFromArray(data, -1, []);
-                return results as ITrip[];
+    public async getAllTrips(): Promise<ITrip[]> {
+        // Define the aggregation pipeline
+        let $pipeline = [
+            {
+                // Perform a lookup to join the 'trips' collection
+                $lookup: {
+                    from: "trips", // The collection to join
+                    localField: "tripId", // The field from the input documents
+                    foreignField: "tripId", // The field from the 'trips' collection
+                    as: "mapItems", // The name of the new array field to add to the input documents
+                    pipeline: [
+                        {
+                            // Project to exclude _id and __v fields from the joined documents
+                            $project: {
+                                _id: 0,
+                                __v: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            // Unwind the 'mapItems' array to deconstruct the array field
+            { $unwind: { path: "$mapItems", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "items": "$mapItems" } },
+            {
+                // Project the 'mapItems' array as 'trips'
+                $project: {
+                    "_id": 0,
+                    "tripId": 0,
+                    "mapItems": 0,
+                    "__v": 0
+                }
+            }
+        ];
+
+        // Execute the aggregation pipeline on the PersonTripSchema
+        return await PersonTripSchema.aggregate($pipeline)
+            .then((data: any[]) => {
+                // Resolve the promise with the resulting data
+                return data.map(x => x.items);
             })
             .catch((error: Error) => {
-                // Throws an error if the operation fails.
+                // Throw an error if the aggregation fails
+                throw error;
+            });
+    }
+
+    // Fetches all Persons from the database
+    public async getAllPersons(): Promise<IPerson[]> {
+        // Define the aggregation pipeline
+        let $pipeline = [
+            {
+                // Perform a lookup to join the 'persons' collection
+                $lookup: {
+                    from: "persons", // The collection to join
+                    localField: "userName", // The field from the input documents
+                    foreignField: "userName", // The field from the 'trips' collection
+                    as: "mapItems", // The name of the new array field to add to the input documents
+                    pipeline: [
+                        {
+                            // Project to exclude _id and __v fields from the joined documents
+                            $project: {
+                                _id: 0,
+                                __v: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            // Unwind the 'mapItems' array to deconstruct the array field
+            { $unwind: { path: "$mapItems", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "items": "$mapItems" } },
+            {
+                // Project the 'mapItems' array as 'trips'
+                $project: {
+                    "_id": 0,
+                    "userName": 0,
+                    "mapItems": 0,
+                    "__v": 0
+                }
+            }
+        ];
+
+        // Execute the aggregation pipeline on the PersonTripSchema
+        return await PersonTripSchema.aggregate($pipeline)
+            .then((data: any[]) => {
+                // Resolve the promise with the resulting data
+                return data.map(x => x.items);
+            })
+            .catch((error: Error) => {
+                // Throw an error if the aggregation fails
                 throw error;
             });
     }

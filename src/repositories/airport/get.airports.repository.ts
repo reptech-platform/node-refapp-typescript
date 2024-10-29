@@ -2,12 +2,12 @@ import { Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
-import { IAirportRead } from "../../models/airport/airport.read.model";
+import { IAirport } from "../../models/airport.model";
 
 // Interface for GetAirportRepository
 export default interface IGetAirportsRepository {
     // Method to get all airports
-    getAirports(): Promise<IAirportRead[]>;
+    getAirports(): Promise<IAirport[]>;
 }
 
 // This decorator ensures that GetAirportRepository is a singleton,
@@ -18,7 +18,7 @@ export class GetAirportsRepository implements IGetAirportsRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Method to get all airports
-    public async getAirports(): Promise<IAirportRead[]> {
+    public async getAirports(): Promise<IAirport[]> {
 
         let $pipeline = [
             {
@@ -48,7 +48,7 @@ export class GetAirportsRepository implements IGetAirportsRepository {
             .then((data: IAirportSchema[]) => {
                 // Uses the helper to process the Airport.
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IAirportRead[];
+                return results as IAirport[];
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.

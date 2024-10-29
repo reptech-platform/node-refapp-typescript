@@ -2,12 +2,13 @@ import { ClientSession, Error } from "mongoose";
 import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
-import { IAirlineRead } from "../../models/airline/airline.read.model";
+import { IAirline } from "../../models/airline.model";
+import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for UpdateAirlineRepository
 export default interface IUpdateAirlineRepository {
     // Updates an airline's information based on the provided airline code.
-    updateAirline(airlineCode: string, airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirlineRead>;
+    updateAirline(airlineCode: string, airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirline>;
 
     // Method to check if an airline exists by its code
     isExist(airlineCode: string): Promise<boolean>;
@@ -37,17 +38,19 @@ export class UpdateAirlineRepository implements IUpdateAirlineRepository {
     }
 
     // Updates an airline's information based on the provided airline code.
-    public async updateAirline(airlineCode: string, airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirlineRead> {
+    public async updateAirline(airlineCode: string, airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirline> {
 
         // Find and update the airline document with the new data.
         return await AirlineSchema.findOneAndUpdate({ airlineCode }, airline, { new: true, session })
             .then((data: any) => {
                 // Extract the first item from the data array using a helper function.
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                // Return the results cast as an IAirlineRead object.
-                return results as IAirlineRead;
+                // Return the results cast as an IAirline object.
+                return results as IAirline;
             })
             .catch((error: Error) => {
+                // Abort Client Session if there's an error
+                DbSession.Abort(session);
                 // Throw an error if the update operation fails.
                 throw error;
             });

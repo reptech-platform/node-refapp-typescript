@@ -2,12 +2,13 @@ import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
-import { IAirportRead } from "../../models/airport/airport.read.model";
+import { IAirport } from "../../models/airport.model";
+import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for CreateAirportRepository
 export default interface ICreateAirportRepository {
     // Creates a new Airport in the database.
-    createAirport(airport: IAirportSchema, session: ClientSession | undefined): Promise<IAirportRead>;
+    createAirport(airport: IAirportSchema, session: ClientSession | undefined): Promise<IAirport>;
 
     // Method to check if an airport exists by its ICAO and IATA codes
     isExist(icaoCode: string, iataCode: string): Promise<boolean>;
@@ -37,16 +38,18 @@ export class CreateAirportRepository implements ICreateAirportRepository {
     }
 
     // Method to create a new airport
-    public async createAirport(airport: IAirportSchema, session: ClientSession | undefined): Promise<IAirportRead> {
+    public async createAirport(airport: IAirportSchema, session: ClientSession | undefined): Promise<IAirport> {
 
         // create the airport document with the new data.
         return await AirportSchema.create([airport], { session })
             .then((data: any) => {
                 // Get the first item from the array or return an empty object
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IAirportRead;
+                return results as IAirport;
             })
             .catch((error: Error) => {
+                // Abort Client Session if there's an error
+                DbSession.Abort(session);
                 // Handle any errors that occur during the creation
                 throw error;
             });

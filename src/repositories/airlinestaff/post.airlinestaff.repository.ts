@@ -2,6 +2,7 @@ import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import AirlineStaffSchema from "../../db/dao/airlinestaff.db.model";
+import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for CreateAirlineStaffRepository
 export default interface ICreateAirlineStaffRepository {
@@ -41,6 +42,8 @@ export class CreateAirlineStaffRepository implements ICreateAirlineStaffReposito
 
         // Inserts the mapItems into the PersonAirlineStaffSchema collection.
         await AirlineStaffSchema.insertMany(mapItems, { session }).catch((error: Error) => {
+            // Abort Client Session if there's an error
+            DbSession.Abort(session);
             // Throws an error if the operation fails.
             throw error;
         });

@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
 import ICreatePersonRepository from "../../repositories/person/post.person.repository";
-import { IPersonAdd } from "../../models/person/person.add.model";
+import { IPersonAdd } from "../../models/person.model";
 import { IPersonRead } from "../../models/person/person.read.model";
 import PersonSchema, { IPersonSchema } from "../../db/dao/person.db.model";
 

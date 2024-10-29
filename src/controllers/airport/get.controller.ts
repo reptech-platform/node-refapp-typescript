@@ -2,7 +2,7 @@ import { Controller, Get, Tags, Route, Path } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
 import IGetAirportService from "../../services/airport/get.airport.service";
-import { IAirportRead } from "../../models/airport/airport.read.model";
+import { IAirport } from "../../models/airport.model";
 
 // Tags and route for the controller
 @Tags("Airports")
@@ -25,7 +25,7 @@ export class AirportGetController extends Controller {
      * @returns IAirport | RequestResponse
      */
     @Get("/:icaoCode/:iataCode")
-    public async getAirport(@Path() icaoCode: string, @Path() iataCode: string): Promise<IAirportRead | RequestResponse> {
+    public async getAirport(@Path() icaoCode: string, @Path() iataCode: string): Promise<IAirport | RequestResponse> {
 
         try {
             // Await the result of the getAirport method from the airportService

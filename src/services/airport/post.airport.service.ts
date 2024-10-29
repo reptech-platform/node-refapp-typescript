@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
 import ICreateAirportRepository from "../../repositories/airport/post.airport.repository";
-import { IAirportAdd } from "../../models/airport/airport.add.model";
+import { IAirportAdd } from "../../models/airport.model";
 import { IAirportRead } from "../../models/airport/airport.read.model";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
 import IGetAirlineRepository from "../../repositories/airline/get.airline.repository";

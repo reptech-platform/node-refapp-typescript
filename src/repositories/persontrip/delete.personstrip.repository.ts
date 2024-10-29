@@ -2,6 +2,7 @@ import { injectable, inject } from "inversify";
 import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import PersonTripSchema from "../../db/dao/persontrip.db.model";
+import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for DeletePersonTripRepository
 export default interface IDeletePersonTripRepository {
@@ -35,6 +36,9 @@ export class DeletePersonTripRepository implements IDeletePersonTripRepository {
     // This method deletes a trip for a person.
     public async deletePersonTrip(userName: string, tripId: number, session: ClientSession | undefined): Promise<void> {
         await PersonTripSchema.deleteOne({ userName, tripId }, { session }).catch((error: Error) => {
+            // Abort Client Session if there's an error
+            DbSession.Abort(session);
+            // Throws an error if the operation fails.
             throw error;
         });
     }

@@ -2,6 +2,7 @@ import { injectable, inject } from "inversify";
 import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import AirlineStaffSchema from "../../db/dao/airlinestaff.db.model";
+import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for DeleteAirlineStaffRepository
 export default interface IDeleteAirlineStaffRepository {
@@ -42,6 +43,8 @@ export class DeleteAirlineStaffRepository implements IDeleteAirlineStaffReposito
 
         // Deletes the userName from the AirportStaffSchema collection.
         await AirlineStaffSchema.deleteOne({ airlineCode, userName }, { session }).catch((error: Error) => {
+            // Abort Client Session if there's an error
+            DbSession.Abort(session);
             // Throws an error if the operation fails.
             throw error;
         });

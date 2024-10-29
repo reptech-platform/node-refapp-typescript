@@ -1,9 +1,9 @@
 import { injectable } from "inversify";
-import { IAirportLocation } from "../airportlocation.model";
-import { IAirlineRead } from "../airline/airline.read.model";
+import { IAirportLocation } from "./airportlocation.model";
+import { IAirline } from "./airline.model";
 
-// Interface representing an airport
-export interface IAirportRead {
+// Interface representing an IAirport
+export interface IAirport {
     // The name of the airport
     name: string;
 
@@ -28,13 +28,16 @@ export interface IAirportRead {
     // Optional property representing the embeded location details of the airport
     location?: IAirportLocation;
 
-    // Optional property representing the airlines associated with the airport
-    airlines?: IAirlineRead;
+    // Optional property to store airline reference id
+    airlineId?: string;
+
+    // Optional property to store airline reference object
+    airline?: IAirline;
 }
 
 // Class implementing the IAirport interface
 @injectable()
-export class AirportRead implements IAirportRead {
+export class Airport implements IAirport {
 
     // Constructor for the Airport class
     constructor() { }
@@ -63,7 +66,10 @@ export class AirportRead implements IAirportRead {
     // Optional property representing the embeded location details of the airport
     location?: IAirportLocation;
 
-    // Optional property representing the airlines associated with the airport
-    airlines?: IAirlineRead;
+    // Optional property to store airline reference id
+    airlineId?: string;
+
+    // Optional property to store airline reference object
+    airline?: IAirline;
 }
 

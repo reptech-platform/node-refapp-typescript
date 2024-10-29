@@ -1,6 +1,7 @@
 import { injectable, inject } from "inversify";
 import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
+import DbSession from "../../db/utils/dbsession.db";
 import TripSchema, { ITripSchema } from "../../db/dao/trip.db.model";
 
 // Interface for DeleteTripRepository
@@ -9,7 +10,7 @@ export default interface IDeleteTripRepository {
     deleteTrip(tripId: number, session: ClientSession | undefined): Promise<boolean>;
 
     // Checks if a trip with the given tripId exists in the database.
-    isTripExist(tripId: number): Promise<boolean>;
+    isExist(tripId: number): Promise<boolean>;
 }
 
 // This decorator ensures that DeleteTripRepository is a singleton,
@@ -21,7 +22,7 @@ export class DeleteTripRepository implements IDeleteTripRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Checks if a trip with the given tripId exists in the database.
-    public async isTripExist(tripId: number): Promise<boolean> {
+    public async isExist(tripId: number): Promise<boolean> {
         return await TripSchema.find({ tripId }, { _id: 1 })
             .then((data: ITripSchema[]) => {
                 // Uses the helper to process the array of trips.
@@ -45,6 +46,8 @@ export class DeleteTripRepository implements IDeleteTripRepository {
                 return true;
             })
             .catch((error: Error) => {
+                // Abort Client Session if there's an error
+                DbSession.Abort(session);
                 // Throws an error if the operation fails.
                 throw error;
             });

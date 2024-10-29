@@ -2,6 +2,7 @@ import PersonSchema from "../../db/dao/person.db.model";
 import { injectable, inject } from "inversify";
 import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
+import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for DeletePersonRepository
 export default interface IDeletePersonRepository {
@@ -45,6 +46,8 @@ export class DeletePersonRepository implements IDeletePersonRepository {
                 return true;
             })
             .catch((error: Error) => {
+                // Abort Client Session if there's an error
+                DbSession.Abort(session);
                 // Throws an error if the operation fails.
                 throw error;
             });

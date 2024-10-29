@@ -2,8 +2,7 @@ import { Controller, Body, Put, Tags, Route, Path } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
 import IUpdateAirportService from "../../services/airport/put.airport.service";
-import { IAirportUpdate } from "../../models/airport/airport.update.model";
-import { IAirportRead } from "../../models/airport/airport.read.model";
+import { IAirport } from "../../models/airport.model";
 
 @Tags("Airports")
 @Route("airports")
@@ -23,7 +22,7 @@ export class AirportUpdateController extends Controller {
      * @returns IAirport | RequestResponse
      */
     @Put("/:icaoCode/:iataCode")
-    public async updateAirport(@Path() icaoCode: string, @Path() iataCode: string, @Body() body: IAirportUpdate): Promise<IAirportRead | RequestResponse> {
+    public async updateAirport(@Path() icaoCode: string, @Path() iataCode: string, @Body() body: IAirport): Promise<IAirport | RequestResponse> {
 
         try {
             // Await the result of the updateAirport method from the updateAirportService

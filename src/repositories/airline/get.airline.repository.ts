@@ -2,12 +2,12 @@ import { Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
-import { IAirlineRead } from "../../models/airline/airline.read.model";
+import { IAirline } from "../../models/airline.model";
 
 // Interface for GetAirlineRepository
 export default interface IGetAirlineRepository {
     // Method to get a specific airline by its code
-    getAirline(airlineCode: string): Promise<IAirlineRead>;
+    getAirline(airlineCode: string): Promise<IAirline>;
 
     // Method to check if an airline exists by its code
     isExist(airlineCode: string): Promise<boolean>;
@@ -37,7 +37,7 @@ export class GetAirlineRepository implements IGetAirlineRepository {
     }
 
     // Fetches a single Airline by its airlineCode, excluding the _id field.
-    public async getAirline(airlineCode: string): Promise<IAirlineRead> {
+    public async getAirline(airlineCode: string): Promise<IAirline> {
 
         let $pipeline = [
             { $match: { airlineCode } },
@@ -69,7 +69,7 @@ export class GetAirlineRepository implements IGetAirlineRepository {
             .then((data: IAirlineSchema[]) => {
                 // Uses the helper to process the Airline.
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IAirlineRead;
+                return results as IAirline;
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.

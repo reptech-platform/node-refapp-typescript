@@ -8,10 +8,10 @@ import { ITrip } from "../../models/trip.model";
 // Interface for CreateTripRepository
 export default interface ICreateTripRepository {
     // Creates a new trip in the database.
-    createTrip(trip: ITrip, session: ClientSession | undefined): Promise<ITrip>;
+    createTrip(trip: ITripSchema, session: ClientSession | undefined): Promise<ITrip>;
 
     // Checks if a trip with the given tripId exists in the database.
-    isTripExist(tripId: number): Promise<boolean>;
+    isExist(tripId: number): Promise<boolean>;
 }
 
 // This decorator ensures that CreateTripRepository is a singleton,
@@ -22,7 +22,7 @@ export class CreateTripRepository implements ICreateTripRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Checks if a trip with the given tripId exists in the database.
-    public async isTripExist(tripId: number): Promise<boolean> {
+    public async isExist(tripId: number): Promise<boolean> {
         return await TripSchema.find({ tripId }, { _id: 1 })
             .then((data: ITripSchema[]) => {
                 // Uses the helper to process the array of trips.
@@ -38,7 +38,7 @@ export class CreateTripRepository implements ICreateTripRepository {
     }
 
     // Creates a new trip in the database.
-    public async createTrip(trip: ITrip, session: ClientSession | undefined): Promise<ITrip> {
+    public async createTrip(trip: ITripSchema, session: ClientSession | undefined): Promise<ITrip> {
 
         // Save the document for the model
         let newTrip = await TripSchema.create([trip], { session })

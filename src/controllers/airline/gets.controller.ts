@@ -1,7 +1,7 @@
 import { Controller, Get, Tags, Route } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
-import { IAirlineRead } from "../../models/airline/airline.read.model";
+import { IAirline } from "../../models/airline.model";
 import IGetAirlinesService from "../../services/airline/get.airlines.service";
 
 @Tags("Airlines")
@@ -16,10 +16,10 @@ export class AirlineGetAllController extends Controller {
 
     /**
      * Define a GET endpoint to get all Airlines
-     * @returns IAirlineRead[] | RequestResponse
+     * @returns IAirline[] | RequestResponse
      */
     @Get()
-    public async getAirlines(): Promise<IAirlineRead[] | RequestResponse> {
+    public async getAirlines(): Promise<IAirline[] | RequestResponse> {
 
         try {
 

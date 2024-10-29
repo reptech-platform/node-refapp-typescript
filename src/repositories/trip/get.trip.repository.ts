@@ -10,7 +10,7 @@ export default interface IGetTripRepository {
     getTrip(tripId: number): Promise<ITrip>;
 
     // Checks if a trip with the given tripId exists in the database.
-    isTripExist(tripId: number): Promise<boolean>;
+    isExist(tripId: number): Promise<boolean>;
 }
 
 // This decorator ensures that GetTripRepository is a singleton,
@@ -21,7 +21,7 @@ export class GetTripRepository implements IGetTripRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Checks if a trip with the given tripId exists in the database.
-    public async isTripExist(tripId: number): Promise<boolean> {
+    public async isExist(tripId: number): Promise<boolean> {
         return await TripSchema.find({ tripId }, { _id: 1 })
             .then((data: ITripSchema[]) => {
                 // Uses the helper to process the array of trips.

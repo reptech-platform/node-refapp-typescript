@@ -1,11 +1,11 @@
 import { inject, injectable } from "inversify";
 import IGetAirlineRepository from "../../repositories/airline/get.airline.repository";
-import { IAirlineRead } from "../../models/airline/airline.read.model";
+import { IAirline } from "../../models/airline.model";
 
 // Interface for GetAirlineService
 export default interface IGetAirlineService {
     // Method to get a specific airline by its code
-    getAirline(airlineCode: string): Promise<IAirlineRead>;
+    getAirline(airlineCode: string): Promise<IAirline>;
 }
 
 // This decorator ensures that GetAirlineService is a singleton,
@@ -18,7 +18,7 @@ export class GetAirlineService implements IGetAirlineService {
     ) { }
 
     // Gets a Airline by their userName
-    public async getAirline(airlineCode: string): Promise<IAirlineRead> {
+    public async getAirline(airlineCode: string): Promise<IAirline> {
         // Check if the Airline exists. If not, throw an error.
         let isExist = await this.getAirlineRepository.isExist(airlineCode);
         if (!isExist) {

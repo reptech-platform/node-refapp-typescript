@@ -2,12 +2,12 @@ import { Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
-import { IAirportRead } from "../../models/airport/airport.read.model";
+import { IAirport } from "../../models/airport.model";
 
 // Interface for GetAirportRepository
 export default interface IGetAirportRepository {
     // Method to get a specific airport by its ICAO and IATA codes
-    getAirport(icaoCode: string, iataCode: string): Promise<IAirportRead>;
+    getAirport(icaoCode: string, iataCode: string): Promise<IAirport>;
 
     // Method to get a specific airport id by its ICAO and IATA codes
     getAirportId(icaoCode: string, iataCode: string): Promise<string>
@@ -40,7 +40,7 @@ export class GetAirportRepository implements IGetAirportRepository {
     }
 
     // Method to get a specific airport by its ICAO and IATA codes
-    public async getAirport(icaoCode: string, iataCode: string): Promise<IAirportRead> {
+    public async getAirport(icaoCode: string, iataCode: string): Promise<IAirport> {
 
         let $pipeline = [
             { $match: { icaoCode, iataCode } },
@@ -71,7 +71,7 @@ export class GetAirportRepository implements IGetAirportRepository {
             .then((data: IAirportSchema[]) => {
                 // Uses the helper to process the Airport.
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IAirportRead;
+                return results as IAirport;
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.

@@ -5,14 +5,12 @@ import IUpdateAirlineRepository from "../../repositories/airline/put.airline.rep
 import IGetPersonRepository from "../../repositories/person/get.person.repository";
 import IGetAirportRepository from "../../repositories/airport/get.airport.repository";
 import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
-
-import { IAirlineUpdate } from "../../models/airline/airline.update.model";
-import { IAirlineRead } from "../../models/airline/airline.read.model";
+import { IAirline } from "../../models/airline.model";
 
 // Interface for UpdateAirlineService
 export default interface IUpdateAirlineService {
     // Updates an existing Airline by their userName and returns the updated Airline.
-    updateAirline(userName: string, airline: IAirlineUpdate, dbSession: ClientSession | undefined): Promise<IAirlineRead>;
+    updateAirline(userName: string, airline: IAirline, dbSession: ClientSession | undefined): Promise<IAirline>;
 }
 
 // This decorator ensures that UpdateAirlineService is a singleton,
@@ -28,7 +26,7 @@ export class UpdateAirlineService implements IUpdateAirlineService {
     ) { }
 
     // Updates an existing Airline by their userName and returns the updated Airline.
-    public async updateAirline(airlineCode: string, airline: IAirlineUpdate, dbSession: ClientSession | undefined): Promise<IAirlineRead> {
+    public async updateAirline(airlineCode: string, airline: IAirline, dbSession: ClientSession | undefined): Promise<IAirline> {
 
         // Create new Airline schema object
         let newAirline: IAirlineSchema = new AirlineSchema();
@@ -80,7 +78,7 @@ export class UpdateAirlineService implements IUpdateAirlineService {
         }
 
         // Create airline document
-        const results: IAirlineRead = await this.updateAirlineRepository.updateAirline(airlineCode, newAirline, dbSession);
+        const results: IAirline = await this.updateAirlineRepository.updateAirline(airlineCode, newAirline, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {

@@ -3,16 +3,14 @@ import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
 import ICreateAirlineRepository from "../../repositories/airline/post.airline.repository";
 import IGetPersonRepository from "../../repositories/person/get.person.repository";
-import { IAirlineAdd } from "../../models/airline/airline.add.model";
-import { IAirlineRead } from "../../models/airline/airline.read.model";
+import { IAirline } from "../../models/airline.model";
 import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
-import { IPerson } from "../../models/person.model";
 import IGetAirportRepository from "../../repositories/airport/get.airport.repository";
 
 // Interface for CreateAirlineService
 export default interface ICreateAirlineService {
     // Method to create a new airline
-    createAirline(airline: IAirlineAdd, dbSession: ClientSession | undefined): Promise<IAirlineRead>;
+    createAirline(airline: IAirline, dbSession: ClientSession | undefined): Promise<IAirline>;
 }
 
 // This decorator ensures that CreateAirlineService is a singleton,
@@ -27,7 +25,7 @@ export class CreateAirlineService implements ICreateAirlineService {
     ) { }
 
     // Method to create a new airline
-    public async createAirline(airline: IAirlineAdd, dbSession: ClientSession | undefined): Promise<IAirlineRead> {
+    public async createAirline(airline: IAirline, dbSession: ClientSession | undefined): Promise<IAirline> {
 
         // Create new Airline schema object
         let newAirline: IAirlineSchema = new AirlineSchema();
@@ -79,7 +77,7 @@ export class CreateAirlineService implements ICreateAirlineService {
         }
 
         // Create airline document
-        const results: IAirlineRead = await this.createAirlineRepository.createAirline(newAirline, dbSession);
+        const results: IAirline = await this.createAirlineRepository.createAirline(newAirline, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {

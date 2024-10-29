@@ -2,10 +2,10 @@ import { Controller, Body, Put, Tags, Route, Path } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
 import IUpdateAirlineService from "../../services/airline/put.airline.service";
-import { IAirlineUpdate } from "../../models/airline/airline.update.model";
+import { IAirline } from "../../models/airline.model";
 
 @Tags("Airlines")
-@Route("Airlines")
+@Route("airlines")
 @provideSingleton(AirlineUpdateController)
 export class AirlineUpdateController extends Controller {
     constructor(
@@ -15,13 +15,13 @@ export class AirlineUpdateController extends Controller {
     }
 
     /**
-     * Define a PUT endpoint with the parameter 'airlineCode' and body parameter 'IAirlineUpdate'
+     * Define a PUT endpoint with the parameter 'airlineCode' and body parameter 'IAirline'
      * @param airlineCode 
      * @param body 
      * @returns RequestResponse
      */
     @Put("/:airlineCode")
-    public async updateAirline(@Path() airlineCode: string, @Body() body: IAirlineUpdate): Promise<RequestResponse> {
+    public async updateAirline(@Path() airlineCode: string, @Body() body: IAirline): Promise<RequestResponse> {
 
         try {
 

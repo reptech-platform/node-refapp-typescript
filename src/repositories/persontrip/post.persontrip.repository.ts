@@ -2,16 +2,15 @@ import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import DbSession from "../../db/utils/dbsession.db";
-import TripSchema, { ITripSchema } from "../../db/dao/trip.db.model";
-import { ITrip } from "../../models/trip.model";
+import PersonTripSchema from "../../db/dao/persontrip.db.model";
 
 // Interface for CreateTripRepository
 export default interface ICreateTripRepository {
-    // Creates a new trip in the database.
-    createTrip(trip: ITrip, session: ClientSession | undefined): Promise<ITrip>;
+    // This method create the trip and person mapping in the database.
+    createTripAndPersonMapping(mapItems: [] | any[], session: ClientSession | undefined): Promise<void>;
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
-    isPersonAndTripExist(userName: string, tripId: number): Promise<boolean>;
+    isExist(userName: string, tripId: number): Promise<boolean>;
 }
 
 // This decorator ensures that CreateTripRepository is a singleton,
@@ -22,7 +21,7 @@ export class CreateTripRepository implements ICreateTripRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
-    public async isPersonAndTripExist(userName: string, tripId: number): Promise<boolean> {
+    public async isExist(userName: string, tripId: number): Promise<boolean> {
 
         return await PersonTripSchema.find({ userName, tripId }, { _id: 1 })
             .then((data: any[]) => {
@@ -38,24 +37,15 @@ export class CreateTripRepository implements ICreateTripRepository {
             });
     }
 
-    // Creates a new trip in the database.
-    public async createTrip(trip: ITrip, session: ClientSession | undefined): Promise<ITrip> {
+    // This method create the trip and person mapping in the database.
+    public async createTripAndPersonMapping(mapItems: [] | any[], session: ClientSession | undefined): Promise<void> {
 
-        // Save the document for the model
-        let newTrip = await TripSchema.create([trip], { session })
-            .then((data: any) => {
-                // Uses the helper to process the trip.
-                let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as ITrip;
-            })
-            .catch((error: Error) => {
-                // Abort Client Session
-                DbSession.Abort(session);
-                // Throws an error if the operation fails.
-                throw error;
-            });
-
-        // Returns newly created trip object
-        return newTrip;
+        // Inserts the mapItems into the PersonTripSchema collection.
+        await PersonTripSchema.insertMany(mapItems, { session }).catch((error: Error) => {
+            // Abort Client Session if there's an error
+            DbSession.Abort(session);
+            // Throws an error if the operation fails.
+            throw error;
+        });
     }
 }

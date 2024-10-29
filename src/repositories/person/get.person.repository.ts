@@ -2,18 +2,18 @@ import { Error } from "mongoose";
 import PersonSchema, { IPersonSchema } from "../../db/dao/person.db.model";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
-import { IPersonRead } from "../../models/person/person.read.model";
+import { IPerson } from "../../models/person.model";
 
 // Interface for GetPersonRepository
 export default interface IGetPersonRepository {
     // Fetches a single person by their userName, excluding the userName field.
-    getPerson(userName: string): Promise<IPersonRead>;
+    getPerson(userName: string): Promise<IPerson>;
 
     // Fetches a best friend of a person by their userName, excluding the userName field.
-    getBestFriend(userName: string): Promise<IPersonRead>;
+    getBestFriend(userName: string): Promise<IPerson>;
 
     // Fetches a single person by their userName, excluding the userName field.
-    getFriends(userName: string): Promise<IPersonRead[]>;
+    getFriends(userName: string): Promise<IPerson[]>;
 
     // Checks if a person with the given userName exists in the database.
     isExist(userName: string): Promise<boolean>;
@@ -43,12 +43,12 @@ export class GetPersonRepository implements IGetPersonRepository {
     }
 
     // Fetches a single person by their userName, excluding the userName field.
-    public async getPerson(userName: string): Promise<IPersonRead> {
+    public async getPerson(userName: string): Promise<IPerson> {
         return await PersonSchema.find({ userName }, { _id: 0 })
             .then((data: IPersonSchema[]) => {
                 // Uses the helper to process the person.
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IPersonRead;
+                return results as IPerson;
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.
@@ -57,7 +57,7 @@ export class GetPersonRepository implements IGetPersonRepository {
     }
 
     // Fetches a best friend of a person by their userName, excluding the userName field.
-    public async getBestFriend(userName: string): Promise<IPersonRead> {
+    public async getBestFriend(userName: string): Promise<IPerson> {
 
         let $pipeline = [
             { $match: { userName } },
@@ -90,7 +90,7 @@ export class GetPersonRepository implements IGetPersonRepository {
                 if (!this.helper.IsJsonNull(results)) {
                     results = results['bestFriend'] || {};
                 }
-                return results as IPersonRead;
+                return results as IPerson;
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.
@@ -99,7 +99,7 @@ export class GetPersonRepository implements IGetPersonRepository {
     }
 
     // Fetches a all friends of a person by their userName, excluding the userName field.
-    public async getFriends(userName: string): Promise<IPersonRead[]> {
+    public async getFriends(userName: string): Promise<IPerson[]> {
 
         let $pipeline = [
             { $match: { userName } },
@@ -131,7 +131,7 @@ export class GetPersonRepository implements IGetPersonRepository {
                 if (!this.helper.IsJsonNull(results)) {
                     results = results['friends'] || [];
                 }
-                return results as IPersonRead[];
+                return results as IPerson[];
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.

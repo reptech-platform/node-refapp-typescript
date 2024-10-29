@@ -2,8 +2,7 @@ import { Controller, Body, Post, Tags, Route } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
 import ICreateAirportService from "../../services/airport/post.airport.service";
-import { IAirportAdd } from "../../models/airport/airport.add.model";
-import { IAirportRead } from "../../models/airport/airport.read.model";
+import { IAirport } from "../../models/airport.model";
 
 @Tags("Airports")
 @Route("airports")
@@ -16,12 +15,12 @@ export class AirportCreateController extends Controller {
     }
 
     /**
-     * Define a POST endpoint with the body parameter 'IAirportAdd'
+     * Define a POST endpoint with the body parameter 'IAirport'
      * @param body 
-     * @returns IAirportRead | RequestResponse
+     * @returns IAirport | RequestResponse
      */
     @Post()
-    public async createAirport(@Body() body: IAirportAdd): Promise<IAirportRead | RequestResponse> {
+    public async createAirport(@Body() body: IAirport): Promise<IAirport | RequestResponse> {
 
         try {
 

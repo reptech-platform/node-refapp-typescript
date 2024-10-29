@@ -2,12 +2,13 @@ import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
-import { IAirlineRead } from "../../models/airline/airline.read.model";
+import { IAirline } from "../../models/airline.model";
+import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for CreateAirlineRepository
 export default interface ICreateAirlineRepository {
     // Method to create a new airline
-    createAirline(airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirlineRead>;
+    createAirline(airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirline>;
 
     // Method to check if an airline exists by its code
     isExist(airlineCode: string): Promise<boolean>;
@@ -37,16 +38,18 @@ export class CreateAirlineRepository implements ICreateAirlineRepository {
     }
 
     // Method to create a new airline
-    public async createAirline(airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirlineRead> {
+    public async createAirline(airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirline> {
 
         // create the airline document with the new data.
         return await AirlineSchema.create([airline], { session })
             .then((data: any) => {
                 // Get the first item from the array or return an empty object
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                return results as IAirlineRead;
+                return results as IAirline;
             })
             .catch((error: Error) => {
+                // Abort Client Session if there's an error
+                DbSession.Abort(session);
                 // Handle any errors that occur during the creation
                 throw error;
             });

@@ -1,12 +1,14 @@
 import { injectable } from "inversify";
-import { ILocation } from "../location.model";
-import { Feature, PersonGender } from "../../enums";
-import { IDocument } from "../document.model";
+import { ILocation } from "./location.model";
+import { Feature, PersonGender } from "../enums";
+import { IDocument } from "./document.model";
+import { ITrip } from "./trip.model";
 
-// Interface representing a person
-export interface IPersonUpdate {
-    // Optional username of the person
-    userName: string;
+// Interface representing a person and their details
+export interface IPerson {
+
+    // Optional unique identifier username of the person
+    userName?: string;
 
     // Optional first name of the person
     firstName?: string;
@@ -38,8 +40,14 @@ export interface IPersonUpdate {
     // Optional best friend of the person, represented by the IPerson interface
     bestFriendId?: string;
 
+    // Optional best friend, represented as another IPerson
+    bestFriend?: IPerson;
+
     // Optional array of friends of the person, each represented by the IPerson interface
     friendsList?: string[];
+
+    // Optional array of friends, represented as IPerson[]
+    friends?: IPerson[];
 
     // Optional array of address information, each represented by the ILocation interface
     addressInfo?: ILocation[];
@@ -54,14 +62,19 @@ export interface IPersonUpdate {
     features?: Feature[];
 
     // Optional array of trips of the person, each represented by the ITrip interface
-    // trips?: ITrip[];
+    trips?: ITrip[];
+
+    // Optional array of trip IDs
+    tripIds?: number[];
 }
+
 
 // Class implementing the IPerson interface
 @injectable()
-export class PersonUpdate implements IPersonUpdate {
+export class Person implements IPerson {
+
     // Optional unique identifier username of the person
-    userName: string;
+    userName?: string;
 
     // Optional first name of the person
     firstName?: string;
@@ -93,8 +106,14 @@ export class PersonUpdate implements IPersonUpdate {
     // Optional best friend of the person, represented by the IPerson interface
     bestFriendId?: string;
 
+    // Optional best friend, represented as another IPerson
+    bestFriend?: IPerson;
+
     // Optional array of friends of the person, each represented by the IPerson interface
     friendsList?: string[];
+
+    // Optional array of friends, represented as IPerson[]
+    friends?: IPerson[];
 
     // Optional array of address information, each represented by the ILocation interface
     addressInfo?: ILocation[];
@@ -109,7 +128,10 @@ export class PersonUpdate implements IPersonUpdate {
     features?: Feature[];
 
     // Optional array of trips of the person, each represented by the ITrip interface
-    // trips?: ITrip[];
+    trips?: ITrip[];
+
+    // Optional array of trip IDs
+    tripIds?: number[];
 
     // Constructor for the Person class
     constructor() { }

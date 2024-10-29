@@ -1,16 +1,16 @@
 import { ClientSession, Error } from "mongoose";
-import TripSchema, { ITripSchema } from "../../db/dao/trip.db.model";
-import { ITrip } from "../../models/trip.model";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
+import PersonTripSchema from "../../db/dao/persontrip.db.model";
+import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for UpdateTripRepository
 export default interface IUpdateTripRepository {
-    // Updates an existing trip by its tripId and returns the updated trip.
-    updateTrip(tripId: number, trip: any, session: ClientSession | undefined): Promise<ITrip>;
+    // This method updates the trip and person mapping in the database.
+    updateTripAndPersonMapping(mapItems: [] | any[], session: ClientSession | undefined): Promise<void>;
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
-    isPersonAndTripExist(userName: string, tripId: number): Promise<boolean>;
+    isExist(userName: string, tripId: number): Promise<boolean>;
 }
 
 // This decorator ensures that UpdateTripRepository is a singleton,
@@ -21,7 +21,7 @@ export class UpdateTripRepository implements IUpdateTripRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // This method checks if a person with the given userName is associated with a trip with the given tripId.
-    public async isPersonAndTripExist(userName: string, tripId: number): Promise<boolean> {
+    public async isExist(userName: string, tripId: number): Promise<boolean> {
 
         return await PersonTripSchema.find({ userName, tripId }, { _id: 1 })
             .then((data: any[]) => {
@@ -37,18 +37,15 @@ export class UpdateTripRepository implements IUpdateTripRepository {
             });
     }
 
-    // Updates an existing trip by its tripId and returns the updated trip.
-    public async updateTrip(tripId: number, trip: any, session: ClientSession | undefined): Promise<ITrip> {
+    // This method updates the trip and person mapping in the database.
+    public async updateTripAndPersonMapping(mapItems: [] | any[], session: ClientSession | undefined): Promise<void> {
 
-        let updatedTrip = await TripSchema.findOneAndUpdate({ tripId }, trip, { new: true, session })
-            .then((data: any) => {
-                return data as ITrip;
-            })
-            .catch((error: Error) => {
-                // Throws an error if the operation fails.
-                throw error;
-            });
-
-        return updatedTrip;
+        // Inserts the mapItems into the PersonTripSchema collection.
+        await PersonTripSchema.insertMany(mapItems, { session }).catch((error: Error) => {
+            // Abort Client Session if there's an error
+            DbSession.Abort(session);
+            // Throws an error if the operation fails.
+            throw error;
+        });
     }
 }

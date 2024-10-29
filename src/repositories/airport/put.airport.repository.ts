@@ -2,12 +2,13 @@ import { ClientSession, Error } from "mongoose";
 import AirportSchema, { IAirportSchema } from "../../db/dao/airport.db.model";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
-import { IAirportRead } from "../../models/airport/airport.read.model";
+import { IAirport } from "../../models/airport.model";
+import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for UpdateAirportRepository
 export default interface IUpdateAirportRepository {
     // Updates an airport's information based on the provided ICAO and IATA codes.
-    updateAirport(icaoCode: string, iataCode: string, airport: IAirportSchema, session: ClientSession | undefined): Promise<IAirportRead>;
+    updateAirport(icaoCode: string, iataCode: string, airport: IAirportSchema, session: ClientSession | undefined): Promise<IAirport>;
 
     // Method to check if an airport exists by its ICAO and IATA codes
     isExist(icaoCode: string, iataCode: string): Promise<boolean>;
@@ -37,18 +38,20 @@ export class UpdateAirportRepository implements IUpdateAirportRepository {
     }
 
     // Updates an airport's information based on the provided ICAO and IATA codes.
-    public async updateAirport(icaoCode: string, iataCode: string, airport: IAirportSchema, session: ClientSession | undefined): Promise<IAirportRead> {
+    public async updateAirport(icaoCode: string, iataCode: string, airport: IAirportSchema, session: ClientSession | undefined): Promise<IAirport> {
 
         // Find and update the airport document with the new data.
         return await AirportSchema.findOneAndUpdate({ icaoCode, iataCode }, airport, { new: true, session })
             .then((data: any) => {
                 // Extract the first item from the data array using a helper function.
                 let results = this.helper.GetItemFromArray(data, 0, {});
-                // Return the results cast as an IAirportRead object.
-                return results as IAirportRead;
+                // Return the results cast as an IAirport object.
+                return results as IAirport;
             })
             .catch((error: Error) => {
-                // Throw an error if the update operation fails.
+                // Abort Client Session if there's an error
+                DbSession.Abort(session);
+                // Handle any errors that occur during the creation
                 throw error;
             });
     }
