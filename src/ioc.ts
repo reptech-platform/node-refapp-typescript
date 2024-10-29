@@ -11,8 +11,10 @@ decorate(injectable(), Controller); // Makes tsoa's Controller injectable
 // make inversify aware of inversify-binding-decorators
 iocContainer.load(buildProviderModule());
 
-// initialize all container binding objects
-ContainerConfigLoader.Load(iocContainer);
+(async () => {
+    // initialize all container binding objects
+    await new ContainerConfigLoader().Load(iocContainer);
+})();
 
 // export according to convention
 export { iocContainer };
