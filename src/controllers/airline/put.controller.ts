@@ -29,7 +29,7 @@ export class AirlineUpdateController extends Controller {
             await this.updateAirlineService.updateAirline(airlineCode, body, undefined);
 
             // Return an success response with the status and status message
-            return { status: 200, message: `Updated Airline ${airlineCode} successfuly.` };
+            return { status: 201, message: `Airline ${body.airlineCode} updated successfuly.` };
 
         } catch (ex: any) {
 

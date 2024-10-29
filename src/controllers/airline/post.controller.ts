@@ -31,7 +31,7 @@ export class AirlineCreateController extends Controller {
             this.setStatus(201);
 
             // Return an success response with the status and status message
-            return { status: 201, message: `Added persion ${body.airlineCode} successfuly.` };
+            return { status: 201, message: `Airline ${body.airlineCode} created successfuly.` };
 
         } catch (ex: any) {
 

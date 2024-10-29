@@ -32,7 +32,7 @@ export class AirlineDeleteController extends Controller {
             this.setStatus(201);
 
             // Return an success response with the status and status message
-            return { status: 201, message: `Added persion ${airlineCode} successfuly.` };
+            return { status: 201, message: `Airline ${airlineCode} deleted successfuly.` };
 
         } catch (ex: any) {
             // Set the status to 400 if an error occurs

@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Tags, Route, Path } from "tsoa";
+import { Controller, Body, Post, Tags, Route } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
 import { Search, SearchResults } from "../../models/search.model";

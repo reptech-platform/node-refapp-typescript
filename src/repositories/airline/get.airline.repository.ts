@@ -47,8 +47,9 @@ export class GetAirlineRepository implements IGetAirlineRepository {
                     pipeline: [
                         {
                             $project: {
-                                __v: 0,
-                                _id: 0
+                                "__v": 0,
+                                "_id": 0,
+                                "airlineId": 0
                             }
                         }
                     ]
@@ -57,10 +58,11 @@ export class GetAirlineRepository implements IGetAirlineRepository {
             { $unwind: { path: "$airports", preserveNullAndEmptyArrays: true } },
             {
                 $project: {
-                    _id: 0,
-                    airportId: 0,
-                    __v: 0,
-                    "CEO._id": 0
+                    "__v": 0,
+                    "_id": 0,
+                    "CEO._id": 0,
+                    "airportId": 0,
+                    "ceoName": 0
                 }
             }
         ];

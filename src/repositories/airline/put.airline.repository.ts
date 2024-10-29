@@ -29,7 +29,7 @@ export class UpdateAirlineRepository implements IUpdateAirlineRepository {
                 let results = this.helper.GetItemFromArray(data, 0, { _id: null });
                 // Check if the _id is not null
                 if (!this.helper.IsNullValue(results._id)) return true;
-                return false;
+                return results._id;
             })
             .catch((error: Error) => {
                 // Handle any errors that occur during the query

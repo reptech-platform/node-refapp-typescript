@@ -15,7 +15,10 @@ export interface IAirline {
     logo?: string | undefined;
 
     // The CEO of the airline, represented by an IPerson interface
-    CEO?: string | undefined;
+    CEO?: IPerson | undefined;
+
+    // The CEO of the airline, represented by an Person's name
+    ceoName?: string | undefined;
 
     // An array of staff members object, each represented by an IPerson interface
     staff?: IPerson[] | undefined | null;
@@ -26,7 +29,7 @@ export interface IAirline {
     // Store airport reference object
     airport?: IAirport;
 
-    // Store airport reference id
+    // Store airport reference
     airportId?: { icaoCode: string, iataCode: string };
 }
 
@@ -43,7 +46,10 @@ export class Airline implements IAirline {
     logo?: string | undefined;
 
     // The CEO of the airline, represented by an IPerson interface
-    CEO?: string | undefined;
+    CEO?: IPerson | undefined;
+
+    // The CEO of the airline, represented by an Person's name
+    ceoName?: string | undefined;
 
     // An array of staff members object, each represented by an IPerson interface
     staff?: IPerson[] | undefined | null;
@@ -54,7 +60,7 @@ export class Airline implements IAirline {
     // Store airport reference object
     airport?: IAirport;
 
-    // Store airport reference id
+    // Store airport reference 
     airportId?: { icaoCode: string, iataCode: string };
 
     // Constructor for the Airline class

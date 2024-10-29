@@ -27,7 +27,7 @@ export default class ContainerConfigLoader {
         let dirName: any;
 
         // bind helper
-        iocContainer.bind('IHelper').to(Helper).inSingletonScope();
+        iocContainer.bind('Helper').to(Helper).inSingletonScope();
 
         // bind repositories
         dirName = path.join(__dirname, "..", 'repositories');

@@ -1,8 +1,7 @@
 import { Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
-import AirlineStaffSchema from "../../db/dao/airlinestaff.db.model";
-import { IAirlineSchema } from "../../db/dao/airline.db.model";
+import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
 import { IAirline } from "../../models/airline.model";
 
 // Interface for GetAirlinesRepository
@@ -24,41 +23,31 @@ export class GetAirlinesRepository implements IGetAirlinesRepository {
         let $pipeline = [
             {
                 $lookup: {
-                    from: "airlines", localField: "airlineCode", foreignField: "airlineCode", as: "airlines",
+                    from: "airports", localField: "airportId", foreignField: "_id", as: "airports",
                     pipeline: [
                         {
                             $project: {
-                                __v: 0,
-                                _id: 0
+                                "__v": 0,
+                                "_id": 0,
+                                "airlineId": 0
                             }
                         }
                     ]
                 }
             },
-            { $unwind: { path: "$airlines", preserveNullAndEmptyArrays: true } },
-            {
-                $lookup: {
-                    from: "persons", localField: "userName", foreignField: "userName", as: "staffs",
-                    pipeline: [
-                        {
-                            $project: {
-                                __v: 0,
-                                _id: 0
-                            }
-                        }
-                    ]
-                }
-            },
-            { $unwind: { path: "$staffs", preserveNullAndEmptyArrays: true } },
+            { $unwind: { path: "$airports", preserveNullAndEmptyArrays: true } },
             {
                 $project: {
-                    "$airlines": 1,
-                    "$staffs": 1
+                    "__v": 0,
+                    "_id": 0,
+                    "CEO._id": 0,
+                    "airportId": 0,
+                    "ceoName": 0
                 }
             }
         ];
 
-        return await AirlineStaffSchema.aggregate($pipeline)
+        return await AirlineSchema.aggregate($pipeline)
             .then((data: IAirlineSchema[]) => {
                 // Uses the helper to process the Airline.
                 let results = this.helper.GetItemFromArray(data, -1, []);
