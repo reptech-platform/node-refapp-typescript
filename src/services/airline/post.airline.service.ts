@@ -48,7 +48,7 @@ export class CreateAirlineService implements ICreateAirlineService {
 
         // Check CEO and ceoName both are passed
         if (!this.helper.IsJsonNull(airline.CEO) && !this.helper.IsNullValue(airline.ceoName)) {
-            throw new Error(`Provid CEO or ceoName`);
+            throw new Error(`Provide only CEO or ceoName`);
         }
 
         let ceoName: any = airline.ceoName;
