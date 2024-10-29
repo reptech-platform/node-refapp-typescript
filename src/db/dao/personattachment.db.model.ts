@@ -7,12 +7,16 @@ const AutoIncrement = AutoIncrementFactory(mongoose);
  * Interface to validate schema field construction
  */
 export interface IPersonAttachmentSchema extends Document {
-    /**
-     * Auto increment docId
-     */
-    docId: Number,
+    // Unique identifier for the document
+    docId: number;
+
+    // Name of the document
     docName: string;
+
+    // Location or path where the document is stored
     docLocation: string;
+
+    // File type of the document
     docFileType: string;
 }
 
@@ -20,21 +24,20 @@ export interface IPersonAttachmentSchema extends Document {
  * Schema defination to store the document
  */
 const PersonAttachmentSchema: Schema = new Schema({
-    /**
-     * Auto increment id
-     */
+    // Unique identifier for the document
     docId: { type: Number },
+
+    // Name of the document
     docName: { type: String, default: null },
+
+    // Location or path where the document is stored
     docLocation: { type: String, default: null },
+
+    // File type of the document
     docFileType: { type: String, default: null }
 }, {
     _id: false
 });
-
-/**
- * Define auto increment number
- */
-PersonAttachmentSchema.plugin(AutoIncrement, { inc_field: 'docId' });
 
 /**
  * Setting function to onvert $numberDecimal to actual decimal values

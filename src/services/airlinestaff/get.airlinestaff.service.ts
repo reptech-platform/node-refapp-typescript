@@ -6,7 +6,7 @@ import { IAirline } from "../../models/airline.model";
 // Interface for GetAirlineStaffService
 export default interface IGetAirlineStaffService {
     // This method get multiple staff for a airline.
-    getArilineStaffs(airlineCode: string): Promise<IPerson[]>;
+    getAirlineStaffs(airlineCode: string): Promise<IPerson[]>;
 
     // This method get multiple airlines for a staff.
     getStaffAirlines(userName: string): Promise<IAirline[]>;
@@ -22,7 +22,7 @@ export class GetAirlineStaffService implements IGetAirlineStaffService {
     ) { }
 
     // This method get multiple staff for a airline.
-    public async getArilineStaffs(airlineCode: string): Promise<IPerson[]> {
+    public async getAirlineStaffs(airlineCode: string): Promise<IPerson[]> {
         // Check if the AirlineStaff exists. If not, throw an error.
         let isExist = await this.getAirlineStaffRepository.isExist(airlineCode, null);
         if (!isExist) {

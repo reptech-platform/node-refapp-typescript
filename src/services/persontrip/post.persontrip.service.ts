@@ -7,7 +7,7 @@ import IGetPersonRepository from "../../repositories/person/get.person.repositor
 import IGetTripRepository from "../../repositories/trip/get.trip.repository";
 
 // Interface for CreatePersonTripService
-export default interface IUpdatePersonTripService {
+export default interface ICreatePersonTripService {
     // Method to create a new person and trip mapping
     createPersonTrips(personTrips: IPersonTrip[], dbSession: ClientSession | undefined): Promise<void>;
 }
@@ -15,7 +15,7 @@ export default interface IUpdatePersonTripService {
 // This decorator ensures that CreatePersonTripService is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class UpdatePersonTripService implements IUpdatePersonTripService {
+export class CreatePersonTripService implements ICreatePersonTripService {
     // Injecting the AirlineRepository service
     constructor(
         @inject('ICreatePersonTripRepository') private createPersonTripRepository: ICreatePersonTripRepository,

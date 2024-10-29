@@ -4,7 +4,6 @@ import DbSession from "../../db/utils/dbsession.db";
 import IGetPersonRepository from "../../repositories/person/get.person.repository";
 import IGetAirlineRepository from "../../repositories/airline/get.airline.repository";
 import ICreateAirlineStaffRepository from "../../repositories/airlinestaff/post.airlinestaff.repository";
-import AirlineStaffSchema, { IAirlineStaffSchema } from "../../db/dao/airlinestaff.db.model";
 import { IAirlineStaff } from "../../models/airlinestaff.model";
 
 // Interface for CreateAirlineStaffService

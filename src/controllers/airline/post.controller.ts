@@ -17,7 +17,7 @@ export class AirlineCreateController extends Controller {
     /**
      * Define a POST endpoint with the body parameter 'IAirline'
      * @param body 
-     * @returns 
+     * @returns RequestResponse
      */
     @Post()
     public async createAirline(@Body() body: IAirline): Promise<RequestResponse> {
