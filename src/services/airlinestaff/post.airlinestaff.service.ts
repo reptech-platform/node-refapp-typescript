@@ -1,69 +1,63 @@
 import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
-import ICreateAirlineRepository from "../../repositories/airline/post.airline.repository";
 import IGetPersonRepository from "../../repositories/person/get.person.repository";
-import { IAirline } from "../../models/airline.model";
-import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
-import IGetAirportRepository from "../../repositories/airport/get.airport.repository";
+import IGetAirlineRepository from "../../repositories/airline/get.airline.repository";
+import ICreateAirlineStaffRepository from "../../repositories/airlinestaff/post.airlinestaff.repository";
+import AirlineStaffSchema, { IAirlineStaffSchema } from "../../db/dao/airlinestaff.db.model";
+import { IAirlineStaff } from "../../models/airlinestaff.model";
 
-// Interface for CreateAirlineService
-export default interface ICreateAirlineService {
+// Interface for CreateAirlineStaffService
+export default interface ICreateAirlineStaffService {
     // Method to create a new airline
-    createAirline(airline: IAirline, dbSession: ClientSession | undefined): Promise<IAirline>;
+    createAirlineStaffs(airlineStaffs: IAirlineStaff[], dbSession: ClientSession | undefined): Promise<void>;
 }
 
-// This decorator ensures that CreateAirlineService is a singleton,
+// This decorator ensures that CreateAirlineStaffService is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class CreateAirlineService implements ICreateAirlineService {
+export class CreateAirlineStaffService implements ICreateAirlineStaffService {
     // Injecting the AirlineRepository service
     constructor(
-        @inject('ICreateAirlineRepository') private createAirlineRepository: ICreateAirlineRepository,
-        @inject('IGetAirportRepository') private getAirportRepository: IGetAirportRepository,
+        @inject('ICreateAirlineStaffRepository') private createAirlineStaffRepository: ICreateAirlineStaffRepository,
+        @inject('IGetAirlineRepository') private getAirlineRepository: IGetAirlineRepository,
         @inject('IGetPersonRepository') private getPersonRepository: IGetPersonRepository
     ) { }
 
     // Method to create a new airline
-    public async createAirline(airline: IAirline, dbSession: ClientSession | undefined): Promise<IAirline> {
+    public async createAirlineStaffs(airlineStaffs: IAirlineStaff[], dbSession: ClientSession | undefined): Promise<void> {
 
-        // Create new Airline schema object
-        let newAirline: IAirlineSchema = new AirlineSchema();
+        // Create new AirlineStaff schema object
+        let newItems: IAirlineStaffSchema[] = [];
 
-        // Check if the Airline exists. If yes, throw an error.
-        let isExist = await this.createAirlineRepository.isExist(airline.airlineCode);
-        if (isExist) {
-            throw new Error(`Provided Airline '${airline.airlineCode}' is already exist`);
-        }
-
-        // Check if CEO  is not null
-        if (airline.CEO) {
-            let isExist = await this.getPersonRepository.isExist(airline.CEO);
-            if (!isExist) {
-                throw new Error(`Provided CEO '${airline.CEO}' does not exist`);
-            }
-            const person: any = await this.getPersonRepository.getPerson(airline.CEO);
-
-            newAirline.CEO = person;
-        }
-
-        // Check if airport is not null
-        if (airline.airport) {
-            const { icaoCode, iataCode } = airline.airport;
-            if (icaoCode && iataCode) {
-                let isExist = await this.getAirportRepository.isExist(icaoCode, iataCode);
+        // Check if airlineStaffs object is not null
+        if (airlineStaffs && airlineStaffs.length > 0) {
+            // Loop to check if each friend already exists in the database using their userName
+            for (let index = 0; index < airlineStaffs.length; index++) {
+                let { airlineCode, userName } = airlineStaffs[index];
+                // Check if the AirlineStaff exists. If not, throw an error.
+                let isExist = await this.createAirlineStaffRepository.isExist(airlineCode, userName);
                 if (!isExist) {
-                    throw new Error(`Provided airport '${airline.airport}' does not exist`);
+                    throw new Error(`Provided airline staff '${airlineCode}' and '${userName}' is already exist`);
                 }
-                newAirline.airportId = await this.getAirportRepository.getAirportId(icaoCode, iataCode);
-            } else {
-                throw new Error(`Provided airport '${airline.airport}' is invalid`);
-            }
-        }
+                isExist = await this.getPersonRepository.isExist(userName);
+                if (!isExist) {
+                    throw new Error(`Provided staff '${userName}' does not exist`);
+                }
 
-        newAirline.airlineCode = airline.airlineCode;
-        if (airline.name) newAirline.name = airline.name;
-        if (airline.logo) newAirline.logo = airline.logo;
+                isExist = await this.getAirlineRepository.isExist(airlineCode);
+                if (!isExist) {
+                    throw new Error(`Provided airline '${airlineCode}' does not exist`);
+                }
+                let item = new AirlineStaffSchema();
+                item.userName = userName;
+                item.airlineCode = airlineCode;
+
+                newItems.push(item);
+            }
+        } else {
+            throw new Error(`Provided airline staffs are required`);
+        }
 
         // Flag to indicate if this function created the session
         let inCarryTransact: boolean = false;
@@ -76,14 +70,12 @@ export class CreateAirlineService implements ICreateAirlineService {
             inCarryTransact = true;
         }
 
-        // Create airline document
-        const results: IAirline = await this.createAirlineRepository.createAirline(newAirline, dbSession);
+        // Create airlinestaff document
+        await this.createAirlineStaffRepository.addStaffAirlines(newItems, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {
             await DbSession.Commit(dbSession);
         }
-
-        return results;
     }
 }

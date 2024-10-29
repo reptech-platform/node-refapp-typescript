@@ -1,16 +1,16 @@
 import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
-import AirlineStaffSchema from "../../db/dao/airlinestaff.db.model";
+import AirlineStaffSchema, { IAirlineStaffSchema } from "../../db/dao/airlinestaff.db.model";
 import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for CreateAirlineStaffRepository
 export default interface ICreateAirlineStaffRepository {
     // This method adds multiple airlines to a staff.
-    addStaffAirlines(mapItems: [] | any[], session: ClientSession | undefined): Promise<void>;
+    addStaffAirlines(mapItems: IAirlineStaffSchema[], session: ClientSession | undefined): Promise<void>;
 
     // This method checks if a person with the given userName is associated with a airline with the given airlineCode.
-    isAirlineAndStaffExist(airlineCode: string, userName: string): Promise<boolean>;
+    isExist(airlineCode: string, userName: string): Promise<boolean>;
 }
 
 // This decorator ensures that CreateAirlineStaffRepository is a singleton,
@@ -21,7 +21,7 @@ export class CreateAirlineStaffRepository implements ICreateAirlineStaffReposito
     constructor(@inject(Helper) private helper: Helper) { }
 
     // This method checks if a person with the given userName is associated with a airline with the given airlineCode.
-    public async isAirlineAndStaffExist(airlineCode: string, userName: string): Promise<boolean> {
+    public async isExist(airlineCode: string, userName: string): Promise<boolean> {
 
         return await AirlineStaffSchema.find({ airlineCode, userName }, { _id: 1 })
             .then((data: any[]) => {
@@ -38,9 +38,9 @@ export class CreateAirlineStaffRepository implements ICreateAirlineStaffReposito
     }
 
     // This method adds multiple airlines to a staff.
-    public async addStaffAirlines(mapItems: [] | any[], session: ClientSession | undefined): Promise<void> {
+    public async addStaffAirlines(mapItems: IAirlineStaffSchema[], session: ClientSession | undefined): Promise<void> {
 
-        // Inserts the mapItems into the PersonAirlineStaffSchema collection.
+        // Inserts the mapItems into the AirlineStaffSchema collection.
         await AirlineStaffSchema.insertMany(mapItems, { session }).catch((error: Error) => {
             // Abort Client Session if there's an error
             DbSession.Abort(session);

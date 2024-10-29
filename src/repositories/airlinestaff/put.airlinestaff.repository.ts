@@ -7,10 +7,10 @@ import DbSession from "../../db/utils/dbsession.db";
 // Interface for UpdateAirlineStaffRepository
 export default interface IUpdateAirlineStaffRepository {
     // This method adds multiple airlines to a staff.
-    addOrUpdateStaffAirlines(mapItems: [] | any[], session: ClientSession | undefined): Promise<void>;
+    updateAirlineStaffs(mapItems: any[], session: ClientSession | undefined): Promise<void>;
 
     // This method checks if a person with the given userName is associated with a airline with the given airlineCode.
-    isAirlineAndStaffExist(airlineCode: string, userName: string): Promise<boolean>;
+    getKeyId(airlineCode: string, userName: string): Promise<string>;
 }
 
 // This decorator ensures that UpdateAirlineStaffRepository is a singleton,
@@ -21,15 +21,13 @@ export class UpdateAirlineStaffRepository implements IUpdateAirlineStaffReposito
     constructor(@inject(Helper) private helper: Helper) { }
 
     // This method checks if a person with the given userName is associated with a airline with the given airlineCode.
-    public async isAirlineAndStaffExist(airlineCode: string, userName: string): Promise<boolean> {
+    public async getKeyId(airlineCode: string, userName: string): Promise<string> {
 
         return await AirlineStaffSchema.find({ airlineCode, userName }, { _id: 1 })
             .then((data: any[]) => {
                 // Uses the helper to process the array of results.
                 let results = this.helper.GetItemFromArray(data, 0, { _id: null });
-                // Returns true if the association exists, otherwise false.
-                if (!this.helper.IsNullValue(results._id)) return true;
-                return false;
+                return results._id;
             })
             .catch((error: Error) => {
                 // Throws an error if the operation fails.
@@ -38,7 +36,7 @@ export class UpdateAirlineStaffRepository implements IUpdateAirlineStaffReposito
     }
 
     // This method adds multiple airlines to a staff.
-    public async addOrUpdateStaffAirlines(mapItems: [] | any[], session: ClientSession | undefined): Promise<void> {
+    public async updateAirlineStaffs(mapItems: any[], session: ClientSession | undefined): Promise<void> {
 
         // Inserts the mapItems into the PersonTripSchema collection.
         await AirlineStaffSchema.updateMany(mapItems, { session }).catch((error: Error) => {

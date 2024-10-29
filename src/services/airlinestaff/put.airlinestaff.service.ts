@@ -1,70 +1,46 @@
 import { inject, injectable } from "inversify";
 import { ClientSession } from "mongoose";
 import DbSession from "../../db/utils/dbsession.db";
-import IUpdateAirlineRepository from "../../repositories/airline/put.airline.repository";
-import IGetPersonRepository from "../../repositories/person/get.person.repository";
-import IGetAirportRepository from "../../repositories/airport/get.airport.repository";
-import AirlineSchema, { IAirlineSchema } from "../../db/dao/airline.db.model";
-import { IAirline } from "../../models/airline.model";
+import { IAirlineStaff } from "../../models/airlinestaff.model";
+import IUpdateAirlineStaffRepository from "../../repositories/airlinestaff/put.airlinestaff.repository";
 
-// Interface for UpdateAirlineService
-export default interface IUpdateAirlineService {
-    // Updates an existing Airline by their userName and returns the updated Airline.
-    updateAirline(userName: string, airline: IAirline, dbSession: ClientSession | undefined): Promise<IAirline>;
+// Interface for UpdateAirlineStaffService
+export default interface IUpdateAirlineStaffService {
+    // Method to create a new airline
+    updateAirlineStaffs(airlineStaffs: IAirlineStaff[], dbSession: ClientSession | undefined): Promise<void>;
 }
 
-// This decorator ensures that UpdateAirlineService is a singleton,
+// This decorator ensures that UpdateAirlineStaffService is a singleton,
 // meaning only one instance of this service will be created and used throughout the application.
 @injectable()
-export class UpdateAirlineService implements IUpdateAirlineService {
+export class UpdateAirlineStaffService implements IUpdateAirlineStaffService {
     // Injecting the AirlineRepository service
     constructor(
-        @inject('IUpdateAirlineRepository') private updateAirlineRepository: IUpdateAirlineRepository,
-        @inject('IGetAirportRepository') private getAirportRepository: IGetAirportRepository,
-        @inject('IGetPersonRepository') private getPersonRepository: IGetPersonRepository
-
+        @inject('IUpdateAirlineStaffRepository') private updateAirlineStaffRepository: IUpdateAirlineStaffRepository
     ) { }
 
-    // Updates an existing Airline by their userName and returns the updated Airline.
-    public async updateAirline(airlineCode: string, airline: IAirline, dbSession: ClientSession | undefined): Promise<IAirline> {
+    // Method to create a new airline
+    public async updateAirlineStaffs(airlineStaffs: IAirlineStaff[], dbSession: ClientSession | undefined): Promise<void> {
 
-        // Create new Airline schema object
-        let newAirline: IAirlineSchema = new AirlineSchema();
+        // Create new AirlineStaff schema object
+        let newItems: any[] = [];
 
-        // Check if the Airline exists. If yes, throw an error.
-        let isExist = await this.updateAirlineRepository.isExist(airlineCode);
-        if (!isExist) {
-            throw new Error(`Provided Airline '${airlineCode}' does not exist`);
-        }
+        // Check if airlineStaffs object is not null
+        if (airlineStaffs && airlineStaffs.length > 0) {
+            // Loop to check if each friend already exists in the database using their userName
+            for (let index = 0; index < airlineStaffs.length; index++) {
+                let { airlineCode, userName } = airlineStaffs[index];
 
-        // Check if CEO  is not null
-        if (airline.CEO) {
-            let isExist = await this.getPersonRepository.isExist(airline.CEO);
-            if (!isExist) {
-                throw new Error(`Provided CEO '${airline.CEO}' does not exist`);
-            }
-            const person: any = await this.getPersonRepository.getPerson(airline.CEO);
-
-            newAirline.CEO = person;
-        }
-
-        // Check if airport is not null
-        if (airline.airport) {
-            const { icaoCode, iataCode } = airline.airport;
-            if (icaoCode && iataCode) {
-                let isExist = await this.getAirportRepository.isExist(icaoCode, iataCode);
-                if (!isExist) {
-                    throw new Error(`Provided airport '${airline.airport}' does not exist`);
+                let _id = await this.updateAirlineStaffRepository.getKeyId(airlineCode, userName);
+                if (!_id) {
+                    throw new Error(`Provided airline staff '${airlineCode}' and '${userName}' does not exist`);
                 }
-                newAirline.airportId = await this.getAirportRepository.getAirportId(icaoCode, iataCode);
-            } else {
-                throw new Error(`Provided airport '${airline.airport}' is invalid`);
-            }
-        }
 
-        newAirline.airlineCode = airlineCode;
-        if (airline.name) newAirline.name = airline.name;
-        if (airline.logo) newAirline.logo = airline.logo;
+                newItems.push({ _id, userName, airlineCode });
+            }
+        } else {
+            throw new Error(`Provided airline staffs are required`);
+        }
 
         // Flag to indicate if this function created the session
         let inCarryTransact: boolean = false;
@@ -77,14 +53,12 @@ export class UpdateAirlineService implements IUpdateAirlineService {
             inCarryTransact = true;
         }
 
-        // Create airline document
-        const results: IAirline = await this.updateAirlineRepository.updateAirline(airlineCode, newAirline, dbSession);
+        // Create airlinestaff document
+        await this.updateAirlineStaffRepository.updateAirlineStaffs(newItems, dbSession);
 
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {
             await DbSession.Commit(dbSession);
         }
-
-        return results;
     }
 }
