@@ -31,7 +31,7 @@ export class PersonTripCreateController extends Controller {
             this.setStatus(201);
 
             // Return an success response with the status and status message
-            return { status: 201, message: `Added airline staffs successfuly.` };
+            return { status: 201, message: `Person trips are added successfuly.` };
 
         } catch (ex: any) {
 
