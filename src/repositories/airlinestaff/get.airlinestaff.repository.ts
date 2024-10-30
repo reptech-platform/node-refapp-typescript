@@ -89,7 +89,7 @@ export class GetAirlineStaffRepository implements IGetAirlineStaffRepository {
                     from: "persons", // The collection to join
                     localField: "userName", // The field from the input documents
                     foreignField: "userName", // The field from the 'persons' collection
-                    as: "mapItems", // The name of the new array field to add to the input documents
+                    as: "persons", // The name of the new array field to add to the input documents
                     pipeline: [
                         {
                             // Project to exclude _id and __v fields from the joined documents
@@ -101,16 +101,12 @@ export class GetAirlineStaffRepository implements IGetAirlineStaffRepository {
                     ]
                 }
             },
-            // Unwind the 'mapItems' array to deconstruct the array field
-            { $unwind: { path: "$mapItems", preserveNullAndEmptyArrays: true } },
-            { "$addFields": { "items": "$mapItems" } },
+            // Unwind the 'persons' array to deconstruct the array field
+            { $unwind: { path: "$persons", preserveNullAndEmptyArrays: true } },
             {
-                // Project the 'mapItems' array as 'persons'
                 $project: {
                     "_id": 0,
-                    "userName": 0,
-                    "mapItems": 0,
-                    "__v": 0
+                    "staff": "$persons"
                 }
             }
         ];
@@ -119,7 +115,7 @@ export class GetAirlineStaffRepository implements IGetAirlineStaffRepository {
         return await AirlineStaffSchema.aggregate($pipeline)
             .then((data: any[]) => {
                 // Resolve the promise with the resulting data
-                return data.map(x => x.items);
+                return data.map(x => x.staff);
             })
             .catch((error: Error) => {
                 // Throw an error if the aggregation fails
@@ -140,28 +136,27 @@ export class GetAirlineStaffRepository implements IGetAirlineStaffRepository {
                     from: "airlines", // The collection to join
                     localField: "airlineCode", // The field from the input documents
                     foreignField: "airlineCode", // The field from the 'trips' collection
-                    as: "mapItems", // The name of the new array field to add to the input documents
+                    as: "airlines", // The name of the new array field to add to the input documents
                     pipeline: [
                         {
                             // Project to exclude _id and __v fields from the joined documents
                             $project: {
                                 _id: 0,
-                                __v: 0
+                                __v: 0,
+                                "CEO._id": 0,
+                                "airportId": 0
                             }
                         }
                     ]
                 }
             },
-            // Unwind the 'mapItems' array to deconstruct the array field
-            { $unwind: { path: "$mapItems", preserveNullAndEmptyArrays: true } },
-            { "$addFields": { "items": "$mapItems" } },
+            // Unwind the 'airlines' array to deconstruct the array field
+            { $unwind: { path: "$airlines", preserveNullAndEmptyArrays: true } },
+            { "$addFields": { "items": "$airlines" } },
             {
-                // Project the 'mapItems' array as 'trips'
                 $project: {
                     "_id": 0,
-                    "airlineCode": 0,
-                    "mapItems": 0,
-                    "__v": 0
+                    "airline": "$airlines"
                 }
             }
         ];
@@ -170,7 +165,7 @@ export class GetAirlineStaffRepository implements IGetAirlineStaffRepository {
         return await AirlineStaffSchema.aggregate($pipeline)
             .then((data: any[]) => {
                 // Resolve the promise with the resulting data
-                return data.map(x => x.items);
+                return data.map(x => x.airline);
             })
             .catch((error: Error) => {
                 // Throw an error if the aggregation fails

@@ -1,7 +1,7 @@
 import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
-import AirlineStaffSchema from "../../db/dao/airlinestaff.db.model";
+import AirlineStaffSchema, { IAirlineStaffSchema } from "../../db/dao/airlinestaff.db.model";
 import DbSession from "../../db/utils/dbsession.db";
 
 // Interface for UpdateAirlineStaffRepository
@@ -36,7 +36,7 @@ export class UpdateAirlineStaffRepository implements IUpdateAirlineStaffReposito
     }
 
     // This method adds multiple airlines to a staff.
-    public async updateAirlineStaffs(mapItems: any[], session: ClientSession | undefined): Promise<void> {
+    public async updateAirlineStaffs(mapItems: IAirlineStaffSchema[], session: ClientSession | undefined): Promise<void> {
 
         // Inserts the mapItems into the PersonTripSchema collection.
         await AirlineStaffSchema.updateMany(mapItems, { session }).catch((error: Error) => {

@@ -20,7 +20,7 @@ export class AirlineStaffUpdateController extends Controller {
      * @returns RequestResponse
      */
     @Put()
-    public async updateAirlineStaff(@Body() body: IAirlineStaff[]): Promise<RequestResponse> {
+    public async updateAirlineStaffs(@Body() body: IAirlineStaff[]): Promise<RequestResponse> {
 
         try {
 
@@ -28,7 +28,7 @@ export class AirlineStaffUpdateController extends Controller {
             await this.updateAirlineStaffService.updateAirlineStaffs(body, undefined);
 
             // Return an success response with the status and status message
-            return { status: 200, message: `Updated AirlineStaff successfuly.` };
+            return { status: 200, message: `Airline staffs are update successfuly..` };
 
         } catch (ex: any) {
 

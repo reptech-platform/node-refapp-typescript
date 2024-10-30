@@ -36,7 +36,7 @@ export class CreateAirlineStaffService implements ICreateAirlineStaffService {
                 let { airlineCode, userName } = airlineStaffs[index];
                 // Check if the AirlineStaff exists. If not, throw an error.
                 let isExist = await this.createAirlineStaffRepository.isExist(airlineCode, userName);
-                if (!isExist) {
+                if (isExist) {
                     throw new Error(`Provided airline staff '${airlineCode}' and '${userName}' is already exist`);
                 }
                 isExist = await this.getPersonRepository.isExist(userName);

@@ -12,10 +12,10 @@ export interface IAirlineStaff {
     userName: string;
 
     // personn object
-    staff: IPerson;
+    staff?: IPerson;
 
     // airline object
-    airline: IAirline;
+    airline?: IAirline;
 }
 
 // The Airline class implements the IAirlineStaff interface
@@ -28,10 +28,10 @@ export class AirlineStaff implements IAirlineStaff {
     userName: string;
 
     // personn object
-    staff: IPerson;
+    staff?: IPerson;
 
     // airline object
-    airline: IAirline;
+    airline?: IAirline;
 
     // Constructor for the Airline class
     constructor() { }

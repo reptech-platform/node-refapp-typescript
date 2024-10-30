@@ -32,7 +32,7 @@ export class AirlineStaffDeleteController extends Controller {
             this.setStatus(201);
 
             // Return an success response with the status and status message
-            return { status: 201, message: `Record deleted successfuly.` };
+            return { status: 201, message: `Airline staff ${airlineCode} and ${userName} deleted successfuly.` };
 
         } catch (ex: any) {
             // Set the status to 400 if an error occurs

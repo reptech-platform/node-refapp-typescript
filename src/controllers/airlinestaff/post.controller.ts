@@ -20,7 +20,7 @@ export class AirlineStaffCreateController extends Controller {
      * @returns RequestResponse
      */
     @Post()
-    public async createAirlineStaff(@Body() body: IAirlineStaff[]): Promise<RequestResponse> {
+    public async createAirlineStaffs(@Body() body: IAirlineStaff[]): Promise<RequestResponse> {
 
         try {
 
@@ -31,7 +31,7 @@ export class AirlineStaffCreateController extends Controller {
             this.setStatus(201);
 
             // Return an success response with the status and status message
-            return { status: 201, message: `Added airline staffs successfuly.` };
+            return { status: 201, message: `Airline staffs are added successfuly.` };
 
         } catch (ex: any) {
 

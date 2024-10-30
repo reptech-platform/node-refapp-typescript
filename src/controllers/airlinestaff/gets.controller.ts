@@ -1,7 +1,7 @@
 import { Controller, Get, Tags, Route } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
-import IGetAirlinesStaffService from "../../services/airlinestaff/get.airlinestaffs.service";
+import IGetAirlineStaffsService from "../../services/airlinestaff/get.airlinestaffs.service";
 import { IAirlineStaff } from "../../models/airlinestaff.model";
 
 // Tags and route for the controller
@@ -13,7 +13,7 @@ import { IAirlineStaff } from "../../models/airlinestaff.model";
 export class AirlineStaffGetAllController extends Controller {
     // Injecting the GetAirlineService
     constructor(
-        @inject("IGetAirlinesStaffService") private getAirlinesStaffService: IGetAirlinesStaffService
+        @inject("IGetAirlineStaffsService") private getAirlineStaffsService: IGetAirlineStaffsService
     ) {
         super();
     }
@@ -26,7 +26,7 @@ export class AirlineStaffGetAllController extends Controller {
     public async getAirlineStaffs(): Promise<IAirlineStaff[] | RequestResponse> {
         try {
             // Await the result of the get method from the getAirlinesStaffService
-            return await this.getAirlinesStaffService.getAirlinesAndStaffs();
+            return await this.getAirlineStaffsService.getAirlinesAndStaffs();
         } catch (ex: any) {
             // Set the status to 400 if an error occurs
             this.setStatus(400);
