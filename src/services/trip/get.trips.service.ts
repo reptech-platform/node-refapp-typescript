@@ -4,7 +4,7 @@ import { ITrip } from "../../models/trip.model";
 
 export default interface IGetTripsService {
     // Fetches all trips from the database.
-    getTrips(): Promise<ITrip[]>;
+    getAllTrips(): Promise<ITrip[]>;
 }
 
 // This decorator ensures that GetTripsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
@@ -17,8 +17,8 @@ export class GetTripsService implements IGetTripsService {
     ) { }
 
     // Fetches all trips from the database.
-    public async getTrips(): Promise<ITrip[]> {
-        return await this.getTripsRepository.getTrips();
+    public async getAllTrips(): Promise<ITrip[]> {
+        return await this.getTripsRepository.getAllTrips();
     }
 
 }

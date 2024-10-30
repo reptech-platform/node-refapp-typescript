@@ -7,7 +7,7 @@ import { injectable, inject } from "inversify";
 // Interface for GetTripsRepository
 export default interface IGetTripsRepository {
     // Fetches all Trips from the database
-    getTrips(): Promise<ITrip[]>;
+    getAllTrips(): Promise<ITrip[]>;
 }
 
 // This decorator ensures that GetTripsRepository is a singleton,
@@ -18,7 +18,7 @@ export class GetTripsRepository implements IGetTripsRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Fetches all Trips from the database
-    public async getTrips(): Promise<ITrip[]> {
+    public async getAllTrips(): Promise<ITrip[]> {
         return await TripSchema.find({}, { _id: 0 })
             .then((data: ITripSchema[]) => {
                 // Uses the helper to process the array of Trips.

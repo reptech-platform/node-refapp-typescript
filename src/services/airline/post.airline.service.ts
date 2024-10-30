@@ -84,15 +84,15 @@ export class CreateAirlineService implements ICreateAirlineService {
         let icaoCode: any, iataCode: any;
 
         // Get icao and iata values from airportId object
-        if (!this.helper.IsJsonNull(airline.airportId)) {
-            icaoCode = airline.airportId?.icaoCode;
-            iataCode = airline.airportId?.iataCode;
+        if (airline.airportId && !this.helper.IsJsonNull(airline.airportId)) {
+            icaoCode = airline.airportId.icaoCode;
+            iataCode = airline.airportId.iataCode;
         }
 
         // Get icao and iata values from airport object
-        if (!this.helper.IsJsonNull(airline.airport)) {
-            icaoCode = airline.airport?.icaoCode;
-            iataCode = airline.airport?.iataCode;
+        if (airline.airport && !this.helper.IsJsonNull(airline.airport)) {
+            icaoCode = airline.airport.icaoCode;
+            iataCode = airline.airport.iataCode;
         }
 
         if (icaoCode && iataCode) {

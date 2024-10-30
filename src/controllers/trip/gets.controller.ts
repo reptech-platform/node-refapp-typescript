@@ -23,10 +23,10 @@ export class TripGetAllController extends Controller {
      * @returns ITrip[] | RequestResponse
      */
     @Get()
-    public async getTrips(): Promise<ITrip[] | RequestResponse> {
+    public async getAllTrips(): Promise<ITrip[] | RequestResponse> {
         try {
             // Await the result of the get method from the getTripsService
-            return await this.getTripsService.getTrips();
+            return await this.getTripsService.getAllTrips();
         } catch (ex: any) {
             // Set the status to 400 if an error occurs
             this.setStatus(400);
