@@ -40,6 +40,10 @@ export class UpdateAirlineRepository implements IUpdateAirlineRepository {
     // Updates an airline's information based on the provided airline code.
     public async updateAirline(airlineCode: string, airline: IAirlineSchema, session: ClientSession | undefined): Promise<IAirline> {
 
+        // Remove new id while updating the collection
+        airline = JSON.parse(JSON.stringify(airline));
+        delete airline['_id'];
+
         // Find and update the airline document with the new data.
         return await AirlineSchema.findOneAndUpdate({ airlineCode }, airline, { new: true, session })
             .then((data: any) => {

@@ -40,8 +40,10 @@ export class UpdateDocumentRepository implements IUpdateDocumentRepository {
     // Updates an airline's information based on the provided airline code.
     public async updateDocument(docId: number, document: IDocumentSchema, session: ClientSession | undefined): Promise<IDocument> {
 
+        // Remove new id while updating the collection
         document = JSON.parse(JSON.stringify(document));
         delete document['_id'];
+
         // Find and update the airline document with the new data.
         return await DocumentSchema.findOneAndUpdate({ docId }, document, { new: true, session })
             .then((data: any) => {

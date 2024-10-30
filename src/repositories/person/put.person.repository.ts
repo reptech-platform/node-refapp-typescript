@@ -39,6 +39,11 @@ export class UpdatePersonRepository implements IUpdatePersonRepository {
 
     // Updates an existing person by their userName and returns the updated person.
     public async updatePerson(userName: string, person: IPersonSchema, session: ClientSession | undefined): Promise<IPerson> {
+
+        // Remove new id while updating the collection
+        person = JSON.parse(JSON.stringify(person));
+        delete person['_id'];
+
         // Update person details in the database
         let updatedPerson = await PersonSchema.findOneAndUpdate({ userName }, person, { new: true, session })
             .then((data: any) => {

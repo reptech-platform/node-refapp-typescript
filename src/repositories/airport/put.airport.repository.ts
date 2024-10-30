@@ -40,6 +40,10 @@ export class UpdateAirportRepository implements IUpdateAirportRepository {
     // Updates an airport's information based on the provided ICAO and IATA codes.
     public async updateAirport(icaoCode: string, iataCode: string, airport: IAirportSchema, session: ClientSession | undefined): Promise<IAirport> {
 
+        // Remove new id while updating the collection
+        airport = JSON.parse(JSON.stringify(airport));
+        delete airport['_id'];
+
         // Find and update the airport document with the new data.
         return await AirportSchema.findOneAndUpdate({ icaoCode, iataCode }, airport, { new: true, session })
             .then((data: any) => {

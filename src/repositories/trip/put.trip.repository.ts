@@ -40,6 +40,10 @@ export class UpdateTripRepository implements IUpdateTripRepository {
     // Updates an existing trip by its tripId and returns the updated trip.
     public async updateTrip(tripId: number, trip: ITripSchema, session: ClientSession | undefined): Promise<ITrip> {
 
+        // Remove new id while updating the collection
+        trip = JSON.parse(JSON.stringify(trip));
+        delete trip['_id'];
+
         let updatedTrip = await TripSchema.findOneAndUpdate({ tripId }, trip, { new: true, session })
             .then((data: any) => {
                 // Uses the helper to process the updated tripe

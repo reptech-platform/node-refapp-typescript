@@ -7,6 +7,7 @@ import TripSchema, { ITripSchema } from "../../db/dao/trip.db.model";
 import Helper from "../../utils/helper.utils";
 import IGetAirportRepository from "../../repositories/airport/get.airport.repository";
 import IGetAirlineRepository from "../../repositories/airline/get.airline.repository";
+import IGetDocumentRepository from "../../repositories/document/get.document.repository";
 
 // Interface for CreateTripService
 export default interface ICreateTripService {
@@ -23,7 +24,8 @@ export class CreateTripService implements ICreateTripService {
         @inject('Helper') private helper: Helper,
         @inject('ICreateTripRepository') private createTripRepository: ICreateTripRepository,
         @inject('IGetAirportRepository') private getAirportRepository: IGetAirportRepository,
-        @inject('IGetAirlineRepository') private getAirlineRepository: IGetAirlineRepository
+        @inject('IGetAirlineRepository') private getAirlineRepository: IGetAirlineRepository,
+        @inject('IGetDocumentRepository') private getDocumentRepository: IGetDocumentRepository
     ) { }
 
     // Creates a new trip in the database.
@@ -44,7 +46,7 @@ export class CreateTripService implements ICreateTripService {
 
             // Loop to check if each planitem has valid details
             for (let index = 0; index < trip.planItems.length; index++) {
-                let { airLine, fromAirport, toAirport } = trip.planItems[index];
+                let { airLine, fromAirport, toAirport, ticket } = trip.planItems[index];
 
                 let isExist: boolean = false;
 
@@ -89,6 +91,16 @@ export class CreateTripService implements ICreateTripService {
                         throw new Error(`Provided to airport '${icaoCode}' and '${iataCode}' does not exist`);
                     }
                     newItem.planItems[index].toAirport = await this.getAirportRepository.getAirportId(icaoCode, iataCode);
+                }
+
+                // Check Ticket
+                if (ticket) {
+                    isExist = await this.getDocumentRepository.isExist(ticket.docId);
+                    if (!isExist) {
+                        throw new Error(`Provided document '${ticket.docId}' does not exist`);
+                    }
+
+                    newItem.planItems[index].ticket = ticket.docId;
                 }
 
             }

@@ -38,6 +38,10 @@ export class UpdateAirlineStaffRepository implements IUpdateAirlineStaffReposito
     // This method adds multiple airlines to a staff.
     public async updateAirlineStaffs(mapItems: IAirlineStaffSchema[], session: ClientSession | undefined): Promise<void> {
 
+        // Remove new id while updating the collection
+        mapItems = JSON.parse(JSON.stringify(mapItems));
+        mapItems.forEach(x => delete x['_id']);
+
         // Inserts the mapItems into the PersonTripSchema collection.
         await AirlineStaffSchema.updateMany(mapItems, { session }).catch((error: Error) => {
             // Abort Client Session if there's an error

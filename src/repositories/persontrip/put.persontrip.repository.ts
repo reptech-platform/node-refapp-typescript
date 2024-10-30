@@ -40,6 +40,10 @@ export class UpdatePersonTripRepository implements IUpdatePersonTripRepository {
     // This method updates the trip and person mapping in the database.
     public async updateTripAndPersonMapping(mapItems: [] | any[], session: ClientSession | undefined): Promise<void> {
 
+        // Remove new id while updating the collection
+        mapItems = JSON.parse(JSON.stringify(mapItems));
+        mapItems.forEach(x => delete x['_id']);
+
         // Inserts the mapItems into the PersonTripSchema collection.
         await PersonTripSchema.updateMany(mapItems, { session }).catch((error: Error) => {
             // Abort Client Session if there's an error
