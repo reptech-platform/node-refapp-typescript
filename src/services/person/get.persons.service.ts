@@ -4,7 +4,7 @@ import { IPerson } from "../../models/person.model";
 
 export default interface IGetPersonsService {
     // Fetches all persons from the database.
-    getPersons(): Promise<IPerson[]>;
+    getAllPersons(): Promise<IPerson[]>;
 }
 
 // This decorator ensures that PersonsService is a singleton, meaning only one instance of this service will be created and used throughout the application.
@@ -17,8 +17,8 @@ export class GetPersonsService implements IGetPersonsService {
     ) { }
 
     // Fetches all persons from the database.
-    public async getPersons(): Promise<IPerson[]> {
-        return await this.getPersonsRepository.getPersons();
+    public async getAllPersons(): Promise<IPerson[]> {
+        return await this.getPersonsRepository.getAllPersons();
     }
 
 }

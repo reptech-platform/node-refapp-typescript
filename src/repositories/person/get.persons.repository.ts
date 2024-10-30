@@ -7,7 +7,7 @@ import { IPerson } from "../../models/person.model";
 // Interface for GetPersonsRepository
 export default interface IGetPersonsRepository {
     // Fetches all persons from the database
-    getPersons(): Promise<IPerson[]>;
+    getAllPersons(): Promise<IPerson[]>;
 }
 
 // This decorator ensures that GetPersonsRepository is a singleton,
@@ -18,7 +18,8 @@ export class GetPersonsRepository implements IGetPersonsRepository {
     constructor(@inject(Helper) private helper: Helper) { }
 
     // Fetches all persons from the database
-    public async getPersons(): Promise<IPerson[]> {
+    public async getAllPersons(): Promise<IPerson[]> {
+
         return await PersonSchema.find({}, { _id: 0 })
             .then((data: IPersonSchema[]) => {
                 // Uses the helper to process the array of persons.

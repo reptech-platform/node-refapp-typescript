@@ -19,12 +19,12 @@ export class PersonGetAllController extends Controller {
      * @returns IPerson[] | RequestResponse
      */
     @Get()
-    public async getPersons(): Promise<IPerson[] | RequestResponse> {
+    public async getAllPersons(): Promise<IPerson[] | RequestResponse> {
 
         try {
 
             // Await the result of the gets method from the getPersonsService
-            return await this.getPersonsService.getPersons();
+            return await this.getPersonsService.getAllPersons();
 
         } catch (ex: any) {
 
