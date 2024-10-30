@@ -42,7 +42,6 @@ export class UpdateAirlineStaffService implements IUpdateAirlineStaffService {
             throw new Error(`Provided airline staffs are required`);
         }
 
-
         /**
          * This is mapping table. So, there is no update, It should delete the mapping and add it again
          * So skipping update option from here
