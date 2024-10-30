@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "start": "npm run start:dev",
+    "start": "tsoa spec-and-routes && nodemon server.ts",
     "dev": "tsoa spec-and-routes && nodemon server.ts",
     "build": "tsoa spec-and-routes && tsc",
     "start:dev": "del build\\*.* /q && tsoa spec-and-routes && nodemon server.ts"
