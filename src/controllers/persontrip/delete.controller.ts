@@ -1,9 +1,7 @@
 import { Controller, Delete, Tags, Route, Path } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
-import { ITrip } from "../../models/trip.model";
 import IDeletePersonTripService from "../../services/persontrip/delete.persontrip.service";
-import { IPerson } from "../../models/person.model";
 
 // Tags and route for the controller
 @Tags("PersonTrips")
@@ -35,7 +33,7 @@ export class PersonTripDeleteController extends Controller {
             this.setStatus(201);
 
             // Return an success response with the status and status message
-            return { status: 201, message: `Record deleted successfuly.` };
+            return { status: 201, message: `Person trip ${userName} and ${tripId} deleted successfuly.` };
 
         } catch (ex: any) {
             // Set the status to 400 if an error occurs

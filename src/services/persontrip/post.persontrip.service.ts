@@ -36,7 +36,7 @@ export class CreatePersonTripService implements ICreatePersonTripService {
                 let { tripId, userName } = personTrips[index];
                 // Check if the PersonTrip exists. If not, throw an error.
                 let isExist = await this.createPersonTripRepository.isExist(userName, tripId);
-                if (!isExist) {
+                if (isExist) {
                     throw new Error(`Provided person trip '${tripId}' and '${userName}' is already exist`);
                 }
                 isExist = await this.getPersonRepository.isExist(userName);

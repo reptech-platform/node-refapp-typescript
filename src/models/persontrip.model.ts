@@ -13,10 +13,10 @@ export interface IPersonTrip {
     userName: string;
 
     // person object
-    person: IPerson;
+    person?: IPerson;
 
     // trip object
-    trip: ITrip;
+    trip?: ITrip;
 }
 
 // The Airline class implements the IPersonTrip interface
@@ -29,10 +29,10 @@ export class PersonTrip implements IPersonTrip {
     userName: string;
 
     // person object
-    person: IPerson;
+    person?: IPerson;
 
     // trip object
-    trip: ITrip;
+    trip?: ITrip;
 
     // Constructor for the Airline class
     constructor() { }

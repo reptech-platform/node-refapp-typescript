@@ -48,7 +48,7 @@ export class GetPersonTripRepository implements IGetPersonTripRepository {
         }
 
         if (!tripId && userName) {
-            return await PersonTripSchema.find({ tripId }, { _id: 1 })
+            return await PersonTripSchema.find({ userName }, { _id: 1 })
                 .then((data: any[]) => {
                     // Uses the helper to process the array of results.
                     let results = this.helper.GetItemFromArray(data, 0, { _id: null });

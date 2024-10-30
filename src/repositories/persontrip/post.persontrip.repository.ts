@@ -2,7 +2,7 @@ import { ClientSession, Error } from "mongoose";
 import Helper from "../../utils/helper.utils";
 import { injectable, inject } from "inversify";
 import DbSession from "../../db/utils/dbsession.db";
-import PersonTripSchema from "../../db/dao/persontrip.db.model";
+import PersonTripSchema, { IPersonTripSchema } from "../../db/dao/persontrip.db.model";
 
 // Interface for CreatePersonTripRepository
 export default interface ICreatePersonTripRepository {
@@ -38,7 +38,7 @@ export class CreatePersonTripRepository implements ICreatePersonTripRepository {
     }
 
     // This method create the trip and person mapping in the database.
-    public async createTripAndPersonMapping(mapItems: [] | any[], session: ClientSession | undefined): Promise<void> {
+    public async createTripAndPersonMapping(mapItems: IPersonTripSchema[] | any[], session: ClientSession | undefined): Promise<void> {
 
         // Inserts the mapItems into the PersonTripSchema collection.
         await PersonTripSchema.insertMany(mapItems, { session }).catch((error: Error) => {

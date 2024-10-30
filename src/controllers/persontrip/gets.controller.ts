@@ -1,9 +1,8 @@
 import { Controller, Get, Tags, Route } from "tsoa";
 import RequestResponse from "../../utils/request.response";
 import { provideSingleton, inject } from "../../utils/provideSingleton";
-import { ITrip } from "../../models/trip.model";
 import IGetPersonTripsService from "../../services/persontrip/get.persontrips.service";
-import { IPerson } from "../../models/person.model";
+import { IPersonTrip } from "../../models/persontrip.model";
 
 // Tags and route for the controller
 @Tags("PersonTrips")
@@ -21,30 +20,13 @@ export class PersonTripGetAllController extends Controller {
 
     /**
      * Gets all trips
-     * @returns ITrip[] | RequestResponse
+     * @returns IPersonTrip[] | RequestResponse
      */
-    @Get("/trips")
-    public async getAllPersonTrips(): Promise<ITrip[] | RequestResponse> {
+    @Get()
+    public async getAllPersonsAndTrips(): Promise<IPersonTrip[] | RequestResponse> {
         try {
-            // Await the result of the get method from the setAirlinesStaffService
-            return await this.getPersonTripsService.getAllPersonTrips();
-        } catch (ex: any) {
-            // Set the status to 400 if an error occurs
-            this.setStatus(400);
-            // Return an error message
-            return { status: 400, message: ex.message };
-        }
-    }
-
-    /**
-     * Gets all travellers
-     * @returns IPerson[] | RequestResponse
-     */
-    @Get("/persons")
-    public async getAllTripTravellers(): Promise<IPerson[] | RequestResponse> {
-        try {
-            // Await the result of the get method from the setAirlinesStaffService
-            return await this.getPersonTripsService.getAllTripTravellers();
+            // Await the result of the get method from the getPersonTripsService
+            return await this.getPersonTripsService.getAllPersonsAndTrips();
         } catch (ex: any) {
             // Set the status to 400 if an error occurs
             this.setStatus(400);

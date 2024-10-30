@@ -42,7 +42,12 @@ export class UpdatePersonTripService implements IUpdatePersonTripService {
             throw new Error(`Provided person trips are required`);
         }
 
-        // Flag to indicate if this function created the session
+        /**
+         * This is mapping table. So, there is no update, It should delete the mapping and add it again
+         * So skipping update option from here
+         */
+
+        /* // Flag to indicate if this function created the session
         let inCarryTransact: boolean = false;
 
         // Check if a session is provided; if not, create a new one
@@ -59,6 +64,6 @@ export class UpdatePersonTripService implements IUpdatePersonTripService {
         // Commit the transaction if it was started in this call
         if (!inCarryTransact) {
             await DbSession.Commit(dbSession);
-        }
+        } */
     }
 }

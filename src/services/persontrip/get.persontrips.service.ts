@@ -1,14 +1,10 @@
 import { inject, injectable } from "inversify";
 import IGetPersonTripsRepository from "../../repositories/persontrip/get.persontrips.repository";
-import { ITrip } from "../../models/trip.model";
-import { IPerson } from "../../models/person.model";
+import { IPersonTrip } from "../../models/persontrip.model";
 
 export default interface IGetPersonTripsService {
-    // Fetches all person's trips from the database.
-    getAllPersonTrips(): Promise<ITrip[]>;
-
-    // Fetches all trip's travellers from the database.
-    getAllTripTravellers(): Promise<IPerson[]>;
+    // Fetches all person and trips from the database.
+    getAllPersonsAndTrips(): Promise<IPersonTrip[]>;
 }
 
 // This decorator ensures that GetPersonTripService is a singleton, meaning only one instance of this service will be created and used throughout the application.
@@ -20,14 +16,8 @@ export class GetPersonTripsService implements IGetPersonTripsService {
         @inject("IGetPersonTripsRepository") private getPersonTripsRepository: IGetPersonTripsRepository
     ) { }
 
-    // Fetches all person's trips from the database.
-    public async getAllPersonTrips(): Promise<ITrip[]> {
-        return await this.getPersonTripsRepository.getAllPersonTrips();
+    // Fetches all persons and trips from the database.
+    public async getAllPersonsAndTrips(): Promise<IPersonTrip[]> {
+        return await this.getPersonTripsRepository.getAllPersonsAndTrips();
     }
-
-    // Fetches all trip's travellers from the database.
-    public async getAllTripTravellers(): Promise<IPerson[]> {
-        return await this.getPersonTripsRepository.getAllTripTravellers();
-    }
-
 }
