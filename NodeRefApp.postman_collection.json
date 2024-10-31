@@ -1,0 +1,784 @@
+{
+	"info": {
+		"_postman_id": "c4d86319-0470-4098-8d53-f178556c6b40",
+		"name": "NodeRefApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1944003",
+		"_collection_link": "https://cloudy-satellite-583010.postman.co/workspace/Ganapathi~c8038742-3447-456e-82f3-35e77008fec5/collection/1944003-c4d86319-0470-4098-8d53-f178556c6b40?action=share&source=collection_link&creator=1944003"
+	},
+	"item": [
+		{
+			"name": "Airline",
+			"item": [
+				{
+					"name": "Get All Airlines",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}airlines/all",
+							"host": [
+								"{{nodereflocal}}airlines"
+							],
+							"path": [
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airline",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}airlines/EK3",
+							"host": [
+								"{{nodereflocal}}airlines"
+							],
+							"path": [
+								"EK3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Airline",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"airlineCode\": \"EK4\",\r\n  \"name\": \"Emirates\",\r\n  \"logo\": \"Emirates\",\r\n  \"ceoName\": \"James\",\r\n  \"airportId\": {\r\n    \"iataCode\": \"BGLS\",\r\n    \"icaoCode\": \"BGL-IND\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}airlines",
+							"host": [
+								"{{nodereflocal}}airlines"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Airline",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"airlineCode\": \"EK1\",\r\n    \"name\": \"Emirates Flight\",\r\n    \"logo\": \"Emirates\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}airlines/EK1",
+							"host": [
+								"{{nodereflocal}}airlines"
+							],
+							"path": [
+								"EK1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Airport",
+			"item": [
+				{
+					"name": "Get All Airports",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}airports/all",
+							"host": [
+								"{{nodereflocal}}airports"
+							],
+							"path": [
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airport",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}airports/BGL-IND/BGL",
+							"host": [
+								"{{nodereflocal}}airports"
+							],
+							"path": [
+								"BGL-IND",
+								"BGL"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Airport",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Chennai\",\r\n    \"icaoCode\": \"CHN-MAA\",\r\n    \"iataCode\": \"CHN\",\r\n    \"latitude\": 13.20042,\r\n    \"longitude\": 77.70653,\r\n    \"isInsideCity\": false,\r\n    \"location\": {\r\n        \"address\": \"Chennai International Airport\",\r\n        \"city\": {\r\n            \"name\": \"Chennai\",\r\n            \"countryRegion\": \"IN\",\r\n            \"region\": \"IN\"\r\n        },\r\n        \"loc\": {\r\n            \"latitude\": 13.20042,\r\n            \"longitude\": 77.70653\r\n        }\r\n    },\r\n    \"airlineId\": \"EK3\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}airports",
+							"host": [
+								"{{nodereflocal}}airports"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Airport",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"airlineCode\": \"EK1\",\r\n    \"name\": \"Emirates Flight\",\r\n    \"logo\": \"Emirates\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}airlines/EK1",
+							"host": [
+								"{{nodereflocal}}airlines"
+							],
+							"path": [
+								"EK1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Airport",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}airlines/EK11",
+							"host": [
+								"{{nodereflocal}}airlines"
+							],
+							"path": [
+								"EK11"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "AirlineStaff",
+			"item": [
+				{
+					"name": "Get All Airlinestaff",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}airlinestaff/all",
+							"host": [
+								"{{nodereflocal}}airlinestaff"
+							],
+							"path": [
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airlinestaff By AirlineCode",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}airlinestaff/EK1/staff",
+							"host": [
+								"{{nodereflocal}}airlinestaff"
+							],
+							"path": [
+								"EK1",
+								"staff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airlinestaff By Staff",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}airlinestaff/James/airlines",
+							"host": [
+								"{{nodereflocal}}airlinestaff"
+							],
+							"path": [
+								"James",
+								"airlines"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Airlinestaff",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"airlineCode\": \"EK1\",\r\n        \"userName\": \"James\"\r\n    },\r\n    {\r\n        \"airlineCode\": \"EK3\",\r\n        \"userName\": \"Williams\"\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}airlinestaff",
+							"host": [
+								"{{nodereflocal}}airlinestaff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Airlinestaff",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"airlineCode\": \"EK1\",\r\n        \"userName\": \"James\"\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}airlinestaff",
+							"host": [
+								"{{nodereflocal}}airlinestaff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Airlinestaff",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}airlinestaff/EK1/James",
+							"host": [
+								"{{nodereflocal}}airlinestaff"
+							],
+							"path": [
+								"EK1",
+								"James"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Person",
+			"item": [
+				{
+					"name": "Get All Persons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}persons/all",
+							"host": [
+								"{{nodereflocal}}persons"
+							],
+							"path": [
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Person",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}persons/Williams",
+							"host": [
+								"{{nodereflocal}}persons"
+							],
+							"path": [
+								"Williams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Best Friend",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}persons/Williams/bestfriend",
+							"host": [
+								"{{nodereflocal}}persons"
+							],
+							"path": [
+								"Williams",
+								"bestfriend"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Friends",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}persons/Williams/friends",
+							"host": [
+								"{{nodereflocal}}persons"
+							],
+							"path": [
+								"Williams",
+								"friends"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Person",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userName\": \"Williams\",\r\n    \"firstName\": \"Williams\",\r\n    \"middleName\": \"Thomos\",\r\n    \"dateOfBirth\": \"1974-09-21T01:57:42.730Z\",\r\n    \"age\": 65,\r\n    \"favoriteFeature\": 1,\r\n    \"features\": [\r\n        1,\r\n        2\r\n    ],\r\n    \"emails\": [\r\n        \"Robert@mail.com\"\r\n    ],\r\n    \"homeAddress\": {\r\n        \"address\": \"2246 Southern Avenue\",\r\n        \"city\": {\r\n            \"name\": \"Charles City\",\r\n            \"countryRegion\": \"US\",\r\n            \"region\": \"Iowa\"\r\n        }\r\n    },\r\n    \"addressInfo\": [\r\n        {\r\n            \"address\": \"2246 Southern Avenue\",\r\n            \"city\": {\r\n                \"name\": \"Charles City\",\r\n                \"countryRegion\": \"US\",\r\n                \"region\": \"Iowa\"\r\n            }\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}persons",
+							"host": [
+								"{{nodereflocal}}persons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Person",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userName\": \"testuser\",\r\n    \"bestFriendId\": \"James\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}persons/testuser",
+							"host": [
+								"{{nodereflocal}}persons"
+							],
+							"path": [
+								"testuser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Person",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userName\": \"testuser\",\r\n    \"bestFriendId\": \"James\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}persons/testuser",
+							"host": [
+								"{{nodereflocal}}persons"
+							],
+							"path": [
+								"testuser"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Trip",
+			"item": [
+				{
+					"name": "Get All Trips",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}trips/all",
+							"host": [
+								"{{nodereflocal}}trips"
+							],
+							"path": [
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trip",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}trips/3",
+							"host": [
+								"{{nodereflocal}}trips"
+							],
+							"path": [
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Trip",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"shareId\": \"{{$guid}}\",\r\n    \"name\": \"Trip03\",\r\n    \"budget\": 250.25,\r\n    \"description\": \"Sample Trip\",\r\n    \"tags\": [\r\n        \"One\",\r\n        \"Two\"\r\n    ],\r\n    \"startAt\": \"2024-06-21T09:25:05.751Z\",\r\n    \"endsAt\": \"2024-06-21T09:25:05.751Z\",\r\n    \"startTime\": \"2024-06-21T09:25:05.751Z\",\r\n    \"endTime\": \"2024-06-21T09:25:05.751Z\",\r\n    \"cost\": 5000.25,\r\n    \"planItems\": [\r\n        {\r\n            \"flightNumber\": \"EK103\",\r\n            \"seatNumber\": \"W28\",\r\n            \"confirmationCode\": \"C1001\",\r\n            \"startsAt\": \"2024-06-21T09:25:05.751Z\",\r\n            \"endsAt\": \"2024-06-21T09:25:05.751Z\",\r\n            \"duration\": \"5days\",\r\n            \"airLine\": {\r\n                \"airlineCode\": \"EK3\",\r\n                \"name\": \"Emirates\",\r\n                \"logo\": \"Emirates\"\r\n            },\r\n            \"fromAirport\": {\r\n                \"name\": \"Mumbai\",\r\n                \"icaoCode\": \"BOM-IND\",\r\n                \"iataCode\": \"BOM\",\r\n                \"latitude\": 13.20042,\r\n                \"longitude\": 77.70653,\r\n                \"isInsideCity\": true,\r\n                \"locationJSON\": \"locationJSON\",\r\n                \"location\": {\r\n                    \"address\": \"Chhatrapati Shivaji International Airport\",\r\n                    \"city\": {\r\n                        \"name\": \"Mumbai\",\r\n                        \"countryRegion\": \"IN\",\r\n                        \"region\": \"IN\"\r\n                    },\r\n                    \"loc\": {\r\n                        \"latitude\": 13.20042,\r\n                        \"longitude\": 77.70653\r\n                    }\r\n                }\r\n            },\r\n            \"toAirport\": {\r\n                \"name\": \"New Delhi\",\r\n                \"icaoCode\": \"DEL-IND\",\r\n                \"iataCode\": \"DEL\",\r\n                \"latitude\": 25.94050,\r\n                \"longitude\": 55.46715,\r\n                \"isInsideCity\": true,\r\n                \"locationJSON\": \"locationJSON\",\r\n                \"location\": {\r\n                    \"address\": \"Delhi Indira Gandhi International Airport\",\r\n                    \"city\": {\r\n                        \"name\": \"New Delhi\",\r\n                        \"countryRegion\": \"IN\",\r\n                        \"region\": \"IN\"\r\n                    },\r\n                    \"loc\": {\r\n                        \"latitude\": 25.94050,\r\n                        \"longitude\": 55.46715\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}trips",
+							"host": [
+								"{{nodereflocal}}trips"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Trip",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Trip",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PersonTrip",
+			"item": [
+				{
+					"name": "Get All PersonTrip",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}persontrip/all",
+							"host": [
+								"{{nodereflocal}}persontrip"
+							],
+							"path": [
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get PersonTrip By Trip",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}persontrip/2/person",
+							"host": [
+								"{{nodereflocal}}persontrip"
+							],
+							"path": [
+								"2",
+								"person"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get PersonTrip By Person",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}persontrip/James/trip",
+							"host": [
+								"{{nodereflocal}}persontrip"
+							],
+							"path": [
+								"James",
+								"trip"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create PersonTrip",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tripId\":2,\r\n    \"userName\":\"Williams\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}persontrip",
+							"host": [
+								"{{nodereflocal}}persontrip"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update PersonTrip",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tripId\":2,\r\n    \"userName\":\"Williams\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodereflocal}}persontrip",
+							"host": [
+								"{{nodereflocal}}persontrip"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete PersonTrip",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}persontrip/testuser/1",
+							"host": [
+								"{{nodereflocal}}persontrip"
+							],
+							"path": [
+								"testuser",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Documents",
+			"item": [
+				{
+					"name": "Get All Documents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}documents/all",
+							"host": [
+								"{{nodereflocal}}documents"
+							],
+							"path": [
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Document",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}documents/1",
+							"host": [
+								"{{nodereflocal}}documents"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Document",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{nodereflocal}}documents/1",
+							"host": [
+								"{{nodereflocal}}documents"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Document",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/D:/Work/Ganapathi/Documents/1366727.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{nodereflocal}}documents",
+							"host": [
+								"{{nodereflocal}}documents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Document",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/saini/OneDrive/Pictures/133549620792271828.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{nodereflocal}}documents/1",
+							"host": [
+								"{{nodereflocal}}documents"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
