@@ -18,7 +18,7 @@ services:
     environment:
       PORT: 3000
       NODE_ENV: development
-      DB_CONN_URL: mongodb://mongo_db:27017/node_refapp
+      DB_CONN_URL: mongodb+srv://codewizard:CWWithMDA432@cwstagingpublic.sdqvmn4.mongodb.net/node_ref_app?socketTimeoutMS=360000&connectTimeoutMS=360000&maxPoolSize=30
     expose:
       - '3000'
     ports:
