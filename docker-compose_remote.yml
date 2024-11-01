@@ -1,14 +1,6 @@
 version: '3.8'
 
 services:
-  mongo_db:
-    container_name: node-refapp-mongo-docker
-    image: mongo:latest
-    restart: always
-    volumes:
-      - mongo_db:/data/db
-    ports:
-      - '9005:27017'
   node_refapp:
     container_name: node-refapp-docker
     restart: always

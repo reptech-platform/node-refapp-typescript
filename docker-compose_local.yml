@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  mongo_db:
+    container_name: node-refapp-mongo-docker
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongo_db:/data/db
+    ports:
+      - '9005:27017'
+  node_refapp:
+    container_name: node-refapp-docker
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      DB_CONN_URL: mongodb://mongo_db:27017/node_ref_app?socketTimeoutMS=360000&connectTimeoutMS=360000&maxPoolSize=30
+    expose:
+      - '3000'
+    ports:
+      - '9004:3000'
+    volumes:
+      - ./src:/home/node/app/src
+      - ./nodemon.json:/home/node/app/nodemon.json
+    depends_on:
+      - mongo_db
+
+volumes:
+  mongo_db: {}
+
