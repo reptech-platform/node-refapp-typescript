@@ -36,11 +36,13 @@ export class SearchPersonRepository implements ISearchPersonRepository {
 
         // Check if the filter array is not null and process each filter criterion.
         if (!this.helper.IsArrayNull(search.filter)) {
-            search.filter?.forEach((e: FilterBy) => {
-                let filterBy: FilterBy = new FilterBy(e);
+            // Build the match object dynamically based on the filter criteria.
+            let filterBy: FilterBy = new FilterBy();
+            let _$match: any = filterBy.getMatchQuery(search.filter);
+            if (_$match) {
                 // Build the match object dynamically.
-                $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
-            });
+                $match = { ...$match, ..._$match };
+            }
         }
 
         // Check if the pagination object is not null and set limit and skip values.
@@ -86,11 +88,13 @@ export class SearchPersonRepository implements ISearchPersonRepository {
 
         // Check if the search object and filter array are not null.
         if (!this.helper.IsNullValue(search) && !this.helper.IsArrayNull(search.filter)) {
-            search.filter?.forEach((e: FilterBy) => {
-                let filterBy: FilterBy = new FilterBy(e);
-                // Build the match object dynamically based on the filter criteria.
-                $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
-            });
+            // Build the match object dynamically based on the filter criteria.
+            let filterBy: FilterBy = new FilterBy();
+            let _$match: any = filterBy.getMatchQuery(search.filter);
+            if (_$match) {
+                // Build the match object dynamically.
+                $match = { ...$match, ..._$match };
+            }
         }
 
         // Define the aggregation pipeline for counting documents.

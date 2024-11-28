@@ -35,10 +35,13 @@ export class SearchAirlineStaffRepository implements ISearchAirlineStaffReposito
 
         // Processes the filter criteria.
         if (!this.helper.IsArrayNull(search.filter)) {
-            search.filter?.forEach((e: FilterBy) => {
-                let filterBy: FilterBy = new FilterBy(e);
-                $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
-            });
+            // Build the match object dynamically based on the filter criteria.
+            let filterBy: FilterBy = new FilterBy();
+            let _$match: any = filterBy.getMatchQuery(search.filter);
+            if (_$match) {
+                // Build the match object dynamically.
+                $match = { ...$match, ..._$match };
+            }
         }
 
         // Processes the pagination criteria.
@@ -80,10 +83,13 @@ export class SearchAirlineStaffRepository implements ISearchAirlineStaffReposito
 
         // Processes the filter criteria.
         if (!this.helper.IsArrayNull(search.filter)) {
-            search.filter?.forEach((e: FilterBy) => {
-                let filterBy: FilterBy = new FilterBy(e);
-                $match = { ...$match, [filterBy.name]: filterBy.getQuery() };
-            });
+            // Build the match object dynamically based on the filter criteria.
+            let filterBy: FilterBy = new FilterBy();
+            let _$match: any = filterBy.getMatchQuery(search.filter);
+            if (_$match) {
+                // Build the match object dynamically.
+                $match = { ...$match, ..._$match };
+            }
         }
 
         // Executes the count query.

@@ -60,37 +60,78 @@ export class FilterBy {
     // The value to filter by
     value: string | number;
 
+    // The operator of the field to filter by ( and || or)
+    operator: string = "OR";
+
     // Private helper instance for additional operations
     private helper: Helper;
 
     // Constructor for the FilterBy class
-    constructor(filterBy: FilterBy) {
+    constructor() { this.helper = new Helper(); }
+
+    /* constructor(filterBy: FilterBy) {
         this.helper = new Helper();
         this.name = filterBy.name;
         this.condition = filterBy.condition;
         this.value = filterBy.value;
+        this.operator = filterBy.operator;
+    } */
+
+    // Method to get the query object for filtering
+    getMatchQuery(filters: FilterBy[] = []) {
+        let $and: any = [], $or: any = [], $match: any = null;
+
+        if (filters.length > 0) {
+            filters.forEach((e: FilterBy) => {
+                let filter = this.getQuery(e);
+                // Build the match object dynamically.
+                if (e.operator.toUpperCase() === 'AND') {
+                    $and.push({ [e.name]: filter });
+                } else if (e.operator.toUpperCase() === 'OR') {
+                    $or.push({ [e.name]: filter });
+                }
+                //$match = { ...$match, [filterBy.name]: filterBy.getQuery() };
+            });
+        }
+
+        if ($and.length > 0 && $or.length > 0) {
+            $match = { $and: [...$and, { $or: [...$or] }] };
+            $or = [];
+            $and = [];
+        }
+
+        if ($and.length > 0) {
+            $match = { $and };
+        }
+
+        if ($or.length > 0) {
+            $match = { $or };
+        }
+
+        return $match;
+
     }
 
     // Method to get the query object for filtering
-    getQuery() {
-        let tOperator = this.condition || "";
-        let _query: any = { $regex: `^${this.value}$`, $options: 'i' };
+    private getQuery(filterBy: FilterBy) {
+        let tOperator = filterBy.condition || "";
+        let _query: any = { $regex: `^${filterBy.value}$`, $options: 'i' };
 
         if (!this.helper.IsNullValue(tOperator)) {
             switch (tOperator.toUpperCase()) {
-                case 'CONTAINS': _query = { $regex: `${this.value}`, $options: 'i' }; break;
-                case 'STARTSWITH': _query = { $regex: `^${this.value}`, $options: 'i' }; break;
-                case 'ENDSWITH': _query = { $regex: `${this.value}$`, $options: 'i' }; break;
+                case 'CONTAINS': _query = { $regex: `${filterBy.value}`, $options: 'i' }; break;
+                case 'STARTSWITH': _query = { $regex: `^${filterBy.value}`, $options: 'i' }; break;
+                case 'ENDSWITH': _query = { $regex: `${filterBy.value}$`, $options: 'i' }; break;
                 case '=':
-                    _query = { $regex: `^${this.value}$`, $options: 'i' };
-                    if (typeof this.value === 'number') {
-                        _query = { $eq: this.value };
+                    _query = { $regex: `^${filterBy.value}$`, $options: 'i' };
+                    if (typeof filterBy.value === 'number') {
+                        _query = { $eq: filterBy.value };
                     }
                     break;
-                case '>': _query = { $gt: this.value }; break;
-                case '>=': _query = { $gte: this.value }; break;
-                case '<': _query = { $lt: this.value }; break;
-                case '<=': _query = { $lte: this.value }; break;
+                case '>': _query = { $gt: filterBy.value }; break;
+                case '>=': _query = { $gte: filterBy.value }; break;
+                case '<': _query = { $lt: filterBy.value }; break;
+                case '<=': _query = { $lte: filterBy.value }; break;
             }
         }
 
